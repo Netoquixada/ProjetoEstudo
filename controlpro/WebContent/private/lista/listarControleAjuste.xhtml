@@ -1,0 +1,302 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="ajuste.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1 styleClass="header1">Controle de Ajustes</h1>
+				<h3 styleClass="header1">Listagem de controles de ajustes
+					cadastrados no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:link id="cadastrar" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/cadastro/cadastrarControleAjuste.xhtml">
+						<i class="material-icons md-32">add_to_photos</i>
+						<br />
+					</p:link>
+					<p:tooltip for="cadastrar" position="top"
+						value="Cadastrar Controle Ajuste" />
+
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{controleAjusteBean.controleAjuste}" />
+			<t:saveState value="#{controleAjusteBean.controleAjustes}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel style="margin-top: 15px">
+					<!-- 					<div class="lupa"> -->
+					<!-- 						<p:graphicImage library="imagens" name="SearchLupa.png" /> -->
+					<!-- 					</div> -->
+
+					<h:panelGrid columns="10">
+
+						<h:panelGroup>
+							<p:outputLabel value="Protocolo Controle" styleClass="my-label" />
+							<br />
+							<p:inputText
+								value="#{controleAjusteBean.controleAjusteFilter.protocoloControle}" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="De: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{controleAjusteBean.controleAjusteFilter.dataInicio}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Até: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{controleAjusteBean.controleAjusteFilter.dataFim}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="" styleClass="my-label" />
+							<br />
+							<p:commandButton value="Pesquisar" icon="fa fa-search"
+								style="margin-left: 5px; width: 100px !important"
+								update=":frm:table-controle"
+								action="#{controleAjusteBean.list()}" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="" styleClass="my-label" />
+							<br />
+							<p:commandButton id="report"
+								actionListener="#{controleAjusteBean.gerarPDF}"
+								icon="fa fa-download" value="Gerar PDF"
+								onclick="this.form.target='_blank'" ajax="false">
+							</p:commandButton>
+						</h:panelGroup>
+					</h:panelGrid>
+				</p:panel>
+
+
+				<p:dataTable id="table-controle"
+					value="#{controleAjusteBean.controleAjustes}" var="entity"
+					paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10">
+
+					<p:column headerText="Protocolo" style="color: #000 !important"
+						styleClass="Center">
+						<p:outputLabel value="#{entity.protocolo}" />
+					</p:column>
+
+					<p:column headerText="Loja" style="color: #000 !important">
+						<p:outputLabel value="#{entity.loja.descricao}" />
+					</p:column>
+
+					<p:column headerText="Data Cadastro" style="color: #000 !important"
+						styleClass="Center">
+						<p:outputLabel value="#{entity.dataCadastro}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Protocolo de Controle"
+						style="color: #000 !important" styleClass="Center">
+						<p:outputLabel value="#{entity.protocoloControle}" />
+					</p:column>
+
+					<p:column headerText="Facção" style="color: #000 !important">
+						<p:outputLabel value="#{entity.faccao.nome}" />
+					</p:column>
+
+					<p:column headerText="Pedido" style="color: #000 !important"
+						width="45" styleClass="Center">
+						<p:outputLabel value="#{entity.sequenciaVenda}" />
+					</p:column>
+
+					<p:column headerText="Cliente" style="color: #000 !important">
+						<p:outputLabel value="#{entity.venda.cliente.nome}" />
+					</p:column>
+
+					<p:column headerText="Data Pronto" styleClass="Center"
+						style="color: #000 !important">
+						<p:outputLabel value="#{entity.dataPronto}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Data da Entrega" styleClass="Center"
+						style="color: #000 !important">
+						<p:outputLabel value="#{entity.dataEntrega}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Ações" styleClass="Center"
+						style="color: #000 !important; width: 90px">
+
+						<p:commandLink id="lnkDetail" rendered="#{entity.status}"
+							oncomplete="PF('dados').show()" style="text-decoration: none"
+							update=":frm:dados"
+							action="#{controleAjusteBean.atualizarListas()}">
+							<i class="material-icons GrayDark">assignment</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{controleAjusteBean.controleAjuste}" />
+						</p:commandLink>
+						<p:tooltip for="lnkDetail" value="Detalhes" position="top" />
+						<p:spacer />
+						<p:link ajax="false" id="lnkEditar" rendered="#{entity.status}"
+							outcome="#{controleAjusteBean.prepareUpdate()}"
+							style="text-decoration: none">
+							<i class="material-icons GrayDark">mode_edit</i>
+							<f:param name="id" value="#{entity.id}" />
+						</p:link>
+						<p:tooltip for="lnkEditar" value="Editar" position="top" />
+						<p:spacer />
+						<p:commandLink id="pdf" ajax="false"
+							action="#{controleAjusteBean.gerarPDFControleAjuste()}"
+							title="Download" style="text-decoration: none">
+							<i class="material-icons GrayDark">get_app</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{controleAjusteBean.controleAjuste}" />
+						</p:commandLink>
+						<p:tooltip for="pdf" value="Download" position="top" />
+					</p:column>
+
+				</p:dataTable>
+
+				<p:dialog header="Detalhes do Controle de Ajuste" modal="true"
+					width="80%" id="dados" widgetVar="dados">
+					<div class="scroll-dialog">
+						<p:panelGrid columns="2" style="margin-top: 20px" layout="grid"
+							styleClass="ui-panelgrid-blank"
+							columnClasses="ui-grid-col-6,ui-grid-col-6">
+							<h:panelGrid columns="2">
+								<p:outputLabel value="Protocolo: " styleClass="my-label" />
+								<p:outputLabel
+									value="#{controleAjusteBean.controleAjuste.protocolo}" />
+								<p:outputLabel value="Loja: " styleClass="my-label" />
+								<p:outputLabel
+									value="#{controleAjusteBean.controleAjuste.loja.descricao}" />
+								<p:outputLabel value="Data de Cadastro: " styleClass="my-label" />
+								<p:outputLabel
+									value="#{controleAjusteBean.controleAjuste.dataCadastro}">
+									<f:convertDateTime pattern="dd/MM/yyyy" />
+								</p:outputLabel>
+								<p:outputLabel value="Protocolo de Controle: "
+									styleClass="my-label" />
+								<p:outputLabel
+									value="#{controleAjusteBean.controleAjuste.protocoloControle}" />
+								<p:outputLabel value="Facção: " styleClass="my-label" />
+								<p:outputLabel
+									value="#{controleAjusteBean.controleAjuste.faccao.nome}" />
+								<p:outputLabel value="Sequência: " styleClass="my-label" />
+								<p:outputLabel
+									value="#{controleAjusteBean.controleAjuste.sequenciaVenda}" />
+								<p:outputLabel value="Cliente da Venda: " styleClass="my-label" />
+								<p:outputLabel
+									value="#{controleAjusteBean.controleAjuste.venda.cliente.nome}" />
+								<p:outputLabel value="Telefone do Cliente: "
+									styleClass="my-label" />
+								<p:outputLabel
+									value="#{controleAjusteBean.controleAjuste.venda.cliente.fone}" />
+								<p:outputLabel value="Pronto em: " styleClass="my-label" />
+								<p:outputLabel
+									value="#{controleAjusteBean.controleAjuste.dataPronto}">
+									<f:convertDateTime pattern="dd/MM/yyyy" />
+								</p:outputLabel>
+								<p:outputLabel value="Entregue em: " styleClass="my-label" />
+								<p:outputLabel
+									value="#{controleAjusteBean.controleAjuste.dataEntrega}">
+									<f:convertDateTime pattern="dd/MM/yyyy" />
+								</p:outputLabel>
+							</h:panelGrid>
+							<h:panelGroup>
+								<p:dataTable id="table"
+									value="#{controleAjusteBean.movimentacoes}" var="entity"
+									paginator="true" style="margin-top: 15px"
+									emptyMessage="Nenhum registro encontrado!"
+									paginatorPosition="bottom" paginatorAlwaysVisible="false"
+									rows="10" lazy="true">
+
+									<f:facet name="header">
+										<p:outputLabel value="Movimentação da Saída" />
+									</f:facet>
+
+									<!-- 								<p:column headerText="Data" style="color: #000 !important"> -->
+									<!-- 									<p:outputLabel value="#{entity.data}"> -->
+									<!-- 										<f:convertDateTime pattern="dd/MM/yyyy" /> -->
+									<!-- 									</p:outputLabel> -->
+									<!-- 								</p:column> -->
+
+									<p:column headerText="Sequencia" style="color: #000 !important">
+										<p:outputLabel value="#{entity.sequencia}" />
+									</p:column>
+
+									<p:column headerText="Linha" style="color: #000 !important">
+										<p:outputLabel value="#{entity.linha}" />
+									</p:column>
+
+									<p:column headerText="Refência Produto"
+										style="color: #000 !important">
+										<p:outputLabel value="#{entity.produto.id}" />
+									</p:column>
+
+									<p:column headerText="Nome" style="color: #000 !important">
+										<p:outputLabel value="#{entity.produto.nome}" />
+									</p:column>
+
+									<f:facet name="footer">
+										<p:outputLabel value="Quantidade de Itens: " />
+										<p:outputLabel
+											value="#{controleAjusteBean.movimentacoes.size()}" />
+									</f:facet>
+								</p:dataTable>
+							</h:panelGroup>
+						</p:panelGrid>
+						<br />
+						<p:panel header="Observação">
+							<br />
+							<p:outputLabel
+								value="#{controleAjusteBean.controleAjuste.observacao}" />
+						</p:panel>
+						<br />
+						<p:dataTable id="tableItemControleAjuste" var="entity"
+							value="#{controleAjusteBean.itemControleAjusteList}"
+							emptyMessage="Nenhum item foi adicionada">
+
+							<f:facet name="header">
+								<p:outputLabel value="Itens do Controle de Ajuste" />
+							</f:facet>
+
+							<p:column headerText="Referência" style="color: #000 !important">
+								<p:outputLabel value="#{entity.sequencia}" />
+							</p:column>
+
+							<p:column headerText="Linha" style="color: #000 !important">
+								<p:outputLabel value="#{entity.linha}" />
+							</p:column>
+
+							<p:column headerText="Observação" style="color: #000 !important">
+								<p:outputLabel value="#{entity.observacao}" />
+							</p:column>
+						</p:dataTable>
+					</div>
+				</p:dialog>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

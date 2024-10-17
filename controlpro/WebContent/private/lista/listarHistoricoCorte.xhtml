@@ -1,0 +1,198 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="avaliacao.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>Lista de Recebimento Ordem de Corte</h1>
+				<h3>Listagem de historico de recebimento de ordem de corte
+					cadastrados no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel header="Filtros" style="margin-top: 15px">
+
+					<h:panelGrid columns="10">
+						<h:panelGroup>
+							<p:outputLabel value="De: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{historicoCorteBean.historicoFilter.dataPesquisaInicio}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Até: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{historicoCorteBean.historicoFilter.dataPesquisaFim}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Cortador: " styleClass="my-label" />
+							<br />
+							<p:selectOneMenu
+								value="#{historicoCorteBean.historicoFilter.cortador}"
+								converter="funcionarioConverter">
+								<f:selectItem itemLabel="Todos" />
+								<f:selectItems value="#{funcionarioBean.listaFuncionarios}"
+									var="cortador" itemLabel="#{cortador.nome}"
+									itemValue="#{cortador}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Produto: " styleClass="my-label" />
+							<br />
+							<p:autoComplete
+								value="#{historicoCorteBean.historicoFilter.produto}"
+								autocomplete="true" size="36" id="produto"
+								completeMethod="#{produtoBean.getProdutoAutoCompletePorProduto}"
+								forceSelection="true" minQueryLength="2" maxResults="30"
+								dropdown="true"
+								converterMessage="Não foi possível selecionar o produto (Erro ao converter o objeto)"
+								converter="produtoConverter" var="prod" itemLabel="#{prod.nome}"
+								itemValue="#{prod}" placeholder="Pesquise pelo código">
+							</p:autoComplete>
+						</h:panelGroup>
+						<h:panelGroup>
+							<br />
+							<p:commandButton value="Pesquisar"
+								style="margin-left: 5px; width: 100px !important"
+								update="table-historico group-total-pagar"
+								action="#{historicoCorteBean.list}" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<br />
+							<p:commandButton id="report"
+								actionListener="#{historicoCorteBean.gerarPDF}"
+								icon="fa fa-download" value="Gerar PDF"
+								onclick="this.form.target='_blank'" ajax="false">
+							</p:commandButton>
+						</h:panelGroup>
+					</h:panelGrid>
+				</p:panel>
+
+				<p:panel style="margin-top: 15px">
+					<h:panelGrid columns="2">
+						<h:panelGroup>
+							<p:outputLabel value="Valor Unitário:" styleClass="my-label"
+								style="vertical-align: text-top;" />
+							<h:outputText value=" * " styleClass="campoObrigatorio" />
+							<br />
+							<br />
+							<p:inputText required="true" size="40"
+								requiredMessage="Campo 'Valor Unitário' é obrigatório!"
+								styleClass="moeda" maxlength="10"
+								value="#{historicoCorteBean.valorUnitario}">
+								<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+									minFractionDigits="2" type="number" />
+								<p:ajax event="blur" update="group-total-pagar"
+									listener="#{historicoCorteBean.getRefreshValores}" />
+							</p:inputText>
+						</h:panelGroup>
+						<h:panelGroup id="group-total-pagar">
+							<p:outputLabel value="Total a pagar: " styleClass="my-label"
+								style="vertical-align: text-top;" />
+							<br />
+							<br />
+							<p:outputLabel value="#{historicoCorteBean.totalPagar}"
+								styleClass="label-azul" style="font-size: 18px">
+								<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+									minFractionDigits="2" type="currency" />
+							</p:outputLabel>
+						</h:panelGroup>
+					</h:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-historico"
+					value="#{historicoCorteBean.historicoCorteList}" var="historico"
+					paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10">
+
+					<p:column headerText="Protocolo" style="color: #000000 !important">
+						<p:outputLabel value="#{historico.ordemCorte.protocolo}" />
+					</p:column>
+
+					<p:column headerText="Recebido por"
+						style="color: #000000 !important">
+						<p:outputLabel value="#{historico.usuario.nome}" />
+					</p:column>
+
+					<p:column headerText="Data lançamento"
+						style="color: #000000 !important">
+						<p:outputLabel value="#{historico.dataRecebimento}">
+							<f:convertDateTime pattern="dd/MM/yyyy - HH:mm" />
+						</p:outputLabel>
+					</p:column>
+					<p:column headerText="Data corte" style="color: #000000 !important">
+						<p:outputLabel value="#{historico.dataCorte}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Cortador" style="color: #000000 !important">
+						<p:outputLabel value="#{historico.cortador.nome}" />
+					</p:column>
+
+					<p:column headerText="Produto" style="color: #000000 !important">
+						<p:outputLabel value="#{historico.produto.nome}" />
+					</p:column>
+
+					<p:column headerText="Referência" width="90" styleClass="Center"
+						style="color: #000000 !important">
+						<p:outputLabel value="#{historico.produto.id}" />
+					</p:column>
+
+					<p:column headerText="Unidade" width="60" styleClass="Center"
+						style="color: #000000 !important">
+						<p:outputLabel value="#{historico.produto.unidadeVenda}" />
+					</p:column>
+
+					<p:column headerText="Grade" width="50" styleClass="Center"
+						style="color: #000000 !important">
+						<p:outputLabel value="#{historico.grade.nome}" />
+					</p:column>
+
+					<p:column headerText="Quantidade Cortada" width="90"
+						styleClass="Center" style="color: #000000 !important">
+						<p:outputLabel value="#{historico.qtdRecebido}" />
+					</p:column>
+
+					<f:facet name="footer">
+						<div align="right">
+							<h1>
+								<p:outputLabel value="Total:" style="color:#fff" />
+								<p:outputLabel value="#{historicoCorteBean.acumulador}"
+									style="color:#fff">
+								</p:outputLabel>
+							</h1>
+						</div>
+					</f:facet>
+
+				</p:dataTable>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

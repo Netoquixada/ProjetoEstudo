@@ -1,0 +1,157 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="conta-pagar.png"
+						width="60px" style="float: left" />
+				</div>
+
+				<h1>Lista de Histórico de Pagamentos</h1>
+				<h3>Listagem de pagamentos cadastrados no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{contaPagarBean.contaPagar}" />
+			<t:saveState value="#{contaPagarBean.contaPagars}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel styleClass="panel-pesquisa" style="margin-top: 15px">
+					<div class="lupa">
+						<p:graphicImage library="imagens" name="SearchLupa.png" />
+					</div>
+
+					<h:panelGrid columns="10">
+						<p:outputLabel value="Facção: " styleClass="my-label" />
+						<br />
+						<p:autoComplete
+							value="#{historicoContaPagarBean.historicoFilter.faccao}"
+							autocomplete="true" size="36" id="faccao"
+							completeMethod="#{faccaoBean.getFaccaoAutoComplete}"
+							forceSelection="true" minQueryLength="1" maxResults="30"
+							dropdown="true"
+							converterMessage="Não foi possível selecionar a facção(Erro ao converter o objeto)"
+							converter="genericConverter" var="faccao"
+							itemLabel="#{faccao.nome}" itemValue="#{faccao}"
+							placeholder="Pesquise pelo nome da facção">
+						</p:autoComplete>
+
+						<p:outputLabel value="De: " styleClass="my-label" />
+						<p:calendar size="10" navigator="true"
+							value="#{historicoContaPagarBean.historicoFilter.dataPesquisaInicio}"
+							pattern="dd/MM/yyyy" />
+						<p:outputLabel value="Até: " styleClass="my-label" />
+						<p:calendar size="10" navigator="true"
+							value="#{historicoContaPagarBean.historicoFilter.dataPesquisaFim}"
+							pattern="dd/MM/yyyy" />
+
+						<p:commandButton value="Pesquisar" icon="fa fa-search"
+							style="margin-left: 5px; width: 100px !important"
+							update="table-historico-conta"
+							action="#{historicoContaPagarBean.list()}" />
+
+						<p:commandButton id="report"
+							actionListener="#{historicoContaPagarBean.gerarPdfHistorico}"
+							icon="fa fa-download" value="Gerar PDF"
+							onclick="this.form.target='_blank'" ajax="false">
+						</p:commandButton>
+					</h:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-historico-conta" var="entity"
+					paginator="true" style="margin-top: 15px"
+					value="#{historicoContaPagarBean.historicoContaList}"
+					paginatorAlwaysVisible="false" rows="10" lazy="true"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					paginatorPosition="bottom">
+
+					<!-- 					<p:column headerText="Código da Conta" -->
+					<!-- 						style="color: #000000 !important" styleClass="Center"> -->
+					<!-- 						<p:outputLabel -->
+					<!-- 							value="#{entity.contaPagar.id}" /> -->
+					<!-- 					</p:column> -->
+
+					<!-- 					<p:column headerText="Produto" style="color: #000000 !important" -->
+					<!-- 						styleClass="Center"> -->
+					<!-- 						<p:outputLabel -->
+					<!-- 							value="#{entity.contaPagar.itemProducao.produto.nome}" /> -->
+					<!-- 					</p:column> -->
+
+					<!-- 					<p:column headerText="Responsável" -->
+					<!-- 						style="color: #000000 !important" styleClass="Center"> -->
+					<!-- 						<p:outputLabel value="#{entity.usuario.nome}" /> -->
+					<!-- 					</p:column> -->
+					<p:column headerText="Protocolo da Ordem"
+						style="color: #000000 !important" styleClass="Center">
+						<p:outputLabel
+							value="#{entity.contaPagar.itemProducao.ordemProducao.protocolo}" />
+					</p:column>
+
+					<p:column headerText="Facção" style="color: #000000 !important"
+						styleClass="Center">
+						<p:outputLabel value="#{entity.faccao.nome}" />
+					</p:column>
+					<p:column headerText="Data pagamento"
+						style="color: #000000 !important" styleClass="Center">
+						<p:outputLabel value="#{entity.dataPagamento}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+					<p:column headerText="Juros" style="color: #000000 !important"
+						styleClass="Center">
+						<p:outputLabel value="#{entity.valorJuros}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+					<p:column headerText="Desconto" style="color: #000000 !important"
+						styleClass="Center">
+						<p:outputLabel value="#{entity.valorDesconto}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+					<!-- 					<p:column styleClass="Center" headerText="Valor da Conta"> -->
+					<!-- 						<p:outputLabel value="#{entity.contaPagar.valorPago}" -->
+					<!-- 							styleClass="negrito Green"> -->
+					<!-- 							<f:convertNumber minFractionDigits="2" type="currency" -->
+					<!-- 								maxFractionDigits="2" /> -->
+					<!-- 						</p:outputLabel> -->
+					<!-- 					</p:column> -->
+					<p:column styleClass="Center" headerText="Valor Pago">
+						<p:outputLabel value="#{entity.valorPago}" styleClass="negrito">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+					<p:column headerText="Forma" style="color: #000000 !important"
+						styleClass="Center">
+						<p:outputLabel value="#{entity.opcaoPagamento.descricao}" />
+					</p:column>
+					<p:column headerText="Banco" style="color: #000000 !important"
+						styleClass="Center">
+						<p:outputLabel value="#{entity.bancoCheque}" />
+					</p:column>
+					
+				</p:dataTable>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

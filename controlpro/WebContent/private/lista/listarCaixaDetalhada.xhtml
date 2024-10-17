@@ -1,0 +1,187 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="money.png" width="60"
+						style="float: left" />
+				</div>
+
+				<h1>Movimentações do Caixa Diario</h1>
+				<h3></h3>
+
+				<div class="links-funcionais">
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{caixaDetalhadaBean.caixa}" />
+			<t:saveState value="#{caixaDetalhadaBean.listaCaixas}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<br />
+
+				<p:panelGrid columns="4" style="width: 100%" layout="grid"
+					id="grid-dash">
+					<h:panelGroup style="width: 25%">
+						<div class="panel-total-projeto shadow-effect">
+							<div class="panel-icon" style="background-color: #1f8936;">
+								<div class="marginTop10"></div>
+								<i class="material-icons md-48 md-light">credit_card</i>
+							</div>
+
+							<div class="panel-infor" style="background-color: #55b94b;">
+								<div class="marginTop10"></div>
+								<div style="font-size: 12px" class="Fs16">Entrada</div>
+								<div style="font-size: 22px" class="animated pulse infinite">
+									<p:outputLabel value="#{caixaDetalhadaBean.entrada}">
+										<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+											minFractionDigits="2" type="currency" />
+									</p:outputLabel>
+								</div>
+							</div>
+						</div>
+					</h:panelGroup>
+					<h:panelGroup style="width: 25%">
+						<div class="panel-total-projeto shadow-effect">
+							<div class="panel-icon" style="background-color: #ad183d;">
+								<div class="marginTop10"></div>
+								<i class="material-icons md-48 md-light">credit_card</i>
+							</div>
+
+							<div class="panel-infor" style="background-color: #cf3f59;">
+								<div class="marginTop10"></div>
+								<div style="font-size: 12px" class="Fs16">Saída</div>
+								<div style="font-size: 22px" class="animated pulse infinite">
+									<p:outputLabel value="#{caixaDetalhadaBean.saida}">
+										<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+											minFractionDigits="2" type="currency" />
+									</p:outputLabel>
+								</div>
+							</div>
+						</div>
+					</h:panelGroup>
+					<h:panelGroup style="width: 25%">
+						<div class="panel-total-projeto shadow-effect">
+							<div class="panel-icon" style="background-color: #32439F;">
+								<div class="marginTop10"></div>
+								<i class="material-icons md-48 md-light">attach_money</i>
+							</div>
+
+							<div class="panel-infor" style="background-color: #3966C2;">
+								<div class="marginTop10"></div>
+								<div style="font-size: 12px" class="Fs16">Saldo</div>
+								<div style="font-size: 22px" class="animated pulse infinite">
+									<p:outputLabel value="#{caixaDetalhadaBean.saldo}">
+										<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+											minFractionDigits="2" type="currency" />
+									</p:outputLabel>
+								</div>
+							</div>
+						</div>
+					</h:panelGroup>
+				</p:panelGrid>
+
+				<p:panel styleClass="panel-pesquisa" style="margin-top: 15px">
+					<div class="lupa">
+						<p:graphicImage library="imagens" name="SearchLupa.png" />
+					</div>
+
+					<h:panelGrid columns="10">
+						<p:outputLabel value="De: " styleClass="my-label" />
+						<p:calendar size="10" navigator="true"
+							value="#{caixaDetalhadaBean.caixaFilter.dataVendaInicio}"
+							pattern="dd/MM/yyyy" />
+						<p:outputLabel value="Até: " styleClass="my-label" />
+						<p:calendar size="10" navigator="true"
+							value="#{caixaDetalhadaBean.caixaFilter.dataVendaFim}"
+							pattern="dd/MM/yyyy" />
+
+						<p:outputLabel value="Tipo: " styleClass="my-label" />
+						<p:selectOneMenu value="#{caixaDetalhadaBean.caixaFilter.tipoMov}">
+							<f:selectItem itemLabel="Selecione" />
+							<f:selectItems value="#{caixaDetalhadaBean.tipoOperacoes}"
+								var="tipo" itemLabel="#{tipo.descricao}"
+								itemValue="#{tipo.descricao}" />
+						</p:selectOneMenu>
+
+						<p:commandButton value="Pesquisar" icon="fa fa-search"
+							style="margin-left: 5px; width: 100px !important"
+							update="table-caixa grid-dash"
+							action="#{caixaDetalhadaBean.list()}" />
+
+						<p:commandButton id="report"
+							actionListener="#{caixaDetalhadaBean.gerarPDF}"
+							icon="fa fa-download" value="Gerar PDF"
+							onclick="this.form.target='_blank'" ajax="false">
+						</p:commandButton>
+					</h:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-caixa"
+					value="#{caixaDetalhadaBean.listaCaixas}" var="entity"
+					paginator="true" style="margin-top: 15px"
+					paginatorAlwaysVisible="false" rows="20" lazy="true"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					paginatorPosition="bottom">
+
+					<p:column headerText="Data" style="width: 90px" styleClass="Center">
+						<p:outputLabel value="#{entity.data}" />
+					</p:column>
+
+					<p:column headerText="Caixa" styleClass="Center" width="70">
+						<p:outputLabel value="#{entity.caixa}" />
+					</p:column>
+
+					<p:column headerText="Tipo" styleClass="Center" width="70">
+						<p:outputLabel value="#{entity.tipoMov}" />
+					</p:column>
+
+					<p:column headerText="Descrição" styleClass="Center">
+						<p:outputLabel value="#{entity.descricao}" />
+					</p:column>
+
+					<p:column headerText="Dinheiro" styleClass="Center" width="120">
+						<p:outputLabel value="#{entity.dinheiro}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+					<p:column headerText="C.Crédito" styleClass="Center" width="120">
+						<p:outputLabel value="#{entity.cartoesCredito}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+					<p:column headerText="C.Débito" styleClass="Center" width="120">
+						<p:outputLabel value="#{entity.cartoesDebito}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+					<p:column headerText="Outros" styleClass="Center" width="120">
+						<p:outputLabel value="#{entity.outros}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+				</p:dataTable>
+				<br />
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

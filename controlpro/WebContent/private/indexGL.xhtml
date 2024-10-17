@@ -1,0 +1,142 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="conteudo">
+
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="ocorrencia.png"
+						style="float: left" styleClass="image-title" />
+				</div>
+				<h1 style="font-size:3vw;">Sistema de Controlador e Gerenciamento</h1>
+			</p:panel>
+
+			<p:tabView>
+
+				<p:tab title="Banner">
+					<div align="center">
+					
+						<p:galleria panelWidth="1100" panelHeight="313" showCaption="true"
+							autoPlay="true">
+<!-- 							<h:graphicImage library="imagens" name="Banner lolabel.jpg" -->
+<!-- 							width="1100" -->
+<!-- 								alt="Descrição da loja Lollabel - aqui vc altera e colcoca o que acha melhor" title="Lollabel" /> -->
+							<h:graphicImage library="imagens" name="GlamixLogo.jpg"
+								alt="GLAMIX a melhor da Cidade!" title="Lolli" width="1100"/>
+<!-- 							<h:graphicImage library="imagens" name="logo.jpg" -->
+<!-- 								alt="Descrição da loja 03" title="Loja 03" /> -->
+<!-- 							<h:graphicImage library="imagens" name="logo1.jpg" -->
+<!-- 								alt="Descrição da loja 04" title="Loja 04" /> -->
+						</p:galleria>
+					</div>
+				</p:tab>
+				
+<!-- 				Foi retirado o que não é usado nessa empresa -->
+
+				<p:tab title="Links Rápidos">
+					<div class="padding">
+						<h:form id="frm">
+							<center>
+								<p:spacer height="30px;" />
+								<div class="ui-grid ui-grid-responsive">
+									<div class="ui-grid-row">
+										<h:panelGroup styleClass="ui-grid-col-12">
+											<h1>
+												<p:outputLabel value="Atalhos a Menus" />
+											</h1>
+
+										</h:panelGroup>
+									</div>
+								</div>
+								<div class="ui-grid ui-grid-responsive">
+									<div class="ui-grid-row">
+										<h:panelGroup styleClass="ui-grid-col-8">
+											<div class="wrapper">
+												<p:graphicImage styleClass="myImg" library="imagens"
+													name="produto.png" />
+
+												<br />
+												<p:outputLabel value="Consultar Produtos"
+													styleClass="myLabel2" />
+												<div class="tooltip">
+													<p:link styleClass="myLabel3" value="Consultar Produtoss"
+														outcome="/private/lista/listarProdutos.xhtml" />
+													<br />
+
+												</div>
+											</div>
+										</h:panelGroup>
+										<h:panelGroup styleClass="ui-grid-col-8">
+											<div class="wrapper">
+												<p:graphicImage styleClass="myImg" library="imagens"
+													name="resgate.png" />
+
+												<br />
+												<p:outputLabel value="Consultar Resgate"
+													styleClass="myLabel2" />
+												<div class="tooltip">
+													<p:link styleClass="myLabel3" value="Resgatar Pontos"
+														outcome="/private/control/controlResgate.xhtml" />
+													<br />
+													<!-- 											<p:link styleClass="myLabel3" value="Listar" -->
+													<!-- 												outcome="/private/control/controlResgate.xhtml" /> -->
+													<!-- 											<br /> -->
+												</div>
+											</div>
+										</h:panelGroup>
+									</div>
+								</div>
+
+								<!-- 						********************** -->
+
+								<div class="ui-grid ui-grid-responsive">
+									<div class="ui-grid-row">
+										<h:panelGroup styleClass="ui-grid-col-8">
+											<div class="wrapper">
+												<p:graphicImage styleClass="myImg" library="imagens"
+													name="produto.png" />
+
+												<br />
+												<p:outputLabel value="Consultar Estoque"
+													styleClass="myLabel2" />
+												<div class="tooltip">
+													<p:link styleClass="myLabel3" value="Consultar Estoque"
+														outcome="/private/lista/listarEstoque.xhtml" />
+													<br />
+
+												</div>
+											</div>
+										</h:panelGroup>
+										<h:panelGroup styleClass="ui-grid-col-8">
+											<div class="wrapper">
+												<p:graphicImage styleClass="myImg" library="imagens"
+													name="cliente.png" />
+
+												<br />
+												<p:outputLabel value="Consultar Cliente"
+													styleClass="myLabel2" />
+												<div class="tooltip">
+													<p:link styleClass="myLabel3" value="Consultar Cliente"
+														outcome="/private/lista/listarClientes.xhtml" />
+													<br />
+												</div>
+											</div>
+										</h:panelGroup>
+									</div>
+								</div>
+							</center>
+						</h:form>
+					</div>
+				</p:tab>
+			</p:tabView>
+
+
+
+		</div>
+	</ui:define>
+</ui:composition>

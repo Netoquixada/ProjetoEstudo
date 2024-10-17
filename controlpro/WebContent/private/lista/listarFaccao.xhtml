@@ -1,0 +1,186 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="maquina.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>Lista de Facções</h1>
+				<h3>Listagem de facções cadastradas no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:link id="cadastrar" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/cadastro/cadastrarFaccao.xhtml">
+						<i class="material-icons md-32">add_to_photos</i>
+						<br />
+					</p:link>
+					<p:tooltip for="cadastrar" position="top" value="Cadastrar facção" />
+
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{faccaoBean.faccao}" />
+			<t:saveState value="#{faccaoBean.faccaos}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel styleClass="panel-pesquisa" style="margin-top: 15px">
+					<div class="lupa">
+						<p:graphicImage library="imagens" name="SearchLupa.png" />
+					</div>
+
+					<h:panelGrid columns="10">
+						<p:outputLabel value="Nome: " styleClass="my-label" />
+						<p:inputText value="#{faccaoBean.faccaoFilter.nome}" size="30"
+							id="nome" />
+
+						<p:outputLabel value="Status" styleClass="my-label" />
+						<p:selectOneRadio value="#{faccaoBean.faccaoFilter.statusFilter}">
+<!-- 							<f:selectItem itemLabel="TodaCs" itemValue="NULL"/> -->
+							<f:selectItem itemLabel="Ativas" itemValue="true" />
+							<f:selectItem itemLabel="Inativas" itemValue="false" />
+						</p:selectOneRadio>
+
+						<p:commandButton value="Pesquisar" icon="fa fa-search"
+							style="margin-left: 5px; width: 100px !important"
+							update="table-faccao" action="#{faccaoBean.list()}" />
+						<p:commandButton id="report"
+							actionListener="#{faccaoBean.gerarPDF}" icon="fa fa-download"
+							value="Gerar PDF" onclick="this.form.target='_blank'"
+							ajax="false">
+						</p:commandButton>
+					</h:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-faccao" value="#{faccaoBean.faccaos}" 
+					var="entity" paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10"
+					lazy="true">
+
+					<p:column headerText="Status" style="width: 50px"
+						styleClass="Center">
+						<p:commandLink id="lnkAlterarStatus"
+							action="#{faccaoBean.updateStatus()}" update="table-faccao"
+							title="#{entity.status ? 'Desativar' : 'Ativar'}">
+
+							<h:panelGroup rendered="#{!entity.status}">
+								<i class="material-icons Red">remove_circle</i>
+							</h:panelGroup>
+
+							<h:panelGroup rendered="#{entity.status}">
+								<i class="material-icons Green">check_circle</i>
+							</h:panelGroup>
+
+							<f:setPropertyActionListener target="#{faccaoBean.faccao}"
+								value="#{entity}" />
+						</p:commandLink>
+					</p:column>
+
+					<p:column headerText="Nome" responsivePriority="3">
+						<p:outputLabel value="#{entity.nome}" />
+					</p:column>
+
+					<p:column headerText="Cpf" style="width: 110px"
+						styleClass="Center" responsivePriority="3">
+						<p:outputLabel value="#{entity.cpf}" />
+					</p:column>
+
+					<p:column headerText="Celular">
+						<p:outputLabel value="#{entity.celular}" />
+					</p:column>
+					<p:column headerText="N° Maquinas" width="80">
+						<p:outputLabel value="#{entity.qtdMaquinas}" />
+					</p:column>
+					<p:column headerText="Endereço">
+						<p:outputLabel value="#{entity.endereco}, N°#{entity.numero}" />
+					</p:column>
+					<p:column headerText="Cep.">
+						<p:outputLabel value="#{entity.cep}" />
+					</p:column>
+					<p:column headerText="Bairro">
+						<p:outputLabel value="#{entity.bairro}" />
+					</p:column>
+					<p:column headerText="Cidade">
+						<p:outputLabel value="#{entity.cidade}" />
+					</p:column>
+					<p:column headerText="Estado" width="50">
+						<p:outputLabel value="#{entity.estado}" />
+					</p:column>
+
+					<p:column headerText="Ações" style="width: 60px"
+						styleClass="Center">
+
+						<p:commandLink id="lnkDetail" rendered="#{entity.status}"
+							oncomplete="PF('dados').show()" style="text-decoration: none"
+							update=":frm:dados">
+							<i class="material-icons GrayDark">assignment</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{faccaoBean.faccao}" />
+						</p:commandLink>
+						<p:tooltip for="lnkDetail" value="Detalhes" position="top" />
+						<p:spacer />
+						<p:commandLink ajax="false" id="lnkEditar"
+							rendered="#{entity.status}"
+							action="#{faccaoBean.prepareUpdate()}"
+							style="text-decoration: none">
+							<i class="material-icons GrayDark">mode_edit</i>
+
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{faccaoBean.faccao}" />
+						</p:commandLink>
+
+						<p:tooltip for="lnkEditar" value="Editar" position="top" />
+					</p:column>
+				</p:dataTable>
+
+				<p:dialog header="Detalhes da Facção" modal="true" width="50%"
+					id="dados" widgetVar="dados">
+					<h:panelGrid columns="2">
+						<p:outputLabel value="Nome: " styleClass="my-label" />
+						<p:outputLabel value="#{faccaoBean.faccao.nome}" />
+						<p:outputLabel value="Cpf: " styleClass="my-label" />
+						<p:outputLabel value="#{faccaoBean.faccao.cpf}" />
+						<p:outputLabel value="Celular: " styleClass="my-label" />
+						<p:outputLabel value="#{faccaoBean.faccao.celular}" />
+						<p:outputLabel value="Telefone: " styleClass="my-label" />
+						<p:outputLabel value="#{faccaoBean.faccao.telefone}" />
+						<p:outputLabel value="Qtd. de Máquinas: " styleClass="my-label" />
+						<p:outputLabel value="#{faccaoBean.faccao.qtdMaquinas}" />
+						<p:outputLabel value="Endereço: " styleClass="my-label" />
+						<p:outputLabel value="#{faccaoBean.faccao.endereco}" />
+						<p:outputLabel value="Número: " styleClass="my-label" />
+						<p:outputLabel value="#{faccaoBean.faccao.numero}" />
+						<p:outputLabel value="Complemento: " styleClass="my-label" />
+						<p:outputLabel value="#{faccaoBean.faccao.complemento}" />
+						<p:outputLabel value="Bairro: " styleClass="my-label" />
+						<p:outputLabel value="#{faccaoBean.faccao.bairro}" />
+						<p:outputLabel value="Cidade: " styleClass="my-label" />
+						<p:outputLabel value="#{faccaoBean.faccao.cidade}" />
+						<p:outputLabel value="Cep: " styleClass="my-label" />
+						<p:outputLabel value="#{faccaoBean.faccao.cep}" />
+						<p:outputLabel value="Estado: " styleClass="my-label" />
+						<p:outputLabel value="#{faccaoBean.faccao.estado}" />
+					</h:panelGrid>
+				</p:dialog>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

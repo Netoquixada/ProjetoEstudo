@@ -1,0 +1,132 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="logistica.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>AUDITORIA - Lista de Logistica</h1>
+<!-- 				<h3>Listagem de logisticas cadastradas no sistema.</h3> -->
+
+				<div class="links-funcionais">
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{logisticaBean.logistica}" />
+			<t:saveState value="#{logisticaBean.logisticas}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel style="margin-top: 15px">
+					<h:panelGrid columns="15">
+
+<!-- 						<h:panelGroup> -->
+<!-- 							<p:outputLabel value="Loja: " styleClass="my-label" /> -->
+<!-- 							<br /> -->
+<!-- 							<p:selectOneMenu value="#{logisticaBean.logisticaFilter.loja}"> -->
+<!-- 								<f:selectItem itemLabel="Todas" /> -->
+<!-- 								<f:selectItems value="#{logisticaBean.lojas}" var="l" -->
+<!-- 									itemLabel="#{l.descricao}" itemValue="#{l}" /> -->
+<!-- 							</p:selectOneMenu> -->
+<!-- 						</h:panelGroup> -->
+
+						<h:panelGroup>
+							<p:outputLabel value="Pedido: " styleClass="my-label" />
+							<br />
+							<p:inputText value="#{logisticaBean.logisticaAudFilter.pedido}" />
+						</h:panelGroup>
+
+<!-- 						<h:panelGroup> -->
+<!-- 							<p:outputLabel value="De: " styleClass="my-label" /> -->
+<!-- 							<br /> -->
+<!-- 							<p:calendar size="10" navigator="true" -->
+<!-- 								value="#{logisticaBean.logisticaFilter.dataCadastroInicio}" -->
+<!-- 								pattern="dd/MM/yyyy" /> -->
+<!-- 						</h:panelGroup> -->
+<!-- 						<h:panelGroup> -->
+<!-- 							<p:outputLabel value="Até: " styleClass="my-label" /> -->
+<!-- 							<br /> -->
+<!-- 							<p:calendar size="10" navigator="true" -->
+<!-- 								value="#{logisticaBean.logisticaFilter.dataCadastroFim}" -->
+<!-- 								pattern="dd/MM/yyyy" /> -->
+<!-- 						</h:panelGroup> -->
+						<h:panelGroup>
+							<br />
+							<p:commandButton icon="fa fa-search" id="pesquisar" value="Pesquisar"
+								style="margin-left: 5px;" update="table-logistica"
+								action="#{logisticaBean.listAuitoria()}" />
+							<p:tooltip for="pesquisar" value="Pesquisar" position="top" />
+						</h:panelGroup>
+					</h:panelGrid>
+
+
+				</p:panel>
+
+				<p:dataTable id="table-logistica" value="#{logisticaBean.logisticasAud}" var="entity"
+					paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!" scrollable="true"
+					 paginatorPosition="bottom"
+					paginatorAlwaysVisible="false" rows="10" lazy="true">
+
+					<p:column headerText="Data alteração" styleClass="Center" style="color: #000">
+						<p:outputLabel value="#{entity.dataAlteracao}">
+							<f:convertDateTime pattern="dd/MM/yyyy HH:mm" timeZone="GMT-03:00" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Usuário" styleClass="Center" style="color: #000">
+						<p:outputLabel value="#{entity.usuario.nome}" />
+					</p:column>
+					
+					<p:column headerText="Data Cadastro" styleClass="Center" style="color: #000">
+						<p:outputLabel value="#{entity.dataCadastro}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Pedido" styleClass="Center" style="color: #000">
+						<p:outputLabel value="#{entity.pedido}" />
+					</p:column>
+
+					<p:column headerText="Local" style="color: #000">
+						<p:outputLabel value="#{entity.localLogistica.descricao}" />
+					</p:column>
+
+					<p:column headerText="Status" style="color: #000">
+						<p:outputLabel value="#{entity.statusLogistica.descricao}" />
+					</p:column>
+					
+					<p:column headerText="Data de envio" styleClass="Center" style="color: #000">
+						<p:outputLabel value="#{entity.dataEnvio}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+					
+					<p:column headerText="Motoboy" style="color: #000">
+						<p:outputLabel value="#{entity.motoboy.nome}" />
+					</p:column>
+
+					<p:column headerText="Observação" style="color: #000">
+						<p:outputLabel value="#{entity.observacao}" />
+					</p:column>
+				</p:dataTable>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,265 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="manifestacao.png"
+						width="60px" style="float: left" />
+				</div>
+
+				<h1>Lista de Controle de Manifestação</h1>
+				<h3>Listagem de manifestações cadastradas no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:link id="cadastrar" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/cadastro/cadastrarControleManifestacao.xhtml">
+						<i class="material-icons md-32">add_to_photos</i>
+						<br />
+					</p:link>
+					<p:tooltip for="cadastrar" position="top"
+						value="Cadastrar Ordem de Produção" />
+
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{controleManifestacaoBean.controleManifestacao}" />
+			<t:saveState
+				value="#{controleManifestacaoBean.controleManifestacaos}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel style="margin-top: 15px">
+					<h:panelGrid columns="5">
+						<h:panelGroup>
+							<p:outputLabel value="Protocolo: " styleClass="my-label" />
+							<br />
+							<p:inputText
+								value="#{controleManifestacaoBean.controleManifestacaoFilter.protocolo}"
+								size="10" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Codigo de Rastreio: " styleClass="my-label" />
+							<br />
+							<p:inputText
+								value="#{controleManifestacaoBean.controleManifestacaoFilter.codigoRastreio}"
+								size="10" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Ocorrencia finalizada? "
+								styleClass="my-label" />
+							<br />
+							<p:selectOneMenu
+								value="#{controleManifestacaoBean.controleManifestacaoFilter.statusOcorrencia}">
+								<f:selectItem itemLabel="Todos" itemValue="0" />
+								<f:selectItem itemLabel="Sim" itemValue="2" />
+								<f:selectItem itemLabel="Não" itemValue="1" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup>
+							<br />
+							<p:commandButton icon="fa fa-search" id="pesquisar"
+								style="margin-left: 5px;" update="table-producao"
+								action="#{controleManifestacaoBean.list()}" value="Pesquisar" />
+							<p:tooltip for="pesquisar" value="Pesquisar" position="top" />
+						</h:panelGroup>
+					</h:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-producao"
+					value="#{controleManifestacaoBean.controleManifestacaos}"
+					var="entity" paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10"
+					lazy="true">
+
+					<p:column headerText="Ocorência" styleClass="Center"
+						style="width: 60px">
+
+						<p:commandLink id="lnkOcorrencia" rendered="#{entity.status}"
+							oncomplete="PF('dados-historico').show()"
+							style="text-decoration: none"
+							update=":form-historico:dados-historico"
+							title="Historico de Ocorrências"
+							action="#{controleManifestacaoBean.carregarListaItemProducao()}">
+							<p:outputLabel rendered="#{entity.statusOcorrencia == 0}">
+								<i class="material-icons GrayDark">class</i>
+							</p:outputLabel>
+							<p:outputLabel rendered="#{entity.statusOcorrencia == 2}">
+								<i class="material-icons GrayDark Green">class</i>
+							</p:outputLabel>
+							<p:outputLabel rendered="#{entity.statusOcorrencia == 1}">
+								<i class="material-icons GrayDark Red">class</i>
+							</p:outputLabel>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{controleManifestacaoBean.controleManifestacao}" />
+						</p:commandLink>
+						<p:tooltip for="lnkOcorrencia" value="Ocorrências" position="top" />
+					</p:column>
+
+					<p:column headerText="Protocolo" styleClass="Center"
+						style="width: 110px">
+						<p:outputLabel id="lb" value="#{entity.protocolo}" />
+					</p:column>
+
+					<p:column headerText="Codigo Rastreio" styleClass="Center">
+						<p:outputLabel value="#{entity.codigoRastreio}" />
+					</p:column>
+
+					<p:column headerText="N° pedido" styleClass="Center">
+						<p:outputLabel value="#{entity.numeroPedido}" />
+					</p:column>
+
+					<p:column headerText="Canal" styleClass="Center">
+						<p:outputLabel value="#{entity.canal.descricao}" />
+					</p:column>
+
+					<p:column headerText="Tipo Envio" styleClass="Center">
+						<p:outputLabel value="#{entity.tipoEnvio.descricao}" />
+					</p:column>
+
+					<p:column headerText="R$ Pedido" styleClass="Center">
+						<p:outputLabel value="#{entity.valor}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Codigo Manifesto" styleClass="Center">
+						<p:outputLabel value="#{entity.codigoManifesto}" />
+					</p:column>
+
+
+					<p:column headerText="Opções" styleClass="Center" width="110">
+						<p:menuButton value="Selecione">
+							<p:menuitem value="Editar" icon="fa fa-edit"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' or escopoSessaoBean.usuarioLogado.perfilUser eq 'PRODUCAO'}"
+								outcome="#{controleManifestacaoBean.prepareUpdate()}"
+								style="text-decoration: none">
+								<i class="material-icons GrayDark">mode_edit</i>
+								<f:param name="id" value="#{entity.id}" />
+							</p:menuitem>
+							<p:menuitem value="Download" icon="fa fa-edit" ajax="false"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' or escopoSessaoBean.usuarioLogado.perfilUser eq 'PRODUCAO'}"
+								action="#{controleManifestacaoBean.gerarPDFControleManifestacao()}"
+								style="text-decoration: none">
+								<i class="material-icons GrayDark">download</i>
+								<f:setPropertyActionListener value="#{entity}"
+									target="#{controleManifestacaoBean.controleManifestacao}" />
+							</p:menuitem>
+						</p:menuButton>
+					</p:column>
+				</p:dataTable>
+
+			</h:form>
+
+			<h:form id="form-historico">
+				<p:dialog modal="true" id="dados-historico" width="70%"
+					widgetVar="dados-historico" resizable="false">
+
+					<f:facet name="header">
+					Historico de Ocorrências
+					</f:facet>
+
+					<div class="scroll-dialog">
+						<div>
+							<p:messages id="msg" closable="true" showDetail="true"
+								showSummary="true" />
+
+							<h:panelGrid columns="2" style="margin-top: 20px"
+								id="grid-historico" cellpadding="05px">
+
+								<h:panelGroup>
+									<p:outputLabel value="Data Ocorrência:" styleClass="my-label" />
+								</h:panelGroup>
+								<p:calendar
+									value="#{controleManifestacaoBean.ocorrencia.dataOcorrencia}"
+									pattern="dd/MM/yyyy">
+								</p:calendar>
+
+								<h:panelGroup>
+									<p:outputLabel value="Descrição: " styleClass="my-label" />
+								</h:panelGroup>
+								<p:inputTextarea cols="60" rows="4" id="descricao"
+									required="true" requiredMessage="true"
+									value="#{controleManifestacaoBean.ocorrencia.descricao}" />
+
+							</h:panelGrid>
+							<p:separator />
+							<h:panelGrid columns="3">
+								<p:commandButton value="Adicionar"
+									update="tableHistorico msg grid-historico"
+									action="#{controleManifestacaoBean.saveOcorrencia()}"
+									icon="fa fa-plus" />
+
+								<p:commandButton value="Cancelar" styleClass="btn-orange"
+									icon="fa fa-close" process="@this"
+									oncomplete="PF('dados-historico').hide()" immediate="true" />
+
+								<p:commandButton value="Finalizar Ocorrência" immediate="true"
+									update="tableHistorico msg grid-historico"
+									oncomplete="PF('dados-historico').hide()"
+									rendered="#{controleManifestacaoBean.controleManifestacao.statusOcorrencia != 2 and 
+									escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR'}"
+									action="#{controleManifestacaoBean.finalizarOcorrencia()}"
+									icon="fa fa-plus" />
+
+								<p:spacer width="20" height="0" />
+							</h:panelGrid>
+
+							<br />
+
+							<p:dataTable id="tableHistorico" var="historico"
+								value="#{controleManifestacaoBean.ocorrenciaList}"
+								emptyMessage="Nenhuma atividade foi adicionada">
+
+								<f:facet name="header">
+									<p:outputLabel value="Lista de historico de Ocorrências" />
+								</f:facet>
+
+								<p:column headerText="Protocolo" style="color: #000">
+									<p:outputLabel value="#{historico.protocolo}" />
+								</p:column>
+
+								<p:column headerText="Data de Cadastro" style="color: #000">
+									<p:outputLabel value="#{historico.dataCadastro}">
+										<f:convertDateTime pattern="dd/MM/yyyy" />
+									</p:outputLabel>
+								</p:column>
+
+								<p:column headerText="Responsável" style="color: #000">
+									<p:outputLabel value="#{historico.usuario.nome}" />
+								</p:column>
+
+								<p:column headerText="Data da Ocorrência" style="color: #000">
+									<p:outputLabel value="#{historico.dataOcorrencia}">
+										<f:convertDateTime pattern="dd/MM/yyyy" />
+									</p:outputLabel>
+								</p:column>
+
+								<p:column headerText="Descrição" style="color: #000">
+									<p:outputLabel value="#{historico.descricao}" />
+								</p:column>
+
+							</p:dataTable>
+						</div>
+					</div>
+				</p:dialog>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,203 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:t="http://myfaces.apache.org/tomahawk"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="usuario.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>#{usuarioBean.usuario.id == null ? 'Cadastrar Usuário' :
+					'Atualizar Usuário'}</h1>
+				<h3>#{usuarioBean.usuario.id == null ? 'Preencha o formulário
+					abaixo para cadastrar um novo usuário.' : 'Preencha o formulário
+					abaixo para atualizar o usuário.'}</h3>
+
+				<div class="links-funcionais">
+					<p:link id="lista" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/lista/listarUsuarios.xhtml">
+						<i class="material-icons md-32">list</i>
+						<br />
+					</p:link>
+					<p:tooltip for="lista" position="top" value="Listar Usuários" />
+
+					<p:link styleClass="link-funcional" outcome="/private/index.xhtml"
+						id="inicio">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+			<p:panel style="margin-top: 15px" styleClass="my-panel">
+				<p:outputLabel value="(" />
+				<p:outputLabel value="*" styleClass="campoObrigatorio" />
+				<p:outputLabel value=") Campos obrigatórios." />
+			</p:panel>
+
+			<t:saveState value="#{usuarioBean.usuario}" />
+			<t:saveState value="#{usuarioBean.lazy}" />
+
+			<h:form id="frm">
+				<p:focus for="nome" />
+
+				<div class="ui-fluid">
+					<p:messages showDetail="true" autoUpdate="true" closable="true" />
+
+					<p:panelGrid columns="2" style="margin-top: 20px" layout="grid"
+						columnClasses="ui-grid-col-2" styleClass="ui-panelgrid-blank">
+
+						<h:panelGroup>
+							<p:outputLabel value="Nome: " styleClass="my-label"
+								style="vertical-align: text-top;" for="nome" />
+						</h:panelGroup>
+
+						<p:inputText id="nome" value="#{usuarioBean.usuario.nome}"
+							required="true" label="Nome"
+							requiredMessage="Nome é obrigatório." />
+
+						<h:panelGroup>
+							<p:outputLabel value="CPF: " styleClass="my-label"
+								style="vertical-align: text-top;" for="cpf" />
+						</h:panelGroup>
+
+						<p:inputMask mask="999.999.999-99" id="cpf"
+							value="#{usuarioBean.usuario.cpf}" required="true" label="CPF"
+							requiredMessage="CPF é obrigatório." />
+
+						<h:panelGroup>
+							<p:outputLabel value="E-mail: " styleClass="my-label" for="email" />
+						</h:panelGroup>
+
+						<p:inputText id="email" value="#{usuarioBean.usuario.email}"
+							required="true" label="E-mail"
+							requiredMessage="E-mail é obrigatório." />
+
+						<h:panelGroup>
+							<p:outputLabel value="Celular: " styleClass="my-label"
+								for="celular" />
+						</h:panelGroup>
+
+						<p:inputMask mask="(99) 9 9999-9999" id="celular"
+							style="width: 60%" label="Telefone"
+							value="#{usuarioBean.usuario.celular}" />
+
+						<h:panelGroup>
+							<p:outputLabel value="Telefone: " styleClass="my-label"
+								for="telefone" />
+						</h:panelGroup>
+
+						<p:inputMask mask="(99) 9999-9999" id="telefone"
+							style="width: 60%" label="Telefone"
+							value="#{usuarioBean.usuario.telefone}" />
+
+						<h:panelGroup>
+							<p:outputLabel value="Login:" styleClass="my-label" for="login" />
+						</h:panelGroup>
+
+						<p:inputText value="#{usuarioBean.usuario.login}" id="login"
+							required="true" requiredMessage="Campo 'Login' obrigatório"
+							size="40" />
+
+						<h:panelGroup>
+							<p:outputLabel value="Perfil " styleClass="my-label"
+								style="vertical-align: text-top;" for="perfil" />
+						</h:panelGroup>
+
+						<p:selectOneMenu id="perfil" style="width: 150px" required="true"
+							label="usuario" value="#{usuarioBean.usuario.perfilUser}"
+							requiredMessage="Perfil do usuário é obrigatória.">
+
+							<f:selectItem itemLabel="Selecione" noSelectionOption="true" />
+							<f:selectItems value="#{usuarioBean.perfis}" var="usuario"
+								itemLabel="#{usuario.descricao}" itemValue="#{usuario}" />
+						</p:selectOneMenu>
+						
+						<h:panelGroup>
+							<p:outputLabel value="Loja " styleClass="my-label"
+								style="vertical-align: text-top;" for="loja" />
+						</h:panelGroup>
+
+						<p:selectOneMenu id="loja" style="width: 150px" required="true"
+							label="usuario" value="#{usuarioBean.usuario.loja}"
+							requiredMessage="Lojaé obrigatória.">
+
+							<f:selectItem itemLabel="Selecione" noSelectionOption="true" />
+							<f:selectItems value="#{usuarioBean.lojas}" var="l"
+								itemLabel="#{l.descricao}" itemValue="#{l}" />
+						</p:selectOneMenu>
+
+						<h:panelGroup>
+							<p:outputLabel value="Atualizar Senha?" styleClass="my-label"
+								style="vertical-align: text-top;" for="perfil" />
+						</h:panelGroup>
+						<p:selectOneRadio value="#{usuarioBean.usuario.atualizarSenha}">
+							<f:selectItem itemLabel="Sim" itemValue="true" />
+							<f:selectItem itemLabel="Não" itemValue="false" />
+							<p:ajax update="grid-senha" />
+						</p:selectOneRadio>
+
+					</p:panelGrid>
+
+					<p:panelGrid id="grid-senha" columns="2" style="margin-top: 20px"
+						layout="grid" columnClasses="ui-grid-col-2"
+						styleClass="ui-panelgrid-blank">
+
+						<h:panelGroup rendered="#{usuarioBean.usuario.atualizarSenha}">
+							<p:outputLabel for="pwd1" value="Senha " styleClass="my-label" />
+						</h:panelGroup>
+
+						<p:password id="pwd1" value="#{usuarioBean.usuario.senha}"
+							match="pwd2" label="Senha" required="true" size="40"
+							validatorMessage="As senhas informadas são diferentes, digite novamente!"
+							feedback="true" promptLabel="Digite sua senha!"
+							weakLabel="Senha fraca" goodLabel="Senha média"
+							strongLabel="Senha forte" redisplay="true"
+							rendered="#{usuarioBean.usuario.atualizarSenha}" />
+
+						<h:panelGroup rendered="#{usuarioBean.usuario.atualizarSenha}">
+							<p:outputLabel for="pwd2" value="Confirmar senha "
+								styleClass="my-label" />
+						</h:panelGroup>
+
+						<p:password id="pwd2" value="#{usuarioBean.usuario.senha}"
+							label="Confirmar senha" required="true" size="40"
+							redisplay="true" rendered="#{usuarioBean.usuario.atualizarSenha}" />
+
+
+					</p:panelGrid>
+					<br /> <br />
+					<p:separator />
+					<h:panelGrid columns="3">
+						<p:commandButton value="Salvar" icon="fa fa-floppy-o"
+							action="#{usuarioBean.save}" update="frm"
+							rendered="#{usuarioBean.usuario.id == null}" />
+
+						<p:commandButton value="Atualizar" icon="fa fa-floppy-o"
+							action="#{usuarioBean.update}"
+							rendered="#{usuarioBean.usuario.id != null}" />
+
+						<p:spacer width="20" height="0" />
+
+						<p:commandButton value="Cancelar" action="/private/index.xhtml"
+							immediate="true" rendered="#{usuarioBean.usuario.id == null}"
+							icon="fa fa-ban" ajax="false" />
+
+						<p:commandButton value="Cancelar"
+							action="#{usuarioBean.goToList()}" immediate="true"
+							rendered="#{usuarioBean.usuario.id != null}" icon="fa fa-ban"
+							ajax="false" />
+					</h:panelGrid>
+				</div>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

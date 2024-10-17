@@ -1,0 +1,179 @@
+
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:t="http://myfaces.apache.org/tomahawk"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="logistica.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>#{logisticaBean.logistica.id == null ? 'Cadastrar
+					Logistica' : 'Atualizar Logistica'}</h1>
+				<h3>#{logisticaBean.logistica.id == null ? 'Preencha o
+					formulário abaixo para cadastrar um logistica.' : 'Preencha o
+					formulário abaixo para atualizar o logistica.'}</h3>
+
+				<div class="links-funcionais">
+					<p:link id="lista" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/lista/listarLogistica.xhtml">
+						<i class="material-icons md-32">list</i>
+						<br />
+					</p:link>
+					<p:tooltip for="lista" position="top" value="Listar Logisticas" />
+
+					<p:link styleClass="link-funcional" outcome="/private/index.xhtml"
+						id="inicio">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+			<p:panel style="margin-top: 15px" styleClass="my-panel">
+				<p:outputLabel value="(" />
+				<p:outputLabel value="*" styleClass="campoObrigatorio" />
+				<p:outputLabel value=") Campos obrigatórios." />
+			</p:panel>
+
+			<h:form id="frm">
+				<div class="ui-fluid">
+					<p:messages showDetail="true" autoUpdate="false" closable="true" />
+					<p:panelGrid columns="4" style="margin-top: 20px" layout="grid"
+						columnClasses="ui-grid-col-2" styleClass="ui-panelgrid-blank">
+
+						<h:panelGroup>
+							<p:outputLabel value="Pedido: " styleClass="my-label"
+								for="pedido" />
+							<p:inputText id="pedido" required="true"
+								value="#{logisticaBean.logistica.pedido}">
+							</p:inputText>
+						</h:panelGroup>
+
+						<h:panelGroup>
+							<p:outputLabel value="Local: " styleClass="my-label"
+								style="vertical-align: text-top;" for="local" />
+							<br />
+							<p:selectOneMenu required="true" id="local"
+								value="#{logisticaBean.logistica.localLogistica}">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{logisticaBean.locaisLogistica}" var="l"
+									itemLabel="#{l.descricao}" itemValue="#{l}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup rendered="#{logisticaBean.logistica.id != null}">
+							<p:outputLabel value="Status: " styleClass="my-label"
+								style="vertical-align: text-top;" for="status" />
+							<p:selectOneMenu required="true" id="status"
+								rendered="#{logisticaBean.logistica.id != null}"
+								value="#{logisticaBean.logistica.statusLogistica}">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{logisticaBean.statusLogistica}" var="l"
+									itemLabel="#{l.descricao}" itemValue="#{l}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup rendered="#{logisticaBean.logistica.id != null}">
+							<p:outputLabel value="Tipo Envio: " styleClass="my-label"
+								style="vertical-align: text-top;" for="tipo-envio" />
+							<br />
+							<p:selectOneMenu required="true" id="tipo-envio"
+								rendered="#{logisticaBean.logistica.id != null}"
+								value="#{logisticaBean.logistica.tipoEnvioLogistica}">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{logisticaBean.tipoEnvioLogistica}"
+									var="l" itemLabel="#{l.descricao}" itemValue="#{l}" />
+								<p:ajax update="grid-rendered" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup rendered="#{logisticaBean.logistica.id != null}">
+							<p:outputLabel value="Data Envio: " styleClass="my-label"
+								style="vertical-align: text-top;" for="data-envio" />
+							<br />
+							<p:calendar size="10" navigator="true" id="data-envio"
+								rendered="#{logisticaBean.logistica.id != null}"
+								value="#{logisticaBean.logistica.dataEnvio}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+
+						<h:panelGrid id="grid-rendered" columns="2"
+							style="width: 100% !important">
+							<h:panelGroup
+								rendered="#{logisticaBean.logistica.id != null and logisticaBean.logistica.tipoEnvioLogistica eq 'DELIVERY'}">
+								<p:outputLabel value="Motoboy:" styleClass="my-label"
+									style="vertical-align: text-top;" for="motoboy" />
+							</h:panelGroup>
+							<br />
+							<p:selectOneMenu value="#{logisticaBean.logistica.motoboy}"
+								id="motoboy"
+								rendered="#{logisticaBean.logistica.id != null and logisticaBean.logistica.tipoEnvioLogistica
+								 eq 'DELIVERY'}"
+								requiredMessage="Selecione o motoboy"
+								converter="genericConverter">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{motoboyBean.motoboys}" var="m"
+									itemLabel="#{m.nome}" itemValue="#{m}" />
+							</p:selectOneMenu>
+
+							<h:panelGroup
+								rendered="#{logisticaBean.logistica.id != null and logisticaBean.logistica.tipoEnvioLogistica eq 'EXCURSAO'}">
+								<p:outputLabel value="Excursão:" styleClass="my-label"
+									style="vertical-align: text-top;" for="excursao" />
+							</h:panelGroup>
+							<br />
+							<p:selectOneMenu value="#{logisticaBean.logistica.excursao}"
+								id="excursao"
+								rendered="#{logisticaBean.logistica.id != null and logisticaBean.logistica.tipoEnvioLogistica eq 'EXCURSAO'}"
+								requiredMessage="Selecione a excursão"
+								converter="genericConverter">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{excursaoBean.excursaos}" var="m"
+									itemLabel="#{m.nome}" itemValue="#{m}" />
+							</p:selectOneMenu>
+						</h:panelGrid>
+					</p:panelGrid>
+					<br />
+
+					<h:panelGroup>
+						<p:outputLabel value="Observação: " styleClass="my-label"
+							for="observacao" />
+					</h:panelGroup>
+					<p:inputTextarea id="observacao" rows="6" cols="60"
+						label="Observação" value="#{logisticaBean.logistica.observacao}" />
+
+					<br /> <br />
+					<p:separator />
+					<h:panelGrid columns="3">
+						<p:commandButton value="Salvar" icon="fa fa-floppy-o"
+							action="#{logisticaBean.save}" update="frm"
+							rendered="#{logisticaBean.logistica.id == null}" />
+
+						<p:commandButton value="Atualizar" icon="fa fa-floppy-o"
+							action="#{logisticaBean.update}"
+							rendered="#{logisticaBean.logistica.id != null}" />
+
+						<p:spacer width="20" height="0" />
+
+						<p:commandButton value="Cancelar" action="/private/index.xhtml"
+							immediate="true" rendered="#{logisticaBean.logistica.id == null}"
+							icon="fa fa-ban" ajax="false" />
+
+						<p:commandButton value="Cancelar"
+							action="#{logisticaBean.goToList()}" immediate="true"
+							rendered="#{logisticaBean.logistica.id != null}" icon="fa fa-ban"
+							ajax="false" />
+					</h:panelGrid>
+				</div>
+			</h:form>
+
+		</div>
+	</ui:define>
+</ui:composition>

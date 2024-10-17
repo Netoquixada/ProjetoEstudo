@@ -1,0 +1,246 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="cliente.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>Lista de Clientes</h1>
+				<h3>Listagem de clientes cadastrados no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{clienteBean.cliente}" />
+			<t:saveState value="#{clienteBean.lazy}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel styleClass="panel-pesquisa" style="margin-top: 15px">
+					<div class="lupa">
+						<p:graphicImage library="imagens" name="SearchLupa.png" />
+					</div>
+
+					<h:panelGrid columns="10">
+						<p:outputLabel value="Nome: " styleClass="my-label" />
+						<p:inputText value="#{clienteBean.clienteFilter.nome}" size="30"
+							id="nome" />
+
+						<p:outputLabel value="Cidade: " styleClass="my-label" />
+						<p:inputText value="#{clienteBean.clienteFilter.cidade}" size="30"
+							id="cidade" />
+
+						<p:commandButton value="Pesquisar"
+							style="margin-left: 5px; width: 100px !important"
+							update="table-clientes" action="#{clienteBean.list()}" />
+					</h:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-clientes" value="#{clienteBean.lazy}"
+					var="entity" paginator="true" style="margin-top: 15px"
+					paginatorAlwaysVisible="false" rows="10" lazy="true">
+
+
+					<p:column headerText="Código" styleClass="Center"
+						style="width: 50px">
+						<p:outputLabel value="#{entity.id}" />
+					</p:column>
+
+					<p:column headerText="Nome" style="width: 200px">
+						<p:outputLabel value="#{entity.nome}" />
+					</p:column>
+
+					<p:column headerText="Cidade" styleClass="Center"
+						style="width: 100px">
+						<p:outputLabel value="#{entity.cidade}" />
+					</p:column>
+
+					<p:column headerText="Estado" styleClass="Center"
+						style="width: 50px">
+						<p:outputLabel value="#{entity.estado}" />
+					</p:column>
+
+					<p:column headerText="Fone" styleClass="Center" style="width: 90px">
+						<p:outputLabel value="#{entity.fone}" />
+					</p:column>
+					<p:column headerText="Excursão" styleClass="Center"
+						style="width: 90px">
+						<p:outputLabel value="#{entity.excursao.nome}" />
+					</p:column>
+
+					<p:column headerText="Excursão" style="width: 30px"
+						styleClass="Center">
+
+						<p:commandLink id="lnkEditar" oncomplete="PF('dados').show()"
+							style="text-decoration: none" update=":form-cadastro:dados">
+							<i class="material-icons GrayDark">directions_bus</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{clienteBean.cliente}" />
+						</p:commandLink>
+
+						<p:tooltip for="lnkEditar" value="Editar" position="top" />
+					</p:column>
+					<p:column headerText="Cartão Fidelidade" style="width: 100px"
+						styleClass="Center">
+						<p:commandLink id="pdf" ajax="false" target="_blank"
+							action="#{clienteBean.gerarPDFCartao()}" title="Download"
+							style="text-decoration: none">
+							<i class="material-icons GrayDark">credit_card</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{clienteBean.cliente}" />
+						</p:commandLink>
+
+						<p:commandLink id="etiqueta" update=":frm:dlg-etiqueta"
+							oncomplete="PF('dlg-etiqueta').show()" title="Etiqueta"
+							style="text-decoration: none">
+							<i class="material-icons GrayDark">get_app</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{clienteBean.cliente}" />
+						</p:commandLink>
+
+					</p:column>
+				</p:dataTable>
+
+
+				<p:dialog id="dlg-etiqueta" modal="true" widgetVar="dlg-etiqueta"
+					resizable="false" header="Selecione a opção" width="80%">
+					<h:panelGrid columns="2" cellpadding="5">
+
+						<h:panelGroup>
+							<p:outputLabel value="Tipo: " />
+							<br />
+							<p:selectOneMenu value="#{clienteBean.cliente.tipoEscursao}">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{clienteBean.tiposExcursao}" var="t"
+									itemLabel="#{t.descricao}" itemValue="#{t}" />
+								<p:ajax update="group-endereco group-bairro group-cidade
+								group-local group-nome group-data" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<br />
+						<h:panelGroup >
+							<p:outputLabel value="Pedido: " />
+							<br />
+							<p:inputText value="#{clienteBean.cliente.pedido}" size="40" />
+						</h:panelGroup>
+						<h:panelGroup id="group-local">
+							<p:outputLabel value="Local Excursão: "
+								rendered="#{clienteBean.cliente.tipoEscursao eq 'EXCURSAO'}" />
+							<br />
+							<p:inputText value="#{clienteBean.cliente.localExcursao}"
+								rendered="#{clienteBean.cliente.tipoEscursao eq 'EXCURSAO'}"
+								size="40" />
+						</h:panelGroup>
+						<h:panelGroup id="group-nome">
+							<p:outputLabel value="Nome Excursão: "
+								rendered="#{clienteBean.cliente.tipoEscursao eq 'EXCURSAO'}" />
+							<br />
+							<p:inputText value="#{clienteBean.cliente.nomeExcursao}"
+								rendered="#{clienteBean.cliente.tipoEscursao eq 'EXCURSAO'}"
+								size="40" />
+						</h:panelGroup>
+						<h:panelGroup id="group-data">
+							<p:outputLabel value="Data: "
+								rendered="#{clienteBean.cliente.tipoEscursao eq 'EXCURSAO'}" />
+							<br />
+							<p:calendar value="#{clienteBean.cliente.dataEnvio}"
+								rendered="#{clienteBean.cliente.tipoEscursao eq 'EXCURSAO'}"
+								pattern="dd/MM/yyyy" size="40" />
+						</h:panelGroup>
+						<h:panelGroup id="group-endereco">
+							<p:outputLabel value="Endereço: "
+								rendered="#{clienteBean.cliente.tipoEscursao eq 'DELIVERY' or clienteBean.cliente.tipoEscursao eq 'TRANSPORTADORA'}" />
+							<br />
+							<p:inputText value="#{clienteBean.cliente.enderecoExcursao}"
+								size="40"
+								rendered="#{clienteBean.cliente.tipoEscursao eq 'DELIVERY' or clienteBean.cliente.tipoEscursao eq 'TRANSPORTADORA'}"/>
+						</h:panelGroup>
+						<h:panelGroup id="group-bairro">
+							<p:outputLabel value="Bairro: "
+								rendered="#{clienteBean.cliente.tipoEscursao eq 'DELIVERY' or clienteBean.cliente.tipoEscursao eq 'TRANSPORTADORA'}" />
+							<br />
+							<p:inputText value="#{clienteBean.cliente.bairroExcursao}"
+								size="40"
+								rendered="#{clienteBean.cliente.tipoEscursao eq 'DELIVERY' or clienteBean.cliente.tipoEscursao eq 'TRANSPORTADORA'}" />
+						</h:panelGroup>
+						<h:panelGroup id="group-cidade">
+							<p:outputLabel value="Cidade: "
+								rendered="#{clienteBean.cliente.tipoEscursao eq 'DELIVERY' or clienteBean.cliente.tipoEscursao eq 'TRANSPORTADORA'}"/>
+							<br />
+							<p:inputText value="#{clienteBean.cliente.cidadeExcursao}"
+								size="40"
+								rendered="#{clienteBean.cliente.tipoEscursao eq 'DELIVERY' or clienteBean.cliente.tipoEscursao eq 'TRANSPORTADORA'}" />
+						</h:panelGroup>
+
+					</h:panelGrid>
+					<h:panelGroup>
+						<p:outputLabel value="Observação: " />
+						<br />
+						<p:inputTextarea value="#{clienteBean.cliente.observacao}"
+							rows="4" cols="60" />
+					</h:panelGroup>
+					<br />
+					<p:separator />
+					<p:commandButton value="Gerar Etiqueta" ajax="false"
+						oncomplete="PF('dlg-etiqueta').hide()"
+						action="#{clienteBean.gerarPDFEtiqueta()}" />
+				</p:dialog>
+			</h:form>
+
+			<h:form id="form-cadastro">
+				<p:dialog modal="true" id="dados" widgetVar="dados"
+					resizable="false" header="Excursão de: #{clienteBean.cliente.nome}">
+
+					<div class="ui-fluid">
+						<p:messages showDetail="true" autoUpdate="true" closable="true" />
+
+						<h:panelGrid columns="2" style="margin-top: 20px"
+							id="grid-cadastro">
+
+							<h:panelGroup>
+								<p:outputLabel value="Excursão: " styleClass="my-label"
+									style="vertical-align: text-top;" />
+							</h:panelGroup>
+
+							<p:autoComplete value="#{clienteBean.cliente.excursao}"
+								autocomplete="true" size="36" id="excursao"
+								completeMethod="#{excursaoBean.getExcursaoAutoComplete}"
+								forceSelection="true" minQueryLength="1" maxResults="30"
+								dropdown="true"
+								converterMessage="Não foi possível selecionar a excursão(Erro ao converter o objeto)"
+								converter="genericConverter" var="e" itemLabel="#{e.nome}"
+								itemValue="#{e}" placeholder="Pesquise pelo nome da excursão">
+							</p:autoComplete>
+							<p:spacer height="35" />
+						</h:panelGrid>
+						<p:separator />
+						<h:panelGrid columns="3">
+							<p:commandButton value="Atualizar" icon="fa fa-floppy-o"
+								action="#{clienteBean.update}"
+								rendered="#{clienteBean.cliente.id != null}" />
+							<p:spacer width="20" height="0" />
+						</h:panelGrid>
+					</div>
+				</p:dialog>
+			</h:form>
+
+		</div>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,355 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="avaliacao.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>Lista de Produto/Consumo</h1>
+				<h3>Listagem de produto/consumo cadastradas no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:link id="cadastrar" styleClass="link-funcional"
+						style="margin-top: 3px" rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR'}"
+						outcome="/private/cadastro/cadastrarProdutoConsumo.xhtml">
+						<i class="material-icons md-32">add_to_photos</i>
+						<br />
+					</p:link>
+					<p:tooltip for="cadastrar" position="top"
+						value="Cadastrar Produto/Consumo" />
+					<p:link id="cadastrar02" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/cadastro/cadastrarProdutoConsumo02.xhtml">
+						<i class="material-icons md-32">note_add</i>
+						<br />
+					</p:link>
+					<p:tooltip for="cadastrar02" position="top"
+						value="Cadastrar Produto/Consumo Atualizado" />
+					
+
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{produtoConsumoBean.produtoConsumo}" />
+			<t:saveState value="#{produtoConsumoBean.itemProdutoConsumoList}" />
+			<t:saveState value="#{produtoConsumoBean.produtoConsumos}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel styleClass="panel-pesquisa" style="margin-top: 15px">
+					<div class="lupa">
+						<p:graphicImage library="imagens" name="SearchLupa.png" />
+					</div>
+					<h:panelGrid columns="15">
+						<p:outputLabel value="Produto: " styleClass="my-label" />
+						<p:autoComplete
+							value="#{produtoConsumoBean.produtoConsumoFilter.produto}"
+							autocomplete="true" size="36" id="produto"
+							completeMethod="#{produtoBean.getProdutoAutoCompletePorProduto}"
+							forceSelection="true" minQueryLength="2" maxResults="30"
+							dropdown="true"
+							converterMessage="Não foi possível selecionar o produto (Erro ao converter o objeto)"
+							converter="produtoConverter" var="prod" itemLabel="#{prod.nome}"
+							itemValue="#{prod}" placeholder="Pesquise pelo código">
+						</p:autoComplete>
+
+						<p:commandButton value="Pesquisar" icon="fa fa-search"
+							style="margin-left: 5px; width: 100px !important"
+							update="table-produto-consumo"
+							action="#{produtoConsumoBean.list()}" />
+
+						<p:commandButton id="report"
+							actionListener="#{produtoConsumoBean.gerarPDF}" icon="fa fa-download"
+							value="Gerar PDF" onclick="this.form.target='_blank'"
+							ajax="false">
+						</p:commandButton>
+					</h:panelGrid>
+
+				</p:panel>
+
+				<p:dataTable id="table-produto-consumo"
+					value="#{produtoConsumoBean.produtoConsumos}" var="entity"
+					paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10"
+					lazy="true">
+
+					<p:column headerText="Produto">
+						<p:outputLabel value="#{entity.produto.nome}" />
+					</p:column>
+
+					<p:column headerText="Referência" width="90">
+						<p:outputLabel value="#{entity.produto.id}" />
+					</p:column>
+
+					<p:column styleClass="Center" headerText="Venda Varejo(R$)">
+						<p:outputLabel value="#{entity.vendaVarejo}"
+							styleClass="negrito label-azul">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column styleClass="Center" headerText="Venda Atacado(R$)">
+						<p:outputLabel value="#{entity.vendaAtacado}"
+							styleClass="negrito label-azul">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+
+					<!-- 					<p:column styleClass="Center" headerText="Custo Facção(R$)"> -->
+					<!-- 						<p:outputLabel value="#{entity.costura}" styleClass="negrito label-vermelho"> -->
+					<!-- 							<f:convertNumber minFractionDigits="2" type="currency" -->
+					<!-- 								maxFractionDigits="2" /> -->
+					<!-- 						</p:outputLabel> -->
+					<!-- 					</p:column> -->
+
+					<!-- 					<p:column styleClass="Center" headerText="Cartão(R$)"> -->
+					<!-- 						<p:outputLabel value="#{entity.cartao}" styleClass="negrito label-vermelho"> -->
+					<!-- 							<f:convertNumber minFractionDigits="2" type="currency" -->
+					<!-- 								maxFractionDigits="2" /> -->
+					<!-- 						</p:outputLabel> -->
+					<!-- 					</p:column> -->
+
+					<!-- 					<p:column styleClass="Center" headerText="Comissões(R$)"> -->
+					<!-- 						<p:outputLabel value="#{entity.comissoes}" styleClass="negrito label-vermelho"> -->
+					<!-- 							<f:convertNumber minFractionDigits="2" type="currency" -->
+					<!-- 								maxFractionDigits="2" /> -->
+					<!-- 						</p:outputLabel> -->
+					<!-- 					</p:column> -->
+
+					<!-- 					<p:column styleClass="Center" headerText="Impostos(R$)"> -->
+					<!-- 						<p:outputLabel value="#{entity.impostos}" styleClass="negrito label-vermelho"> -->
+					<!-- 							<f:convertNumber minFractionDigits="2" type="currency" -->
+					<!-- 								maxFractionDigits="2" /> -->
+					<!-- 						</p:outputLabel> -->
+					<!-- 					</p:column> -->
+
+					<!-- 					<p:column styleClass="Center" headerText="Loja(R$)"> -->
+					<!-- 						<p:outputLabel value="#{entity.loja}" styleClass="negrito label-vermelho"> -->
+					<!-- 							<f:convertNumber minFractionDigits="2" type="currency" -->
+					<!-- 								maxFractionDigits="2" /> -->
+					<!-- 						</p:outputLabel> -->
+					<!-- 					</p:column> -->
+
+					<!-- 					<p:column styleClass="Center" headerText="Outros (R$)" > -->
+					<!-- 						<p:outputLabel value="#{entity.outros}" styleClass="negrito label-vermelho"> -->
+					<!-- 							<f:convertNumber minFractionDigits="2" type="currency" -->
+					<!-- 								maxFractionDigits="2" /> -->
+					<!-- 						</p:outputLabel> -->
+					<!-- 					</p:column> -->
+
+					<p:column headerText="Observação">
+						<p:outputLabel value="#{entity.observacao}" />
+					</p:column>
+
+					<p:column headerText="Ações" style="width: 130px"
+						styleClass="Center">
+						<p:commandLink id="lnkDetail" rendered="#{entity.status}"
+							oncomplete="PF('dados').show()" style="text-decoration: none"
+							update=":frm:dados" title="Detalhes"
+							action="#{produtoConsumoBean.carregarListaItemProdutoConsumo()}">
+							<i class="material-icons GrayDark">assignment</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{produtoConsumoBean.produtoConsumo}" />
+						</p:commandLink>
+						<p:spacer />
+						<p:link ajax="false" id="lnkEditar" title="Editar"
+							rendered="#{entity.status}"
+							outcome="#{produtoConsumoBean.prepareUpdate()}"
+							style="text-decoration: none">
+							<i class="material-icons GrayDark">mode_edit</i>
+							<f:param name="id" value="#{entity.id}" />
+						</p:link>
+						<p:spacer />
+						<p:commandLink id="pdf" ajax="false"
+							action="#{produtoConsumoBean.gerarPDFOrdemCorte()}" title="Download"
+							style="text-decoration: none">
+							<i class="material-icons GrayDark">get_app</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{produtoConsumoBean.produtoConsumo}" />
+						</p:commandLink>
+					</p:column>
+				</p:dataTable>
+
+				<p:dialog header="Detalhes de Produto/Consumo" modal="true"
+					closable="true" width="1000" closeOnEscape="true" draggable="false"
+					id="dados" widgetVar="dados" resizable="false">
+
+					<div class="scroll-dialog">
+						<p:panelGrid columns="2" style="margin-top: 20px" layout="grid"
+							styleClass="ui-panelgrid-blank">
+
+							<p:panelGrid columns="2" style="margin-top: 20px" layout="grid"
+								styleClass="ui-panelgrid-blank">
+								<p:outputLabel value="Produto: " styleClass="my-label" />
+								<p:outputLabel
+									value="#{produtoConsumoBean.produtoConsumo.produto.nome}" />
+								<p:outputLabel value="Referência: " styleClass="my-label" />
+								<p:outputLabel
+									value="#{produtoConsumoBean.produtoConsumo.produto.id}" />
+
+								<p:outputLabel value="Venda Varejo: " styleClass="my-label" />
+								<p:outputLabel
+									value="#{produtoConsumoBean.produtoConsumo.vendaVarejo}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+
+								<p:outputLabel value="Venda Atacado: " styleClass="my-label" />
+								<p:outputLabel
+									value="#{produtoConsumoBean.produtoConsumo.vendaAtacado}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+								<p:outputLabel value="Costura: " styleClass="my-label" />
+								<p:outputLabel
+									value="#{produtoConsumoBean.produtoConsumo.costura}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+								<p:outputLabel value="Cartão (%): " styleClass="my-label" />
+								<p:outputLabel
+									value="#{produtoConsumoBean.produtoConsumo.percentualCartao}">
+									<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+										minFractionDigits="2" type="number" />
+								</p:outputLabel>
+								<p:outputLabel value="Comissões (%): " styleClass="my-label" />
+								<p:outputLabel
+									value="#{produtoConsumoBean.produtoConsumo.percentualComissao}">
+									<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+										minFractionDigits="2" type="number" />
+								</p:outputLabel>
+								<p:outputLabel value="Impostos (%): " styleClass="my-label" />
+								<p:outputLabel
+									value="#{produtoConsumoBean.produtoConsumo.percentualImpostos}">
+									<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+										minFractionDigits="2" type="number" />
+								</p:outputLabel>
+								<p:outputLabel value="Loja: " styleClass="my-label" />
+								<p:outputLabel value="#{produtoConsumoBean.produtoConsumo.loja}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+								<p:outputLabel value="Outros: " styleClass="my-label" />
+								<p:outputLabel
+									value="#{produtoConsumoBean.produtoConsumo.outros}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+								<p:outputLabel value="Observação: " styleClass="my-label" />
+								<p:outputLabel
+									value="#{produtoConsumoBean.produtoConsumo.observacao}" />
+							</p:panelGrid>
+							<p:panelGrid columns="1" style="margin-top: 20px" layout="grid"
+								styleClass="ui-panelgrid-blank">
+
+								<h:panelGroup style="width: 25%">
+									<div class="panel-total-projeto shadow-effect">
+										<div class="panel-icon" style="background-color: #283593;">
+											<div class="marginTop10"></div>
+											<i class="material-icons md-48 md-light">credit_card</i>
+										</div>
+
+										<div class="panel-infor" style="background-color: #3f51b5;">
+											<div class="marginTop10"></div>
+											<div style="font-size: 12px" class="Fs16">TOTAL GERAL</div>
+											<div style="font-size: 22px" class="animated pulse infinite">
+												<p:outputLabel value="#{produtoConsumoBean.totalGeral}">
+													<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+														minFractionDigits="2" type="currency" />
+												</p:outputLabel>
+											</div>
+										</div>
+									</div>
+								</h:panelGroup>
+
+								<h:panelGroup style="width: 25%">
+									<div class="panel-total-projeto shadow-effect">
+										<div class="panel-icon" style="#{produtoConsumoBean.percentualLucroVarejo ge 30 ? 'background-color: #126610;' : 'background-color: #9c1313'}">
+											<div class="marginTop10"></div>
+											<i class="material-icons md-48 md-light">credit_card</i>
+										</div>
+
+										<div class="panel-infor" style="#{produtoConsumoBean.percentualLucroVarejo ge 30 ? 'background-color: #1a7221;' : 'background-color: #8f2332'}">
+											<div class="marginTop10"></div>
+											<div style="font-size: 12px" class="Fs16">LUCRO VAREJO</div>
+											<div style="font-size: 16px" class="animated pulse infinite">
+												<p:outputLabel value="#{produtoConsumoBean.lucroVarejo}">
+													<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+														minFractionDigits="2" type="currency" />
+												</p:outputLabel>
+												->
+												<p:outputLabel
+													value="#{produtoConsumoBean.percentualLucroVarejo}">
+													<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+														minFractionDigits="2" type="number" />
+												</p:outputLabel>
+												%
+											</div>
+										</div>
+									</div>
+								</h:panelGroup>
+
+								<h:panelGroup style="width: 25%">
+									<div class="panel-total-projeto shadow-effect">
+										<div class="panel-icon" style="#{produtoConsumoBean.percentualLucroAtacado ge 30 ? 'background-color: #126610;' : 'background-color: #9c1313'}">
+											<div class="marginTop10"></div>
+											<i class="material-icons md-48 md-light">credit_card</i>
+										</div>
+
+										<div class="panel-infor" style="#{produtoConsumoBean.percentualLucroAtacado ge 30 ? 'background-color: #1a7221;' : 'background-color: #8f2332'}">
+											<div class="marginTop10"></div>
+											<div style="font-size: 12px" class="Fs16">LUCRO ATACADO</div>
+											<div style="font-size: 16px" class="animated pulse infinite">
+												<p:outputLabel value="#{produtoConsumoBean.lucroAtacado}">
+													<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+														minFractionDigits="2" type="currency" />
+												</p:outputLabel>
+												->
+												<p:outputLabel
+													value="#{produtoConsumoBean.percentualLucroAtacado}">
+													<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+														minFractionDigits="2" type="number" />
+												</p:outputLabel>
+												%
+											</div>
+										</div>
+									</div>
+								</h:panelGroup>
+
+								<p:graphicImage value="#{recuperaImagemMB.image}" width="400px"
+									height="250" styleClass="my-img">
+									<f:param name="id"
+										value="#{produtoConsumoBean.produtoConsumo.id}" />
+								</p:graphicImage>
+							</p:panelGrid>
+						</p:panelGrid>
+						<br />
+
+						<ui:include src="/private/fragmentos/itens-produto-consumo.xhtml" />
+						<br />
+					</div>
+				</p:dialog>
+
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

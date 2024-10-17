@@ -1,0 +1,178 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="materia.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>Lista de Materia Prima</h1>
+				<h3>Listagem de materias primas cadastradas no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:link id="cadastrar" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/cadastro/cadastrarMateriaPrima.xhtml">
+						<i class="material-icons md-32">add_to_photos</i>
+						<br />
+					</p:link>
+					<p:tooltip for="cadastrar" position="top"
+						value="Cadastrar Materia Prima" />
+
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{materiaPrimaBean.materiaPrima}" />
+			<t:saveState value="#{materiaPrimaBean.materiaPrimas}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel styleClass="panel-pesquisa" style="margin-top: 15px">
+					<div class="lupa">
+						<p:graphicImage library="imagens" name="SearchLupa.png" />
+					</div>
+
+					<h:panelGrid columns="10">
+
+						<p:outputLabel value="Status: " styleClass="my-label" />
+						<p:selectOneRadio
+							value="#{materiaPrimaBean.materiaPrimaFilter.status}">
+							<f:selectItem itemLabel="Ativo" itemValue="true" />
+							<f:selectItem itemLabel="Inativo" itemValue="false" />
+						</p:selectOneRadio>
+
+						<p:outputLabel value="Grupo Item: " styleClass="my-label" />
+						<p:selectOneMenu 
+							value="#{materiaPrimaBean.materiaPrimaFilter.grupoItem}"
+							required="true" label="Saldo"
+							requiredMessage="Grupo Item é obrigatório.">
+							<f:selectItem itemLabel="Selecione" />
+							<f:selectItems var="u" value="#{materiaPrimaBean.grupoItens}"
+								itemLabel="#{u.descricao}" itemValue="#{u}" />
+						</p:selectOneMenu>
+
+						<p:outputLabel value="Nome: " styleClass="my-label" />
+						<p:inputText value="#{materiaPrimaBean.materiaPrimaFilter.nome}"
+							size="30" id="nome" />
+
+						<p:commandButton value="Pesquisar" icon="fa fa-search"
+							style="margin-left: 5px; width: 100px !important"
+							update="table-materia" action="#{materiaPrimaBean.list()}" />
+
+						<p:commandButton id="report" value="Donwload"
+							actionListener="#{materiaPrimaBean.gerarPDF}"
+							icon="fa fa-download" onclick="this.form.target='_blank'"
+							ajax="false">
+						</p:commandButton>
+
+					</h:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-materia"
+					value="#{materiaPrimaBean.materiaPrimas}" var="entity"
+					paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10"
+					lazy="true">
+
+					<p:column headerText="Status" style="width: 50px"
+						styleClass="Center">
+						<p:commandLink id="lnkAlterarStatus"
+							action="#{materiaPrimaBean.updateStatus()}"
+							update="table-materia"
+							title="#{entity.status ? 'Desativar' : 'Ativar'}">
+
+							<h:panelGroup rendered="#{!entity.status}">
+								<i class="material-icons Red">remove_circle</i>
+							</h:panelGroup>
+
+							<h:panelGroup rendered="#{entity.status}">
+								<i class="material-icons Green">check_circle</i>
+							</h:panelGroup>
+
+							<f:setPropertyActionListener
+								target="#{materiaPrimaBean.materiaPrima}" value="#{entity}" />
+						</p:commandLink>
+					</p:column>
+
+					<p:column headerText="Nome">
+						<p:outputLabel value="#{entity.nome}" />
+					</p:column>
+
+					<p:column styleClass="Center" headerText="Valor (R$)">
+						<p:outputLabel value="#{entity.valor}" styleClass="negrito">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Grupo Item">
+						<p:outputLabel value="#{entity.grupoItem.descricao}" />
+					</p:column>
+
+					<p:column headerText="Sugrupo">
+						<p:outputLabel value="#{entity.subGrupo.nome}" />
+					</p:column>
+
+					<p:column headerText="Tipo">
+						<p:outputLabel value="#{entity.tipoMateriaPrima.descricao}" />
+					</p:column>
+
+					<p:column headerText="Unidade de medida">
+						<p:outputLabel
+							value="#{entity.unidadeMedida} - #{entity.unidadeMedida.descricao}" />
+					</p:column>
+
+					<p:column headerText="Saldo">
+						<p:outputLabel value="#{entity.saldo}" />
+					</p:column>
+
+					<p:column headerText="Ultima atualização" styleClass="Center">
+						<p:outputLabel value="#{entity.ultimaAtualizacao}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Fornecedores" width="300">
+						<ul>
+							<ui:repeat var="f" value="#{entity.fornecedores}">
+								<li><p:outputLabel value="#{f.nome}" /></li>
+							</ui:repeat>
+						</ul>
+					</p:column>
+
+					<p:column headerText="Ações" style="width: 60px"
+						styleClass="Center">
+
+						<p:link ajax="false" id="lnkEditar" title="Editar"
+							rendered="#{entity.status}"
+							outcome="#{materiaPrimaBean.prepareUpdate()}"
+							style="text-decoration: none">
+							<i class="material-icons GrayDark">mode_edit</i>
+							<f:param name="id" value="#{entity.id}" />
+						</p:link>
+						<p:spacer />
+
+						<p:tooltip for="lnkEditar" value="Editar" position="top" />
+					</p:column>
+				</p:dataTable>
+
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

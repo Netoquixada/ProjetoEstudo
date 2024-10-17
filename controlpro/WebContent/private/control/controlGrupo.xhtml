@@ -1,0 +1,155 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="grupo.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>Lista de Grupos</h1>
+				<h3>Listagem de grupos cadastrados no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:commandLink id="cadastrar" styleClass="link-funcional"
+						style="margin-top: 3px" update=":form-cadastro:dados"
+						oncomplete="PF('dados').show()">
+						<i class="material-icons md-32">add_to_photos</i>
+						<br />
+					</p:commandLink>
+					<p:tooltip for="cadastrar" position="top" value="Cadastrar grupo" />
+
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{grupoBean.grupo}" />
+			<t:saveState value="#{grupoBean.lazy}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="false" closable="true" />
+
+				<p:panel styleClass="panel-pesquisa" style="margin-top: 15px">
+					<div class="lupa">
+						<p:graphicImage library="imagens" name="SearchLupa.png" />
+					</div>
+
+					<h:panelGrid columns="10">
+						<p:outputLabel value="Nome: " styleClass="my-label" />
+						<p:inputText value="#{grupoBean.grupoFilter.nome}" size="30"
+							id="nome" />
+
+						<p:commandButton value="Pesquisar"
+							style="margin-left: 5px; width: 100px !important"
+							update="table-grupo" action="#{grupoBean.list()}" />
+					</h:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-grupo" value="#{grupoBean.lazy}" var="entity"
+					paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10"
+					lazy="true">
+
+					<p:column headerText="Status" style="width: 50px"
+						styleClass="Center">
+						<p:commandLink id="lnkAlterarStatus"
+							action="#{grupoBean.updateStatus()}" update="table-grupo"
+							title="#{entity.status ? 'Desativar' : 'Ativar'}">
+
+							<h:panelGroup rendered="#{!entity.status}">
+								<i class="material-icons Red">remove_circle</i>
+							</h:panelGroup>
+
+							<h:panelGroup rendered="#{entity.status}">
+								<i class="material-icons Green">check_circle</i>
+							</h:panelGroup>
+
+							<f:setPropertyActionListener target="#{grupoBean.grupo}"
+								value="#{entity}" />
+						</p:commandLink>
+					</p:column>
+
+					<p:column headerText="Nome">
+						<p:outputLabel value="#{entity.nome}" />
+					</p:column>
+					<p:column headerText="Observação">
+						<p:outputLabel value="#{entity.observacao}" />
+					</p:column>
+
+					<p:column headerText="Ações" style="width: 60px"
+						styleClass="Center">
+
+						<p:commandLink id="lnkEditar" rendered="#{entity.status}"
+							oncomplete="PF('dados').show()" style="text-decoration: none"
+							update=":form-cadastro:dados">
+							<i class="material-icons GrayDark">mode_edit</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{grupoBean.grupo}" />
+						</p:commandLink>
+
+						<p:tooltip for="lnkEditar" value="Editar" position="top" />
+					</p:column>
+				</p:dataTable>
+			</h:form>
+
+			<h:form id="form-cadastro">
+				<p:dialog modal="true" id="dados" widgetVar="dados"
+				resizable="false">
+
+					<f:facet name="header">
+					#{grupoBean.grupo.id == null ? 'Cadastrar Grupo' :
+					'Atualizar Grupo'}
+					</f:facet>
+
+					<div class="ui-fluid">
+						<p:messages showDetail="true" autoUpdate="true" closable="true" />
+
+						<h:panelGrid columns="2" style="margin-top: 20px" 
+							id="grid-cadastro" >
+
+							<h:panelGroup>
+								<p:outputLabel value="Nome: " styleClass="my-label"
+									style="vertical-align: text-top;" for="nome" />
+							</h:panelGroup>
+							<p:inputText id="nome" value="#{grupoBean.grupo.nome}"
+								required="true" label="Nome"
+								requiredMessage="Nome é obrigatório." />
+							<h:panelGroup>
+								<p:outputLabel value="Observação: " styleClass="my-label"
+									style="vertical-align: text-top;" for="observacao" />
+							</h:panelGroup>
+							<p:inputTextarea rows="6" cols="60" id="observacao"
+								value="#{grupoBean.grupo.observacao}" label="Observação" />
+						</h:panelGrid>
+						<p:separator />
+						<h:panelGrid columns="3">
+							<p:commandButton value="Salvar" icon="fa fa-floppy-o"
+								action="#{grupoBean.save}"
+								update="grid-cadastro :frm:table-grupo"
+								rendered="#{grupoBean.grupo.id == null}" />
+
+							<p:commandButton value="Atualizar" icon="fa fa-floppy-o"
+								action="#{grupoBean.update}"
+								rendered="#{grupoBean.grupo.id != null}" />
+
+							<p:spacer width="20" height="0" />
+						</h:panelGrid>
+					</div>
+				</p:dialog>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,182 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="funcionario.jpg"
+						width="60px" style="float: left" />
+				</div>
+
+				<h1>Lista de Funcionários</h1>
+				<h3>Listagem de funcionários cadastradas no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:link id="cadastrar" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/cadastro/cadastrarFuncionarioControlPro.xhtml">
+						<i class="material-icons md-32">add_to_photos</i>
+						<br />
+					</p:link>
+					<p:tooltip for="cadastrar" position="top" value="Cadastrar facção" />
+
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState
+				value="#{funcionarioControlProBean.funcionarioControlPro}" />
+			<t:saveState
+				value="#{funcionarioControlProBean.funcionarioControlPros}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel styleClass="panel-pesquisa" style="margin-top: 15px">
+					<div class="lupa">
+						<p:graphicImage library="imagens" name="SearchLupa.png" />
+					</div>
+
+					<h:panelGrid columns="10">
+						<p:outputLabel value="Nome: " styleClass="my-label" />
+						<p:inputText
+							value="#{funcionarioControlProBean.funcionarioControlProFilter.nome}"
+							size="30" id="nome" />
+
+
+						<p:commandButton value="Pesquisar" icon="fa fa-search"
+							style="margin-left: 5px; width: 100px !important"
+							update="table-funcionarioControlPro"
+							action="#{funcionarioControlProBean.list()}" />
+					</h:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-funcionarioControlPro"
+					value="#{funcionarioControlProBean.funcionarioControlPros}"
+					var="entity" paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10"
+					lazy="true">
+
+					<p:column headerText="Status" style="width: 50px"
+						styleClass="Center">
+						<p:commandLink id="lnkAlterarStatus"
+							action="#{funcionarioControlProBean.updateStatus()}"
+							update="table-funcionarioControlPro"
+							title="#{entity.status ? 'Desativar' : 'Ativar'}">
+
+							<h:panelGroup rendered="#{!entity.status}">
+								<i class="material-icons Red">remove_circle</i>
+							</h:panelGroup>
+
+							<h:panelGroup rendered="#{entity.status}">
+								<i class="material-icons Green">check_circle</i>
+							</h:panelGroup>
+
+							<f:setPropertyActionListener
+								target="#{funcionarioControlProBean.funcionarioControlPro}"
+								value="#{entity}" />
+						</p:commandLink>
+					</p:column>
+
+					<p:column headerText="Loja">
+						<p:outputLabel value="#{entity.loja.descricao}" />
+					</p:column>
+
+					<p:column headerText="Nome">
+						<p:outputLabel value="#{entity.nome}" />
+					</p:column>
+
+					<p:column headerText="Cargo" style="width: 110px"
+						styleClass="Center">
+						<p:outputLabel value="#{entity.cargo.nome}" />
+					</p:column>
+
+					<p:column headerText="Salário Carteira." styleClass="Center"
+						style="color: #000">
+						<p:outputLabel value="#{entity.salarioCt}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Salário Por fora" styleClass="Center"
+						style="color: #000">
+						<p:outputLabel value="#{entity.salarioPf}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+					
+					<p:column headerText="Salário Familia" styleClass="Center"
+						style="color: #000">
+						<p:outputLabel value="#{entity.salarioFamilia}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="INSS" styleClass="Center" style="color: #000">
+						<p:outputLabel value="#{entity.inss}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Salário Total" styleClass="Center"
+						style="color: #000">
+						<p:outputLabel value="#{entity.salarioTotal}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Ações" style="width: 60px"
+						styleClass="Center">
+
+<!-- 						<p:commandLink id="lnkDetail" rendered="#{entity.status}" -->
+<!-- 							oncomplete="PF('dados').show()" style="text-decoration: none" -->
+<!-- 							update=":frm:dados"> -->
+<!-- 							<i class="material-icons GrayDark">assignment</i> -->
+<!-- 							<f:setPropertyActionListener value="#{entity}" -->
+<!-- 								target="#{funcionarioControlProBean.funcionarioControlPro}" /> -->
+<!-- 						</p:commandLink> -->
+<!-- 						<p:tooltip for="lnkDetail" value="Detalhes" position="top" /> -->
+<!-- 						<p:spacer /> -->
+						<p:commandLink ajax="false" id="lnkEditar"
+							rendered="#{entity.status}"
+							action="#{funcionarioControlProBean.prepareUpdate()}"
+							style="text-decoration: none">
+							<i class="material-icons GrayDark">mode_edit</i>
+
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{funcionarioControlProBean.funcionarioControlPro}" />
+						</p:commandLink>
+
+						<p:tooltip for="lnkEditar" value="Editar" position="top" />
+					</p:column>
+				</p:dataTable>
+
+				<p:dialog header="Detalhes do Funcionário" modal="true" width="50%"
+					id="dados" widgetVar="dados">
+					<h:panelGrid columns="2">
+						<p:outputLabel value="Nome: " styleClass="my-label" />
+						<p:outputLabel
+							value="#{funcionarioControlProBean.funcionarioControlPro.nome}" />
+					</h:panelGrid>
+				</p:dialog>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

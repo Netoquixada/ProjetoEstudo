@@ -1,0 +1,59 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:t="http://myfaces.apache.org/tomahawk"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+	<br />
+	<p:outputLabel value="Itens Produto Consumo"
+		styleClass="my-label-titulo" />
+	<br />
+	<br />
+	<center>
+		<p:dataTable id="tableItemProdutoConsumo" var="entity"
+			value="#{produtoConsumoBean.itemProdutoConsumoList}"
+			emptyMessage="Nenhuma atividade foi adicionada">
+
+			<p:column headerText="Matéria Prima" style="color: #000">
+				<p:outputLabel value="#{entity.materiaPrima.nome}" />
+			</p:column>
+
+			<p:column headerText="Unidade Medida" style="color: #000">
+				<p:outputLabel
+					value="#{entity.materiaPrima.unidadeMedida} - #{entity.materiaPrima.unidadeMedida.descricao}" />
+			</p:column>
+
+			<p:column styleClass="Center" headerText="Valor (R$)" style="color: #000">
+				<p:outputLabel value="#{entity.materiaPrima.valor}">
+					<f:convertNumber minFractionDigits="2" type="currency"
+						maxFractionDigits="2" />
+				</p:outputLabel>
+			</p:column>
+
+			<p:column headerText="Quantidade" width="110" style="color: #000">
+				<p:outputLabel value="#{entity.quantidade}" />
+			</p:column>
+
+			<p:column headerText="Total" width="110" style="color: #000">
+				<p:outputLabel value="#{entity.total}" styleClass="label-azul">
+					<f:convertNumber minFractionDigits="2" type="currency"
+						maxFractionDigits="2" />
+				</p:outputLabel>
+			</p:column>
+
+			<f:facet name="footer">
+				<div align="right">
+					<h1>
+						<p:outputLabel value="Total:" style="color:#fff" />
+						<p:outputLabel value="#{produtoConsumoBean.total}"
+							style="color:#fff">
+							<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+								minFractionDigits="2" type="currency" />
+						</p:outputLabel>
+					</h1>
+				</div>
+			</f:facet>
+		</p:dataTable>
+	</center>
+</ui:composition>

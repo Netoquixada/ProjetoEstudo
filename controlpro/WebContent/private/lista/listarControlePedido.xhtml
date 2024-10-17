@@ -1,0 +1,730 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="controle_pedido.png"
+						width="60px" style="float: left" />
+				</div>
+
+				<h1 styleClass="header1">Controle de Pedidos</h1>
+				<h3 styleClass="header1">Listagem de controles de pedidos
+					cadastrados no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:link id="cadastrar" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/cadastro/cadastrarControlePedido.xhtml">
+						<i class="material-icons md-32">add_to_photos</i>
+						<br />
+					</p:link>
+					<p:tooltip for="cadastrar" position="top"
+						value="Cadastrar Controle Pedido" />
+
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{controlePedidoBean.controlePedido}" />
+			<t:saveState value="#{controlePedidoBean.controlePedidos}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel style="margin-top: 15px">
+					<!-- 					<div class="lupa"> -->
+					<!-- 						<p:graphicImage library="imagens" name="SearchLupa.png" /> -->
+					<!-- 					</div> -->
+
+					<h:panelGrid columns="5">
+
+						<h:panelGroup>
+							<p:outputLabel value="Empacotamento: " styleClass="my-label"
+								style="vertical-align: text-top;" />
+							<br />
+							<p:selectOneMenu
+								value="#{controlePedidoBean.controlePedidoFilter.despachante}"
+								converter="funcionarioConverter">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{funcionarioBean.listaFuncionarios}"
+									var="func" itemLabel="#{func.nome}" itemValue="#{func}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Forma de Envio Envio" styleClass="my-label" />
+							<br />
+							<p:selectOneMenu
+								value="#{controlePedidoBean.controlePedidoFilter.envio}">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItem itemLabel="Correios" itemValue="Correios" />
+								<f:selectItem itemLabel="Avião" itemValue="Avião" />
+								<f:selectItem itemLabel="Transportadora"
+									itemValue="Transportadora" />
+								<f:selectItem itemLabel="Outros" itemValue="Outros" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Status Pedido" styleClass="my-label" />
+							<br />
+							<p:selectOneMenu
+								value="#{controlePedidoBean.controlePedidoFilter.envioStatus}">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItem itemLabel="Empacotamento"
+									itemValue="Empacotamento" />
+								<f:selectItem itemLabel="Enviado" itemValue="Enviado" />
+								<f:selectItem itemLabel="Estraviado" itemValue="Estraviado" />
+								<f:selectItem itemLabel="Entregue" itemValue="Entregue" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+
+						<!-- 						<h:panelGroup> -->
+						<!-- 							<p:outputLabel value="Rastreio" styleClass="my-label" /> -->
+						<!-- 							<br /> -->
+						<!-- 							<p:inputText -->
+						<!-- 								value="#{controlePedidoBean.controlePedidoFilter.rastreio}" /> -->
+						<!-- 						</h:panelGroup> -->
+						<h:panelGroup>
+							<p:outputLabel value="Pedido" styleClass="my-label" />
+							<br />
+							<p:inputText
+								value="#{controlePedidoBean.controlePedidoFilter.sequenciaVenda}" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="De: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{controlePedidoBean.controlePedidoFilter.dataInicio}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Até: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{controlePedidoBean.controlePedidoFilter.dataFim}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<h:panelGroup
+							rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR'}">
+							<p:outputLabel value="Ocorrencia finalizada? "
+								styleClass="my-label" />
+							<br />
+							<p:selectOneMenu
+								value="#{controlePedidoBean.controlePedidoFilter.statusOcorrencia}">
+								<f:selectItem itemLabel="Todos" itemValue="0" />
+								<f:selectItem itemLabel="Sim" itemValue="2" />
+								<f:selectItem itemLabel="Não" itemValue="1" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="" styleClass="my-label" />
+							<br />
+							<p:commandButton value="Pesquisar"
+								style="margin-left: 5px; width: 100px !important"
+								update=":frm:tab:table-controle :frm:tab:table-controle-resumida"
+								action="#{controlePedidoBean.list()}" />
+						</h:panelGroup>
+					</h:panelGrid>
+				</p:panel>
+
+
+				<p:tabView id="tab">
+					<p:tab title="Completa">
+						<p:dataTable id="table-controle"
+							value="#{controlePedidoBean.controlePedidos}" var="entity"
+							paginator="true" style="margin-top: 15px"
+							emptyMessage="Nenhum registro encontrado!"
+							paginatorPosition="bottom" paginatorAlwaysVisible="false"
+							rows="10">
+
+							<p:column headerText="Data Cadastro"
+								style="color: #000 !important">
+								<p:outputLabel value="#{entity.dataCadastro}">
+									<f:convertDateTime pattern="dd/MM/yyyy" />
+								</p:outputLabel>
+							</p:column>
+
+							<p:column headerText="Status Pedido"
+								style="color: #000 !important" width="140">
+								<p:outputLabel
+									rendered="#{entity.envioStatus eq 'Empacotamento'}"
+									value="#{entity.envioStatus}" styleClass="my-label-blue" />
+								<p:outputLabel rendered="#{entity.envioStatus eq 'Enviado'}"
+									value="#{entity.envioStatus}" styleClass="my-label-orange" />
+								<p:outputLabel rendered="#{entity.envioStatus eq 'Entregue'}"
+									value="#{entity.envioStatus}" styleClass="my-label-green" />
+								<p:outputLabel rendered="#{entity.envioStatus eq 'Estraviado'}"
+									value="#{entity.envioStatus}" styleClass="my-label-red" />
+							</p:column>
+
+							<p:column headerText="Pedido" style="color: #000 !important"
+								width="45">
+								<p:outputLabel value="#{entity.sequenciaVenda}" />
+							</p:column>
+
+							<p:column headerText="Empacotamento"
+								style="color: #000 !important">
+								<p:outputLabel value="#{entity.despachante.nome}" />
+							</p:column>
+
+							<!-- 					<p:column headerText="NFE" width="45"> -->
+							<!-- 						<p:outputLabel rendered="#{entity.nfe}" value="Sim" -->
+							<!-- 							styleClass="my-label" /> -->
+							<!-- 						<p:outputLabel rendered="#{!entity.nfe}" value="Não" -->
+							<!-- 							styleClass="my-label" /> -->
+							<!-- 					</p:column> -->
+
+							<p:column headerText="Envio" style="color: #000 !important">
+								<p:outputLabel value="#{entity.envio}" />
+							</p:column>
+
+							<p:column headerText="Frete (R$)" style="color: #000 !important">
+								<p:outputLabel value="#{entity.valorFrete}" styleClass="negrito"
+									style="color: green">
+									<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+										minFractionDigits="2" type="currency" />
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Frete Pago(R$)"
+								style="color: #000 !important">
+								<p:outputLabel value="#{entity.valorFretePago}"
+									styleClass="negrito" style="color: blue">
+									<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+										minFractionDigits="2" type="currency" />
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Diferença Frete(R$)"
+								style="color: #000 !important">
+								<p:outputLabel value="#{entity.diferencaFrete}"
+									styleClass="negrito">
+									<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+										minFractionDigits="2" type="currency" />
+								</p:outputLabel>
+							</p:column>
+
+							<!-- 					<p:column headerText="Rastreio"> -->
+							<!-- 						<p:outputLabel value="#{entity.rastreio}" /> -->
+							<!-- 					</p:column> -->
+
+							<p:column headerText="Data da Entrega"
+								style="color: #000 !important">
+								<p:outputLabel value="#{entity.dataEntraga}">
+									<f:convertDateTime pattern="dd/MM/yyyy" />
+								</p:outputLabel>
+							</p:column>
+
+							<!-- 							<p:column headerText="Pós-Venda?" width="45" style="color: #000 !important"> -->
+							<!-- 								<p:outputLabel rendered="#{entity.posVenda}" value="Sim" -->
+							<!-- 									styleClass="my-label" /> -->
+							<!-- 								<p:outputLabel rendered="#{!entity.posVenda}" value="Não" -->
+							<!-- 									styleClass="my-label" /> -->
+							<!-- 							</p:column> -->
+
+							<p:column headerText="Data Pós-Venda"
+								style="color: #000 !important">
+								<p:outputLabel value="#{entity.dataPosVenda}">
+									<f:convertDateTime pattern="dd/MM/yyyy" />
+								</p:outputLabel>
+							</p:column>
+
+							<p:column headerText="Ações" styleClass="Center"
+								style="color: #000 !important; width: 90px">
+
+								<p:commandLink id="lnkAquisicao" rendered="#{entity.status}"
+									oncomplete="PF('dados-historico').show()"
+									style="text-decoration: none" update=":form:dados-historico"
+									title="Historico de Ocorrências"
+									action="#{controlePedidoBean.carregarLista()}">
+									<p:outputLabel rendered="#{entity.statusOcorrencia == 0}">
+										<i class="material-icons GrayDark">chrome_reader_mode</i>
+									</p:outputLabel>
+									<p:outputLabel rendered="#{entity.statusOcorrencia == 2}">
+										<i class="material-icons GrayDark Green">chrome_reader_mode</i>
+									</p:outputLabel>
+									<p:outputLabel rendered="#{entity.statusOcorrencia == 1}">
+										<i class="material-icons GrayDark Red">chrome_reader_mode</i>
+									</p:outputLabel>
+									<f:setPropertyActionListener value="#{entity}"
+										target="#{controlePedidoBean.controlePedido}" />
+								</p:commandLink>
+								<p:tooltip for="lnkAquisicao" value="Ocorrências" position="top" />
+								<p:spacer />
+								<p:commandLink id="lnkDetail" rendered="#{entity.status}"
+									oncomplete="PF('dados').show()" style="text-decoration: none"
+									update=":frm:dados"
+									action="#{controlePedidoBean.movimentacoesProduto()}">
+									<i class="material-icons GrayDark">assignment</i>
+									<f:setPropertyActionListener value="#{entity}"
+										target="#{controlePedidoBean.controlePedido}" />
+								</p:commandLink>
+								<p:tooltip for="lnkDetail" value="Detalhes" position="top" />
+								<p:spacer />
+								<p:link ajax="false" id="lnkEditar" rendered="#{entity.status}"
+									outcome="#{controlePedidoBean.prepareUpdate()}"
+									style="text-decoration: none">
+									<i class="material-icons GrayDark">mode_edit</i>
+									<f:param name="id" value="#{entity.id}" />
+								</p:link>
+								<p:tooltip for="lnkEditar" value="Editar" position="top" />
+							</p:column>
+
+							<p:columnGroup type="footer">
+								<p:row>
+									<p:column colspan="5" style="text-align:right"
+										footerText="Total:" styleClass="negrito" />
+									<p:column>
+										<f:facet name="footer">
+											<p:outputLabel styleClass="negrito"
+												value="#{controlePedidoBean.valorFrete}">
+												<f:convertNumber minFractionDigits="2" type="currency"
+													maxFractionDigits="2" />
+											</p:outputLabel>
+										</f:facet>
+									</p:column>
+									<p:column>
+										<f:facet name="footer">
+											<p:outputLabel styleClass="negrito"
+												value="#{controlePedidoBean.valorFretePago}">
+												<f:convertNumber minFractionDigits="2" type="currency"
+													maxFractionDigits="2" />
+											</p:outputLabel>
+										</f:facet>
+									</p:column>
+									<p:column>
+										<f:facet name="footer">
+											<p:outputLabel styleClass="negrito"
+												value="#{controlePedidoBean.valorFrete - controlePedidoBean.valorFretePago}">
+												<f:convertNumber minFractionDigits="2" type="currency"
+													maxFractionDigits="2" />
+											</p:outputLabel>
+										</f:facet>
+									</p:column>
+									<p:column colspan="3" />
+
+								</p:row>
+							</p:columnGroup>
+
+							<!-- 					<f:facet name="footer"> -->
+							<!-- 						<div align="right"> -->
+							<!-- 							<h1> -->
+							<!-- 								<p:outputLabel value="Valor total do frete: " -->
+							<!-- 									style="color: #fff !important" /> -->
+							<!-- 								<p:outputLabel value="#{controlePedidoBean.totalFrete}" -->
+							<!-- 									style="color: #fff !important"> -->
+							<!-- 									<f:convertNumber minFractionDigits="2" type="currency" -->
+							<!-- 										maxFractionDigits="2" /> -->
+							<!-- 								</p:outputLabel> -->
+							<!-- 							</h1> -->
+							<!-- 						</div> -->
+							<!-- 					</f:facet> -->
+						</p:dataTable>
+
+					</p:tab>
+					<p:tab title="Resumida">
+						<p:dataTable id="table-controle-resumida"
+							value="#{controlePedidoBean.controlePedidos}" var="entity"
+							paginator="true" style="margin-top: 15px"
+							emptyMessage="Nenhum registro encontrado!"
+							paginatorPosition="bottom" paginatorAlwaysVisible="false"
+							rows="10">
+
+							<p:column headerText="Data Cadastro"
+								style="color: #000 !important">
+								<p:outputLabel value="#{entity.dataCadastro}">
+									<f:convertDateTime pattern="dd/MM/yyyy" />
+								</p:outputLabel>
+							</p:column>
+
+							<p:column headerText="Status  Pagamento"
+								style="color: #000 !important" width="180">
+								<p:outputLabel value="Aguardando Pagamento"
+									styleClass="my-label-blue"
+									rendered="#{entity.venda.efetivadaFinanceiro == 0}" />
+								<p:outputLabel value="Pagamento Efetuado"
+									styleClass="my-label-green"
+									rendered="#{entity.venda.efetivadaFinanceiro == 1}" />
+							</p:column>
+
+							<p:column headerText="Data do Pagamento"
+								style="color: #000 !important">
+								<p:outputLabel value="#{entity.venda.dataConfirmacao}">
+									<f:convertDateTime pattern="dd/MM/yyyy" />
+								</p:outputLabel>
+							</p:column>
+
+							<p:column headerText="Status Pedido"
+								style="color: #000 !important" width="140">
+								<p:outputLabel
+									rendered="#{entity.envioStatus eq 'Empacotamento'}"
+									value="#{entity.envioStatus}" styleClass="my-label-blue" />
+								<p:outputLabel rendered="#{entity.envioStatus eq 'Enviado'}"
+									value="#{entity.envioStatus}" styleClass="my-label-orange" />
+								<p:outputLabel rendered="#{entity.envioStatus eq 'Entregue'}"
+									value="#{entity.envioStatus}" styleClass="my-label-green" />
+								<p:outputLabel rendered="#{entity.envioStatus eq 'Estraviado'}"
+									value="#{entity.envioStatus}" styleClass="my-label-red" />
+							</p:column>
+
+							<p:column headerText="Enviado por" style="color: #000 !important">
+								<p:outputLabel value="#{entity.responsavelEnvio.nome}" />
+							</p:column>
+
+							<p:column headerText="Pedido" style="color: #000 !important"
+								width="45">
+								<p:outputLabel value="#{entity.sequenciaVenda}" />
+							</p:column>
+
+							<p:column headerText="Empacotamento"
+								style="color: #000 !important">
+								<p:outputLabel value="#{entity.despachante.nome}" />
+							</p:column>
+
+							<p:column headerText="Envio" style="color: #000 !important">
+								<p:outputLabel value="#{entity.envio}" />
+							</p:column>
+
+							<p:column headerText="Ações" styleClass="Center"
+								style="color: #000 !important; width: 90px">
+
+								<p:commandLink id="lnkAquisicao" rendered="#{entity.status}"
+									oncomplete="PF('dados-historico').show()"
+									style="text-decoration: none" update=":form:dados-historico"
+									title="Historico de Ocorrências"
+									action="#{controlePedidoBean.carregarLista()}">
+									<i class="material-icons GrayDark">chrome_reader_mode</i>
+									<f:setPropertyActionListener value="#{entity}"
+										target="#{controlePedidoBean.controlePedido}" />
+								</p:commandLink>
+								<p:tooltip for="lnkAquisicao" value="Ocorrências" position="top" />
+								<p:spacer />
+								<p:commandLink id="lnkDetail" rendered="#{entity.status}"
+									oncomplete="PF('dados').show()" style="text-decoration: none"
+									update=":frm:dados"
+									action="#{controlePedidoBean.movimentacoesProduto()}">
+									<i class="material-icons GrayDark">assignment</i>
+									<f:setPropertyActionListener value="#{entity}"
+										target="#{controlePedidoBean.controlePedido}" />
+								</p:commandLink>
+								<p:tooltip for="lnkDetail" value="Detalhes" position="top" />
+								<p:spacer />
+								<p:link ajax="false" id="lnkEditar" rendered="#{entity.status}"
+									outcome="#{controlePedidoBean.prepareUpdate()}"
+									style="text-decoration: none">
+									<i class="material-icons GrayDark">mode_edit</i>
+									<f:param name="id" value="#{entity.id}" />
+								</p:link>
+								<p:tooltip for="lnkEditar" value="Editar" position="top" />
+							</p:column>
+
+
+						</p:dataTable>
+					</p:tab>
+				</p:tabView>
+
+
+				<p:dialog header="Detalhes do Controle de Pedido" modal="true"
+					width="80%" id="dados" widgetVar="dados">
+
+					<div class="scroll-dialog">
+						<p:panelGrid columns="2" style="margin-top: 20px" layout="grid"
+							styleClass="ui-panelgrid-blank"
+							columnClasses="ui-grid-col-6,ui-grid-col-6">
+							<h:panelGrid columns="2">
+								<p:outputLabel value="Pedido(Sequencia): " styleClass="my-label" />
+								<p:outputLabel
+									value="#{controlePedidoBean.controlePedido.sequenciaVenda}" />
+								<p:outputLabel value="Empacotamento: " styleClass="my-label" />
+								<p:outputLabel
+									value="#{controlePedidoBean.controlePedido.despachante.nome}" />
+								<p:outputLabel value="Vendedor: " styleClass="my-label" />
+								<p:outputLabel
+									value="#{controlePedidoBean.venda.vendedor.id} - #{controlePedidoBean.venda.vendedor.nome}" />
+								<p:outputLabel value="Cliente: " styleClass="my-label" />
+								<p:outputLabel
+									value="#{controlePedidoBean.venda.cliente.id} - #{controlePedidoBean.venda.cliente.nome}" />
+								<p:outputLabel value="Telefone: " styleClass="my-label" />
+								<p:outputLabel value="#{controlePedidoBean.venda.cliente.fone}" />
+
+								<!-- 							Detalhamento financeiro do Pedido -->
+
+								<p:outputLabel value="Total Produtos: " styleClass="my-label"
+									style="vertical-align: text-top;" />
+								<p:outputLabel value="#{controlePedidoBean.venda.valorVenda}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+
+								<p:outputLabel value="Desconto Produtos: " styleClass="my-label"
+									style="vertical-align: text-top;" />
+								<p:outputLabel
+									value="#{controlePedidoBean.venda.destontoProdutos}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+
+								<p:outputLabel value="Produtos com Desconto: "
+									styleClass="my-label" style="vertical-align: text-top;" />
+								<p:outputLabel value="#{controlePedidoBean.venda.totalProduto}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+
+								<p:separator />
+								<p:separator />
+
+								<p:outputLabel value="Despesa Envio: " styleClass="my-label"
+									style="vertical-align: text-top;" />
+								<p:outputLabel value="#{controlePedidoBean.venda.despesaEnvio}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+
+								<p:outputLabel value="Total da Pedido: " styleClass="my-label"
+									style="vertical-align: text-top;" />
+								<p:outputLabel value="#{controlePedidoBean.venda.totalVenda}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+
+								<p:separator />
+								<p:separator />
+								<p:outputLabel value="Status Pagamento: " styleClass="my-label" />
+								<p:outputLabel value="Aguardando Pagamento"
+									styleClass="my-label-blue"
+									rendered="#{controlePedidoBean.controlePedido.venda.efetivadaFinanceiro == 0}" />
+								<p:outputLabel value="Pagamento Efetuado"
+									styleClass="my-label-green"
+									rendered="#{controlePedidoBean.controlePedido.venda.efetivadaFinanceiro == 1}" />
+								<p:outputLabel value="Data Pagamento: " styleClass="my-label" />
+								<p:outputLabel
+									value="#{controlePedidoBean.controlePedido.venda.dataConfirmacao}">
+									<f:convertDateTime pattern="dd/MM/yyyy" />
+								</p:outputLabel>
+								<p:outputLabel value="NFE?: " styleClass="my-label" />
+								<p:outputLabel
+									rendered="#{controlePedidoBean.controlePedido.nfe}" value="Sim"
+									styleClass="my-label" />
+								<p:outputLabel value="Número NFE: " styleClass="my-label" />
+								<p:outputLabel
+									value="#{controlePedidoBean.controlePedido.numeroNfe}"
+									styleClass="my-label" />
+								<p:outputLabel
+									rendered="#{!controlePedidoBean.controlePedido.nfe}"
+									value="Não" styleClass="my-label" />
+								<p:outputLabel value="Forma de Envio: " styleClass="my-label" />
+								<p:outputLabel
+									value="#{controlePedidoBean.controlePedido.envio}" />
+								<p:outputLabel value="Valor do Frete: " styleClass="my-label" />
+								<p:outputLabel
+									value="#{controlePedidoBean.controlePedido.valorFrete}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+								<p:outputLabel value="Valor do Frete Pago: "
+									styleClass="my-label" />
+								<p:outputLabel
+									value="#{controlePedidoBean.controlePedido.valorFretePago}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+								<p:outputLabel value="Rastreio: " styleClass="my-label" />
+								<p:outputLabel
+									value="#{controlePedidoBean.controlePedido.rastreio}" />
+								<p:outputLabel value="Status de Envio: " styleClass="my-label" />
+								<p:outputLabel
+									rendered="#{controlePedidoBean.controlePedido.envioStatus eq 'Empacotamento'}"
+									value="#{controlePedidoBean.controlePedido.envioStatus}"
+									styleClass="my-label-blue" />
+								<p:outputLabel
+									rendered="#{controlePedidoBean.controlePedido.envioStatus eq 'Enviado'}"
+									value="#{controlePedidoBean.controlePedido.envioStatus}"
+									styleClass="my-label-orange" />
+								<p:outputLabel
+									rendered="#{controlePedidoBean.controlePedido.envioStatus eq 'Entregue'}"
+									value="#{controlePedidoBean.controlePedido.envioStatus}"
+									styleClass="my-label-green" />
+								<p:outputLabel
+									rendered="#{controlePedidoBean.controlePedido.envioStatus eq 'Estraviado'}"
+									value="#{controlePedidoBean.controlePedido.envioStatus}"
+									styleClass="my-label-red" />
+								<p:outputLabel value="Data do Envio: " styleClass="my-label" />
+								<p:outputLabel
+									value="#{controlePedidoBean.controlePedido.dataEnvio}">
+									<f:convertDateTime pattern="dd/MM/yyyy" />
+								</p:outputLabel>
+								<p:outputLabel value="Responsável Envio: " styleClass="my-label" />
+								<p:outputLabel
+									value="#{controlePedidoBean.controlePedido.responsavelEnvio.nome}" />
+								<p:outputLabel value="Data da Entrega: " styleClass="my-label" />
+								<p:outputLabel
+									value="#{controlePedidoBean.controlePedido.dataEntraga}">
+									<f:convertDateTime pattern="dd/MM/yyyy" />
+								</p:outputLabel>
+								<p:outputLabel value="Pós-Venda?: " styleClass="my-label" />
+								<p:outputLabel
+									rendered="#{controlePedidoBean.controlePedido.posVenda}"
+									value="Sim" styleClass="my-label" />
+								<p:outputLabel
+									rendered="#{!controlePedidoBean.controlePedido.posVenda}"
+									value="Não" styleClass="my-label" />
+								<p:outputLabel value="Data Pós-Venda: " styleClass="my-label" />
+								<p:outputLabel
+									value="#{controlePedidoBean.controlePedido.dataPosVenda}">
+									<f:convertDateTime pattern="dd/MM/yyyy" />
+								</p:outputLabel>
+								<p:outputLabel value="Observação: " styleClass="my-label" />
+								<p:outputLabel
+									value="#{controlePedidoBean.controlePedido.observacao}" />
+							</h:panelGrid>
+							<h:panelGroup>
+								<p:dataTable id="table"
+									value="#{controlePedidoBean.movimentacoes}" var="entity"
+									paginator="true" style="margin-top: 15px"
+									emptyMessage="Nenhum registro encontrado!"
+									paginatorPosition="bottom" paginatorAlwaysVisible="false"
+									rows="10" lazy="true">
+
+									<f:facet name="header">
+										<p:outputLabel value="Movimentação da Saída" />
+									</f:facet>
+
+									<!-- 								<p:column headerText="Data" style="color: #000 !important"> -->
+									<!-- 									<p:outputLabel value="#{entity.data}"> -->
+									<!-- 										<f:convertDateTime pattern="dd/MM/yyyy" /> -->
+									<!-- 									</p:outputLabel> -->
+									<!-- 								</p:column> -->
+
+									<p:column headerText="Sequencia" style="color: #000 !important">
+										<p:outputLabel value="#{entity.sequencia}" />
+									</p:column>
+
+									<p:column headerText="Linha" style="color: #000 !important">
+										<p:outputLabel value="#{entity.linha}" />
+									</p:column>
+
+									<p:column headerText="Refência Produto"
+										style="color: #000 !important">
+										<p:outputLabel value="#{entity.produto.id}" />
+									</p:column>
+
+									<p:column headerText="Nome" style="color: #000 !important">
+										<p:outputLabel value="#{entity.produto.nome}" />
+									</p:column>
+
+									<f:facet name="footer">
+										<p:outputLabel value="Quantidade de Itens: " />
+										<p:outputLabel
+											value="#{controlePedidoBean.movimentacoes.size()}" />
+									</f:facet>
+								</p:dataTable>
+							</h:panelGroup>
+						</p:panelGrid>
+					</div>
+				</p:dialog>
+			</h:form>
+			<h:form id="form">
+				<p:dialog modal="true" id="dados-historico" width="70%"
+					widgetVar="dados-historico" resizable="false">
+
+					<f:facet name="header">
+					Historico de Ocorrências
+					</f:facet>
+
+					<div class="scroll-dialog">
+						<div>
+							<p:messages id="msg" closable="true" showDetail="true"
+								showSummary="true" />
+
+							<h:panelGrid columns="2" style="margin-top: 20px"
+								id="grid-historico" cellpadding="05px">
+
+								<h:panelGroup>
+									<p:outputLabel value="Data Ocorrência:" styleClass="my-label" />
+								</h:panelGroup>
+								<p:calendar
+									value="#{controlePedidoBean.historicoControlePedido.dataOcorrencia}"
+									pattern="dd/MM/yyyy">
+								</p:calendar>
+
+								<h:panelGroup>
+									<p:outputLabel value="Descrição: " styleClass="my-label" />
+								</h:panelGroup>
+								<p:inputTextarea cols="60" rows="4" id="descricao"
+									required="true" requiredMessage="true"
+									value="#{controlePedidoBean.historicoControlePedido.descricao}" />
+
+							</h:panelGrid>
+							<p:separator />
+							<h:panelGrid columns="3">
+								<p:commandButton value="Adicionar"
+									update="tableHistorico msg grid-historico"
+									action="#{controlePedidoBean.saveHistoricoControlePedido()}"
+									icon="fa fa-plus" />
+
+								<p:commandButton value="Cancelar" styleClass="btn-orange"
+									icon="fa fa-close" process="@this"
+									oncomplete="PF('dados-historico').hide()" immediate="true" />
+
+								<p:commandButton value="Finalizar Ocorrência" immediate="true"
+									update="tableHistorico msg grid-historico"
+									oncomplete="PF('dados-historico').hide()"
+									rendered="#{controlePedidoBean.controlePedido.statusOcorrencia != 2 and 
+									escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR'}"
+									action="#{controlePedidoBean.finalizarOcorrencia()}"
+									icon="fa fa-plus" />
+								<p:spacer width="20" height="0" />
+							</h:panelGrid>
+
+							<br />
+
+							<p:dataTable id="tableHistorico" var="historico"
+								value="#{controlePedidoBean.historicoControlePedidoList}"
+								emptyMessage="Nenhuma atividade foi adicionada">
+
+								<f:facet name="header">
+									<p:outputLabel value="Lista de historico de Ocorrências" />
+								</f:facet>
+
+								<p:column headerText="Protocolo" style="color: #000">
+									<p:outputLabel value="#{historico.protocolo}" />
+								</p:column>
+
+								<p:column headerText="Data de Cadastro" style="color: #000">
+									<p:outputLabel value="#{historico.dataCadastro}">
+										<f:convertDateTime pattern="dd/MM/yyyy" />
+									</p:outputLabel>
+								</p:column>
+
+								<p:column headerText="Responsável" style="color: #000">
+									<p:outputLabel value="#{historico.usuario.nome}" />
+								</p:column>
+
+								<p:column headerText="Data da Ocorrência" style="color: #000">
+									<p:outputLabel value="#{historico.dataOcorrencia}">
+										<f:convertDateTime pattern="dd/MM/yyyy" />
+									</p:outputLabel>
+								</p:column>
+
+								<p:column headerText="Descrição" style="color: #000">
+									<p:outputLabel value="#{historico.descricao}" />
+								</p:column>
+
+							</p:dataTable>
+						</div>
+					</div>
+				</p:dialog>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

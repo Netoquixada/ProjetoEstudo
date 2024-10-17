@@ -1,0 +1,178 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="cliente-glamix.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>Lista de Clientes Glamix</h1>
+				<h3>Listagem de clientes cadastrados no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:link id="cadastrar" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/cadastro/cadastrarClienteGlamix.xhtml">
+						<i class="material-icons md-32">add_to_photos</i>
+						<br />
+					</p:link>
+					<p:tooltip for="cadastrar" position="top" value="Cadastrar Cliente" />
+
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{clienteGlamixBean.clienteGlamix}" />
+			<t:saveState value="#{clienteGlamixBean.clienteGlamixs}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel styleClass="panel-pesquisa" style="margin-top: 15px">
+					<div class="lupa">
+						<p:graphicImage library="imagens" name="SearchLupa.png" />
+					</div>
+
+					<h:panelGrid columns="10">
+						<p:outputLabel value="Nome: " styleClass="my-label" />
+						<p:inputText value="#{clienteGlamixBean.clienteGlamixFilter.nome}" size="30"
+							id="nome" />
+
+						<p:commandButton value="Pesquisar" icon="fa fa-search"
+							style="margin-left: 5px; width: 100px !important"
+							update="table-clienteGlamix" action="#{clienteGlamixBean.list()}" />
+							
+<!-- 							PENDENTE - CRIAR PDF PARA CHAMAR NESSE METODO -->
+<!-- 						<p:commandButton id="report" -->
+<!-- 							actionListener="#{clienteGlamixBean.gerarPDF}" icon="fa fa-download" -->
+<!-- 							value="Gerar PDF" onclick="this.form.target='_blank'" -->
+<!-- 							ajax="false"> -->
+<!-- 						</p:commandButton> -->
+
+					</h:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-clienteGlamix" value="#{clienteGlamixBean.clienteGlamixs}"
+					var="entity" paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10"
+					lazy="true">
+
+					<p:column headerText="Status" style="width: 50px"
+						styleClass="Center">
+						<p:commandLink id="lnkAlterarStatus"
+							action="#{clienteGlamixBean.updateStatus()}" update="table-clienteGlamix"
+							title="#{entity.status ? 'Desativar' : 'Ativar'}">
+
+							<h:panelGroup rendered="#{!entity.status}">
+								<i class="material-icons Red">remove_circle</i>
+							</h:panelGroup>
+
+							<h:panelGroup rendered="#{entity.status}">
+								<i class="material-icons Green">check_circle</i>
+							</h:panelGroup>
+
+							<f:setPropertyActionListener target="#{clienteGlamixBean.clienteGlamix}"
+								value="#{entity}" />
+						</p:commandLink>
+					</p:column>
+
+					<p:column headerText="Nome">
+						<p:outputLabel value="#{entity.nome}" />
+					</p:column>
+
+					<p:column headerText="Telefone" style="width: 110px"
+						styleClass="Center">
+						<p:outputLabel value="#{entity.telefone}" />
+					</p:column>
+
+					<p:column headerText="Celular">
+						<p:outputLabel value="#{entity.celular}" />
+					</p:column>
+					<p:column headerText="CEP" width="80">
+						<p:outputLabel value="#{entity.cep}" />
+					</p:column>
+					<p:column headerText="Endereço">
+						<p:outputLabel value="#{entity.endereco}, N°#{entity.numero}" />
+					</p:column>
+					<p:column headerText="Compl." >
+						<p:outputLabel value="#{entity.complemento}" />
+					</p:column>
+					<p:column headerText="Bairro">
+						<p:outputLabel value="#{entity.bairro}" />
+					</p:column>
+					<p:column headerText="Cidade">
+						<p:outputLabel value="#{entity.cidade}" />
+					</p:column>
+					<p:column headerText="Estado" width="50">
+						<p:outputLabel value="#{entity.estado}" />
+					</p:column>
+
+					<p:column headerText="Ações" style="width: 60px"
+						styleClass="Center">
+
+						<p:commandLink id="lnkDetail" rendered="#{entity.status}"
+							oncomplete="PF('dados').show()" style="text-decoration: none"
+							update=":frm:dados">
+							<i class="material-icons GrayDark">assignment</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{clienteGlamixBean.clienteGlamix}" />
+						</p:commandLink>
+						<p:tooltip for="lnkDetail" value="Detalhes" position="top" />
+						<p:spacer />
+						<p:commandLink ajax="false" id="lnkEditar"
+							rendered="#{entity.status}"
+							action="#{clienteGlamixBean.prepareUpdate()}"
+							style="text-decoration: none">
+							<i class="material-icons GrayDark">mode_edit</i>
+
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{clienteGlamixBean.clienteGlamix}" />
+						</p:commandLink>
+
+						<p:tooltip for="lnkEditar" value="Editar" position="top" />
+					</p:column>
+				</p:dataTable>
+
+				<p:dialog header="Detalhes do Cliente" modal="true" width="50%"
+					id="dados" widgetVar="dados">
+					<h:panelGrid columns="2">
+						<p:outputLabel value="Nome: " styleClass="my-label" />
+						<p:outputLabel value="#{clienteGlamixBean.clienteGlamix.nome}" />
+						<p:outputLabel value="Celular: " styleClass="my-label" />
+						<p:outputLabel value="#{clienteGlamixBean.clienteGlamix.celular}" />
+						<p:outputLabel value="Telefone: " styleClass="my-label" />
+						<p:outputLabel value="#{clienteGlamixBean.clienteGlamix.telefone}" />
+						<p:outputLabel value="CEP: " styleClass="my-label" />
+						<p:outputLabel value="#{clienteGlamixBean.clienteGlamix.cep}" />
+						<p:outputLabel value="Endereço: " styleClass="my-label" />
+						<p:outputLabel value="#{clienteGlamixBean.clienteGlamix.endereco}" />
+						<p:outputLabel value="Número: " styleClass="my-label" />
+						<p:outputLabel value="#{clienteGlamixBean.clienteGlamix.numero}" />
+						<p:outputLabel value="Complemento: " styleClass="my-label" />
+						<p:outputLabel value="#{clienteGlamixBean.clienteGlamix.complemento}" />
+						<p:outputLabel value="Bairro: " styleClass="my-label" />
+						<p:outputLabel value="#{clienteGlamixBean.clienteGlamix.bairro}" />
+						<p:outputLabel value="Cidade: " styleClass="my-label" />
+						<p:outputLabel value="#{clienteGlamixBean.clienteGlamix.cidade}" />
+						<p:outputLabel value="Estado: " styleClass="my-label" />
+						<p:outputLabel value="#{clienteGlamixBean.clienteGlamix.estado}" />
+					</h:panelGrid>
+				</p:dialog>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

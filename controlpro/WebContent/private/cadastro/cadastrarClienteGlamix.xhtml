@@ -1,0 +1,183 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:t="http://myfaces.apache.org/tomahawk"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="cliente-glamix.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>#{clienteGlamixBean.clienteGlamix.id == null ? 'Cadastrar Cliente Glamix' :
+					'Atualizar Cliente Glamix'}</h1>
+				<h3>#{clienteGlamixBean.clienteGlamix.id == null ? 'Preencha o formulário
+					abaixo para cadastrar um novo cliente.' : 'Preencha o formulário
+					abaixo para atualizar o cliente.'}</h3>
+
+				<div class="links-funcionais">
+					<p:link id="lista" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/lista/listarClienteGlamix.xhtml">
+						<i class="material-icons md-32">list</i>
+						<br />
+					</p:link>
+					<p:tooltip for="lista" position="top" value="Listar Clientes Glamix" />
+
+					<p:link styleClass="link-funcional" outcome="/private/index.xhtml"
+						id="inicio">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+			<p:panel style="margin-top: 15px" styleClass="my-panel">
+				<p:outputLabel value="(" />
+				<p:outputLabel value="*" styleClass="campoObrigatorio" />
+				<p:outputLabel value=") Campos obrigatórios." />
+			</p:panel>
+
+			<t:saveState value="#{clienteGlamixBean.clienteGlamix}" />
+			<t:saveState value="#{clienteGlamixBean.clienteGlamixs}" />
+
+			<h:form id="frm">
+				<div class="ui-fluid">
+					<p:messages showDetail="true" autoUpdate="true" closable="true" />
+
+					<p:panelGrid columns="2" style="margin-top: 20px" layout="grid"
+						columnClasses="ui-grid-col-2" styleClass="ui-panelgrid-blank">
+
+						<h:panelGroup>
+							<p:outputLabel value="Nome: " styleClass="my-label"
+								style="vertical-align: text-top;" for="nome" />
+						</h:panelGroup>
+						<p:inputText id="nome" value="#{clienteGlamixBean.clienteGlamix.nome}"
+							required="true" label="Nome"
+							requiredMessage="Nome é obrigatório." />
+
+						<h:panelGroup>
+							<p:outputLabel value="Celular: " styleClass="my-label"
+								for="celular" />
+						</h:panelGroup>
+						<p:inputMask mask="(99) 9 9999-9999" id="celular" label="Telefone"
+							value="#{clienteGlamixBean.clienteGlamix.celular}" />
+
+						<h:panelGroup>
+							<p:outputLabel value="CPF: " styleClass="my-label" for="cpf" />
+						</h:panelGroup>
+						<p:inputMask mask="999.999.999-99" id="cpf" label="CPF"
+							value="#{clienteGlamixBean.clienteGlamix.cpf}" />
+
+						<h:panelGroup>
+							<p:outputLabel value="RG: " styleClass="my-label"
+								style="vertical-align: text-top;" for="rg" />
+						</h:panelGroup>
+						<p:inputText id="rg" value="#{clienteGlamixBean.clienteGlamix.rg}" label="RG" />
+
+						<h:panelGroup>
+							<p:outputLabel value="Telefone: " styleClass="my-label"
+								for="telefone" />
+						</h:panelGroup>
+						<p:inputMask mask="(99) 9999-9999" id="telefone" label="Telefone"
+							value="#{clienteGlamixBean.clienteGlamix.telefone}" />
+
+						<h:panelGroup>
+							<p:outputLabel value="CEP: " styleClass="my-label"
+								for="cep" />
+						</h:panelGroup>
+						<p:inputMask id="cep" required="true" label="CEP"
+							requiredMessage="Qtd. máquinas obrigatório" mask="99.999-999"
+							value="#{clienteGlamixBean.clienteGlamix.cep}" />
+
+						<h:panelGroup>
+							<p:outputLabel value="Estado: " styleClass="my-label"
+								for="estado" />
+						</h:panelGroup>
+						<p:selectOneMenu id="estado" label="Máquina"
+							value="#{clienteGlamixBean.clienteGlamix.estado}" required="true"
+							requiredMessage="Estado obrigatório">
+							<f:selectItem itemLabel="-- Selecione --" />
+							<f:selectItems value="#{clienteGlamixBean.estados}" var="estado"
+								itemLabel="#{estado.nome}" itemValue="#{estado.sigla}" />
+							<p:ajax update="cidade" />
+						</p:selectOneMenu>
+
+						<h:panelGroup>
+							<p:outputLabel value="Cidade: " styleClass="my-label"
+								for="cidade" />
+						</h:panelGroup>
+						<p:selectOneMenu id="cidade" label="Máquina" filter="true"
+							filterMatchMode="startsWith" value="#{clienteGlamixBean.clienteGlamix.cidade}"
+							required="true" requiredMessage="Cidade obrigatória">
+							<f:selectItem itemLabel="-- Selecione --" />
+							<f:selectItems value="#{clienteGlamixBean.cidades}" var="cidade"
+								itemLabel="#{cidade.cidadeNome}"
+								itemValue="#{cidade.cidadeNome}" />
+						</p:selectOneMenu>
+
+						<h:panelGroup>
+							<p:outputLabel value="Bairro: " styleClass="my-label"
+								style="vertical-align: text-top;" for="bairro" />
+						</h:panelGroup>
+						<p:inputText id="bairro" value="#{clienteGlamixBean.clienteGlamix.bairro}"
+							required="true" label="Bairro"
+							requiredMessage="Bairro é obrigatório." />
+						<h:panelGroup>
+							<p:outputLabel value="Endereço: " styleClass="my-label"
+								style="vertical-align: text-top;" for="endereco" />
+						</h:panelGroup>
+						<p:inputText id="endereco" value="#{clienteGlamixBean.clienteGlamix.endereco}"
+							required="true" label="Endereço"
+							requiredMessage="Endereço é obrigatório." />
+						<h:panelGroup>
+							<p:outputLabel value="Complemento: " styleClass="my-label"
+								style="vertical-align: text-top;" for="comp" />
+						</h:panelGroup>
+						<p:inputText id="comp" value="#{clienteGlamixBean.clienteGlamix.complemento}" />
+						<h:panelGroup>
+							<p:outputLabel value="Número: " styleClass="my-label"
+								style="vertical-align: text-top;" for="numero" />
+						</h:panelGroup>
+						<p:inputText id="numero" value="#{clienteGlamixBean.clienteGlamix.numero}"
+							required="true" label="Numero"
+							requiredMessage="Número é obrigatório." />
+					</p:panelGrid>
+					<h:panelGroup>
+						<p:outputLabel value="Observação: " styleClass="my-label"
+							style="vertical-align: text-top;" for="obs" />
+					</h:panelGroup>
+					<p:inputTextarea id="obs" value="#{clienteGlamixBean.clienteGlamix.observacao}"
+						rows="6" cols="40" label="OBS" />
+					<br /> <br />
+					<p:separator />
+					<h:panelGrid columns="3">
+						<p:commandButton value="Salvar" icon="fa fa-floppy-o"
+							action="#{clienteGlamixBean.save}" update="frm"
+							rendered="#{clienteGlamixBean.clienteGlamix.id == null}" />
+
+						<p:commandButton value="Atualizar" icon="fa fa-floppy-o"
+							action="#{clienteGlamixBean.update}"
+							rendered="#{clienteGlamixBean.clienteGlamix.id != null}" />
+
+						<p:spacer width="20" height="0" />
+
+						<p:commandButton value="Cancelar" action="/private/index.xhtml"
+							immediate="true" rendered="#{clienteGlamixBean.clienteGlamix.id == null}"
+							icon="fa fa-ban" ajax="false" />
+
+						<p:commandButton value="Cancelar"
+							action="#{clienteGlamixBean.goToList()}" immediate="true"
+							rendered="#{clienteGlamixBean.clienteGlamix.id != null}" icon="fa fa-ban"
+							ajax="false" />
+					</h:panelGrid>
+				</div>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

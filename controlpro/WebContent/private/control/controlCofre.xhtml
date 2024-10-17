@@ -1,0 +1,302 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="cofre.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>Lista de Cofres</h1>
+				<h3>Listagem de cofres cadastradas no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:commandLink id="cadastrar" styleClass="link-funcional"
+						style="margin-top: 3px" update=":form-cadastro:dados"
+						oncomplete="PF('dados').show()"
+						action="#{cofreBean.prepareSave()}">
+						<i class="material-icons md-32">add_to_photos</i>
+						<br />
+					</p:commandLink>
+					<p:tooltip for="cadastrar" position="top" value="Cadastrar Reserva" />
+
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{cofreBean.cofre}" />
+			<t:saveState value="#{cofreBean.cofres}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="false" closable="true" />
+
+				<br />
+
+				<p:panelGrid columns="4" style="width: 100%" layout="grid"
+					id="grid-dash">
+					<h:panelGroup style="width: 25%">
+						<div class="panel-total-projeto shadow-effect">
+							<div class="panel-icon" style="background-color: #1f8936;">
+								<div class="marginTop10"></div>
+								<i class="material-icons md-48 md-light">credit_card</i>
+							</div>
+
+							<div class="panel-infor" style="background-color: #55b94b;">
+								<div class="marginTop10"></div>
+								<div style="font-size: 12px" class="Fs16">Entrada</div>
+								<div style="font-size: 22px" class="animated pulse infinite">
+									<p:outputLabel value="#{cofreBean.entrada}">
+										<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+											minFractionDigits="2" type="currency" />
+									</p:outputLabel>
+								</div>
+							</div>
+						</div>
+					</h:panelGroup>
+					<h:panelGroup style="width: 25%">
+						<div class="panel-total-projeto shadow-effect">
+							<div class="panel-icon" style="background-color: #ad183d;">
+								<div class="marginTop10"></div>
+								<i class="material-icons md-48 md-light">credit_card</i>
+							</div>
+
+							<div class="panel-infor" style="background-color: #cf3f59;">
+								<div class="marginTop10"></div>
+								<div style="font-size: 12px" class="Fs16">Saída</div>
+								<div style="font-size: 22px" class="animated pulse infinite">
+									<p:outputLabel value="#{cofreBean.saida}">
+										<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+											minFractionDigits="2" type="currency" />
+									</p:outputLabel>
+								</div>
+							</div>
+						</div>
+					</h:panelGroup>
+					<h:panelGroup style="width: 25%">
+						<div class="panel-total-projeto shadow-effect">
+							<div class="panel-icon" style="background-color: #32439F;">
+								<div class="marginTop10"></div>
+								<i class="material-icons md-48 md-light">attach_money</i>
+							</div>
+
+							<div class="panel-infor" style="background-color: #3966C2;">
+								<div class="marginTop10"></div>
+								<div style="font-size: 12px" class="Fs16">Saldo</div>
+								<div style="font-size: 22px" class="animated pulse infinite">
+									<p:outputLabel value="#{cofreBean.saldo}">
+										<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+											minFractionDigits="2" type="currency" />
+									</p:outputLabel>
+								</div>
+							</div>
+						</div>
+					</h:panelGroup>
+				</p:panelGrid>
+
+				<p:panel styleClass="panel-pesquisa" style="margin-top: 15px">
+					<div class="lupa">
+						<p:graphicImage library="imagens" name="SearchLupa.png" />
+					</div>
+
+					<h:panelGrid columns="10">
+						<p:outputLabel value="Loja: " styleClass="my-label" />
+						<p:selectOneMenu value="#{cofreBean.cofreFilter.loja}">
+							<f:selectItem itemLabel="Selecione" />
+							<f:selectItems value="#{cofreBean.lojas}" var="loja"
+								itemLabel="#{loja.descricao}" itemValue="#{loja}" />
+						</p:selectOneMenu>
+						<p:outputLabel value="Movimentação: " styleClass="my-label" />
+						<p:selectOneMenu value="#{cofreBean.cofreFilter.tipoMovimentacao}">
+							<f:selectItem itemLabel="Selecione" />
+							<f:selectItems value="#{cofreBean.tipoMovimentacoes}" var="t"
+								itemLabel="#{t.descricao}" itemValue="#{t}" />
+						</p:selectOneMenu>
+
+						<p:outputLabel value="De: " styleClass="my-label" />
+						<p:calendar size="10" navigator="true"
+							value="#{cofreBean.cofreFilter.dataInicio}" pattern="dd/MM/yyyy" />
+						<p:outputLabel value="Até: " styleClass="my-label" />
+						<p:calendar size="10" navigator="true"
+							value="#{cofreBean.cofreFilter.dataFim}" pattern="dd/MM/yyyy" />
+
+						<p:commandButton value="Pesquisar" icon="fa fa-search"
+							style="margin-left: 5px; width: 100px !important"
+							update="table-cofre grid-dash" action="#{cofreBean.list()}" />
+
+						<p:commandButton id="report"
+							actionListener="#{cofreBean.gerarPDF}" icon="fa fa-download"
+							value="Gerar PDF" onclick="this.form.target='_blank'"
+							ajax="false">
+						</p:commandButton>
+					</h:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-cofre" value="#{cofreBean.cofres}"
+					var="entity" paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10"
+					lazy="true">
+
+					<p:column headerText="Status" style="width: 50px"
+						styleClass="Center">
+						<p:commandLink id="lnkAlterarStatus"
+							action="#{cofreBean.updateStatus()}" update="table-cofre"
+							title="#{entity.status ? 'Desativar' : 'Ativar'}">
+
+							<h:panelGroup rendered="#{!entity.status}">
+								<i class="material-icons Red">remove_circle</i>
+							</h:panelGroup>
+
+							<h:panelGroup rendered="#{entity.status}">
+								<i class="material-icons Green">check_circle</i>
+							</h:panelGroup>
+
+							<f:setPropertyActionListener target="#{cofreBean.cofre}"
+								value="#{entity}" />
+						</p:commandLink>
+					</p:column>
+					<p:column headerText="Movimentação">
+						<p:outputLabel value="#{entity.tipoMovimentacao.descricao}"
+							rendered="#{entity.tipoMovimentacao eq 'ENTRADA'}"
+							styleClass="label-verde" />
+						<p:outputLabel value="#{entity.tipoMovimentacao.descricao}"
+							rendered="#{entity.tipoMovimentacao eq 'SAIDA'}"
+							styleClass="label-vermelho" />
+					</p:column>
+
+					<p:column headerText="Data">
+						<p:outputLabel value="#{entity.data}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+					<p:column headerText="Loja">
+						<p:outputLabel value="#{entity.loja.descricao}" />
+					</p:column>
+
+					<p:column headerText="Descrição">
+						<p:outputLabel value="#{entity.obs}" />
+					</p:column>
+
+					<p:column headerText="Valor" styleClass="Center">
+						<p:outputLabel value="#{entity.valor}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Ações" style="width: 60px"
+						styleClass="Center">
+
+						<p:commandLink id="lnkEditar" rendered="#{entity.status}"
+							oncomplete="PF('dados').show()" style="text-decoration: none"
+							update=":form-cadastro:dados">
+							<i class="material-icons GrayDark">mode_edit</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{cofreBean.cofre}" />
+						</p:commandLink>
+
+						<p:tooltip for="lnkEditar" value="Editar" position="top" />
+					</p:column>
+				</p:dataTable>
+			</h:form>
+
+			<h:form id="form-cadastro">
+				<p:dialog modal="true" id="dados" widgetVar="dados"
+					resizable="false">
+
+					<f:facet name="header">
+					#{cofreBean.cofre.id == null ? 'Cadastrar Reserva' :
+					'Atualizar Reserva'}
+					</f:facet>
+
+					<div class="ui-fluid">
+						<p:messages showDetail="true" autoUpdate="true" closable="true" />
+
+						<h:panelGrid columns="2" style="margin-top: 20px"
+							id="grid-cadastro">
+
+							<h:panelGroup>
+								<p:outputLabel value="Data: " styleClass="my-label"
+									style="vertical-align: text-top;" for="data" />
+							</h:panelGroup>
+
+							<p:inputMask mask="99/99/9999" size="10" navigator="true"
+								required="true" requiredMessage="Digite a data" id="data"
+								value="#{cofreBean.cofre.data}">
+								<f:convertDateTime pattern="dd/MM/yyyy" />
+							</p:inputMask>
+
+							<h:panelGroup>
+								<p:outputLabel value="Loja: " styleClass="my-label"
+									style="vertical-align: text-top;" for="loja" />
+							</h:panelGroup>
+							<p:selectOneMenu value="#{cofreBean.cofre.loja}" required="true"
+								id="loja">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{cofreBean.lojas}" var="loja"
+									itemLabel="#{loja.descricao}" itemValue="#{loja}" />
+							</p:selectOneMenu>
+							<h:panelGroup>
+								<p:outputLabel value="Movimentação:" styleClass="my-label"
+									style="vertical-align: text-top;" for="movimentacao" />
+							</h:panelGroup>
+							<p:selectOneMenu required="true" id="movimentacao"
+								value="#{cofreBean.cofre.tipoMovimentacao}">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{cofreBean.tipoMovimentacoes}" var="t"
+									itemLabel="#{t.descricao}" itemValue="#{t}" />
+							</p:selectOneMenu>
+
+							<h:panelGroup>
+								<p:outputLabel value="OBS: " styleClass="my-label"
+									style="vertical-align: text-top;" for="obs" />
+							</h:panelGroup>
+							<p:inputText id="obs" value="#{cofreBean.cofre.obs}"
+								required="true" label="OBS" requiredMessage="OBS é obrigatório." />
+
+
+							<h:panelGroup>
+								<p:outputLabel value="Valor (R$):" styleClass="my-label"
+									style="vertical-align: text-top;" for="valor-vendas" />
+							</h:panelGroup>
+							<p:inputText required="true" id="valor-vendas"
+								requiredMessage="Campo 'Valor Vendas' é obrigatório!"
+								styleClass="moeda" maxlength="10"
+								value="#{cofreBean.cofre.valor}">
+								<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+									minFractionDigits="2" type="number" />
+							</p:inputText>
+						</h:panelGrid>
+						<p:separator />
+						<h:panelGrid columns="3">
+							<p:commandButton value="Salvar" icon="fa fa-floppy-o"
+								action="#{cofreBean.save}"
+								update="grid-cadastro :frm:table-cofre :frm:grid-dash"
+								rendered="#{cofreBean.cofre.id == null}" />
+
+							<p:commandButton value="Atualizar" icon="fa fa-floppy-o"
+								action="#{cofreBean.update}"
+								update=":frm:table-cofre :frm:grid-dash"
+								oncomplete="PF('dados').hide()"
+								rendered="#{cofreBean.cofre.id != null}" />
+
+							<p:spacer width="20" height="0" />
+						</h:panelGrid>
+					</div>
+				</p:dialog>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

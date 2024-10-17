@@ -1,0 +1,327 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:t="http://myfaces.apache.org/tomahawk"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="folha-pagamento.png"
+						width="60px" style="float: left" />
+				</div>
+
+				<h1>#{folhaPagamentoBean.folhaPagamento.id == null ? 'Cadastrar
+					Folha de Pagamento' : 'Atualizar Folha de Pagamento'}</h1>
+				<h3>#{folhaPagamentoBean.folhaPagamento.id == null ? 'Preencha
+					o formulário abaixo para cadastrar uma nova Folha de Pagamento.' :
+					'Preencha o formulário abaixo para atualizar a Folha de
+					Pagamento.'}</h3>
+
+				<div class="links-funcionais">
+					<p:link id="lista" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/lista/listarFolhaPagamento.xhtml">
+						<i class="material-icons md-32">list</i>
+						<br />
+					</p:link>
+					<p:tooltip for="lista" position="top"
+						value="Listar Folhas de Pagamento" />
+
+					<p:link styleClass="link-funcional" outcome="/private/index.xhtml"
+						id="inicio">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+			<p:panel style="margin-top: 15px" styleClass="my-panel">
+				<p:outputLabel value="(" />
+				<p:outputLabel value="*" styleClass="campoObrigatorio" />
+				<p:outputLabel value=") Campos obrigatórios." />
+			</p:panel>
+
+			<h:form id="frm">
+				<div class="ui-fluid">
+					<p:messages showDetail="true" autoUpdate="false" closable="true" />
+
+					<p:panelGrid columns="2" style="margin-top: 20px" layout="grid"
+						columnClasses="ui-grid-col-2" styleClass="ui-panelgrid-blank">
+
+						<p:commandButton id="infop" type="button" icon="fa fa-info"
+							value="Informações" />
+						<p:overlayPanel showCloseIcon="true" showEffect="fade"
+							id="imagePanelp" for="infop" hideEffect="explode" modal="true"
+							style="width: 40%;">
+
+							<h:panelGrid cellpadding="15">
+								<p:outputLabel value="Preencha todos os campos com atenção!"
+									styleClass="Red my-label" />
+							</h:panelGrid>
+						</p:overlayPanel>
+
+
+						<h:panelGroup>
+							<p:outputLabel value="Loja: " styleClass="my-label"
+								style="vertical-align: text-top;" for="loja" />
+						</h:panelGroup>
+						<p:selectOneMenu required="true"
+							requiredMessage="Selecione a loja" id="loja"
+							value="#{folhaPagamentoBean.folhaPagamento.loja}">
+							<f:selectItem itemLabel="Selecione" />
+							<f:selectItems value="#{folhaPagamentoBean.lojas}" var="loja"
+								itemLabel="#{loja.descricao}" itemValue="#{loja}" />
+						</p:selectOneMenu>
+						<h:panelGroup>
+							<p:outputLabel value="Tipo: " styleClass="my-label"
+								style="vertical-align: text-top;" for="tipo" />
+						</h:panelGroup>
+						<p:selectOneMenu required="true"
+							requiredMessage="Selecione o tipo" id="tipo"
+							value="#{folhaPagamentoBean.folhaPagamento.tipoFolhaPagamento}">
+							<f:selectItem itemLabel="Selecione" />
+							<f:selectItems value="#{folhaPagamentoBean.tiposFolhaPagamento}"
+								var="tipo" itemLabel="#{tipo.descricao}" itemValue="#{tipo}" />
+							<p:ajax listener="#{folhaPagamentoBean.atualizandoValores()}"
+								update="tableItemFolhaPagamento" />
+						</p:selectOneMenu>
+						<h:panelGroup>
+							<p:outputLabel value="Referência: " styleClass="my-label"
+								for="referencia" />
+						</h:panelGroup>
+						<p:inputMask mask="99/9999" id="referencia" required="true"
+							requiredMessage="Referência é obrigatório"
+							value="#{folhaPagamentoBean.folhaPagamento.referencia}">
+						</p:inputMask>
+						<h:panelGroup>
+							<p:outputLabel value="Observação: " styleClass="my-label"
+								for="observacao" />
+						</h:panelGroup>
+						<p:inputTextarea id="observacao" rows="6" cols="60"
+							label="Observação"
+							value="#{folhaPagamentoBean.folhaPagamento.observacao}" />
+					</p:panelGrid>
+					<h:panelGrid>
+						<br />
+						<p:commandButton value="Adicionar Funcionário"
+							oncomplete="PF('dados').show()" styleClass="button-add"
+							action="#{folhaPagamentoBean.clearItemFolhaPagamento()}"
+							process="@this" update=":form-cadastro:dados" icon="fa fa-plus">
+						</p:commandButton>
+						<br />
+
+						<p:dataTable id="tableItemFolhaPagamento" var="item"
+							value="#{folhaPagamentoBean.itemFolhaPagamentoList}"
+							emptyMessage="Nenhuma atividade foi adicionada">
+
+							<p:column headerText="Funcionario"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{item.funcionario.nome}" />
+							</p:column>
+
+							<p:column headerText="Valor" styleClass="Center">
+								<p:outputLabel value="#{item.valor}" styleClass="my-label-green">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Hora Extra" styleClass="Center">
+								<p:outputLabel value="#{item.horaExtra}" styleClass="my-label-green">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Salário Familia" styleClass="Center">
+								<p:outputLabel value="#{item.salarioFamilia}"
+									styleClass="my-label-green">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Inss" styleClass="Center">
+								<p:outputLabel value="#{item.inss}" styleClass="my-label-red">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Outros Descontos" styleClass="Center">
+								<p:outputLabel value="#{item.outrosDescontos}"
+									styleClass="my-label-red">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Salário Receber" styleClass="Center">
+								<p:outputLabel value="#{item.salarioReceber}"
+									styleClass="my-label-blue">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Ações" width="80">
+								<div align="center">
+									<h:panelGroup>
+										<p:commandLink oncomplete="PF('dados').show()" id="edititem"
+											update=":form-cadastro:dados" process="@this">
+											<i class="material-icons GrayDark">mode_edit</i>
+											<f:setPropertyActionListener
+												target="#{folhaPagamentoBean.itemFolhaPagamento}"
+												value="#{item}" />
+										</p:commandLink>
+										<p:tooltip for="edititem"
+											value="Clique para editar o registro da folha de pagamento" />
+									</h:panelGroup>
+									<h:panelGroup>
+										<p:commandLink id="removeitem"
+											action="#{folhaPagamentoBean.removerItemFolhaPagamento()}"
+											update="tableItemFolhaPagamento" process="@this">
+											<i class="material-icons GrayDark">delete_forever</i>
+											<f:setPropertyActionListener
+												target="#{folhaPagamentoBean.itemFolhaPagamento}"
+												value="#{item}"></f:setPropertyActionListener>
+										</p:commandLink>
+										<p:tooltip for="removeitem"
+											value="Clique para excluir o registro da folha de pagamento" />
+									</h:panelGroup>
+								</div>
+							</p:column>
+							<f:facet name="footer">
+								<div align="right">
+									<h1>
+										<p:outputLabel value="Total:" style="color:#fff" />
+										<p:outputLabel
+											value="#{folhaPagamentoBean.salarioReceberTotal}"
+											style="color:#fff">
+											<f:convertNumber minFractionDigits="2" type="currency"
+												maxFractionDigits="2" />
+										</p:outputLabel>
+									</h1>
+								</div>
+							</f:facet>
+						</p:dataTable>
+					</h:panelGrid>
+
+					<br /> <br />
+					<p:separator />
+					<h:panelGrid columns="3">
+						<p:commandButton value="Salvar" icon="fa fa-floppy-o"
+							action="#{folhaPagamentoBean.save}" update="frm"
+							rendered="#{folhaPagamentoBean.folhaPagamento.id == null}" />
+
+						<p:commandButton value="Atualizar" icon="fa fa-floppy-o"
+							action="#{folhaPagamentoBean.update}"
+							rendered="#{folhaPagamentoBean.folhaPagamento.id != null}" />
+
+						<p:spacer width="20" height="0" />
+
+						<p:commandButton value="Cancelar" action="/private/index.xhtml"
+							immediate="true"
+							rendered="#{folhaPagamentoBean.folhaPagamento.id == null}"
+							icon="fa fa-ban" ajax="false" />
+
+						<p:commandButton value="Cancelar"
+							action="#{folhaPagamentoBean.goToList()}" immediate="true"
+							rendered="#{folhaPagamentoBean.folhaPagamento.id != null}"
+							icon="fa fa-ban" ajax="false" />
+					</h:panelGrid>
+				</div>
+			</h:form>
+
+			<h:form id="form-cadastro">
+				<p:dialog modal="true" id="dados" widgetVar="dados"
+					resizable="false">
+
+					<f:facet name="header">
+					#{folhaPagamentoBean.itemFolhaPagamento.funcionario.nome == null ? 'Adicionar Registro' :
+					'Atualizar Registro'}
+					</f:facet>
+
+					<div class="ui-fluid">
+						<p:messages showDetail="true" autoUpdate="true" closable="true" />
+
+						<h:panelGrid columns="2" style="margin-top: 20px"
+							id="grid-cadastro" cellpadding="05px">
+
+							<h:panelGroup>
+								<p:outputLabel value="Funcionário: " styleClass="my-label"
+									style="vertical-align: text-top;" for="funcionario" />
+							</h:panelGroup>
+							<p:autoComplete
+								value="#{folhaPagamentoBean.itemFolhaPagamento.funcionario}"
+								autocomplete="true" size="36" id="funcionario"
+								completeMethod="#{funcionarioControlProBean.getFuncionarioControlProAutoComplete}"
+								forceSelection="true" minQueryLength="1" maxResults="30"
+								dropdown="true" required="true"
+								requiredMessage="Campo 'Funcionário' é obrigatório!"
+								converterMessage="Não foi possível selecionar o funcionário (Erro ao converter o objeto)"
+								converter="genericConverter" var="func" itemLabel="#{func.nome}"
+								itemValue="#{func}" placeholder="Pesquise pelo nome">
+							</p:autoComplete>
+
+							<!-- 							<h:panelGroup> -->
+							<!-- 								<p:outputLabel value="Valor (R$):" styleClass="my-label" -->
+							<!-- 									style="vertical-align: text-top;" for="valor" /> -->
+							<!-- 							</h:panelGroup> -->
+							<!-- 							<p:inputText required="true" id="valor" -->
+							<!-- 								requiredMessage="Campo 'Valor' é obrigatório!" -->
+							<!-- 								styleClass="moeda" maxlength="10" -->
+							<!-- 								value="#{folhaPagamentoBean.itemFolhaPagamento.valor}"> -->
+							<!-- 								<f:convertNumber locale="pt_BR" maxFractionDigits="2" -->
+							<!-- 									minFractionDigits="2" type="number" /> -->
+							<!-- 							</p:inputText> -->
+							<h:panelGroup>
+								<p:outputLabel value="Hora Extra (R$):" styleClass="my-label"
+									style="vertical-align: text-top;" for="hora-extra" />
+							</h:panelGroup>
+							<p:inputText required="true" id="hora-extra"
+								requiredMessage="Campo 'Valor' é obrigatório!"
+								styleClass="moeda" maxlength="10"
+								value="#{folhaPagamentoBean.itemFolhaPagamento.horaExtra}">
+								<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+									minFractionDigits="2" type="number" />
+							</p:inputText>
+							<h:panelGroup>
+								<p:outputLabel value="Outros Descontos (R$):"
+									styleClass="my-label" style="vertical-align: text-top;"
+									for="outros-descontos" />
+							</h:panelGroup>
+							<p:inputText required="true" id="outros-descontos"
+								requiredMessage="Campo 'Valor' é obrigatório!"
+								styleClass="moeda" maxlength="10"
+								value="#{folhaPagamentoBean.itemFolhaPagamento.outrosDescontos}">
+								<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+									minFractionDigits="2" type="number" />
+							</p:inputText>
+
+						</h:panelGrid>
+						<p:separator />
+						<h:panelGrid columns="3">
+							<p:commandButton value="Adicionar"
+								update=":frm:tableItemFolhaPagamento grid-cadastro"
+								action="#{folhaPagamentoBean.addItemFolhaPagamento()}"
+								icon="fa fa-plus"
+								rendered="#{folhaPagamentoBean.itemFolhaPagamento.funcionario.nome == null}" />
+
+							<p:commandButton value="Atualizar"
+								oncomplete="PF('dados').hide()" icon="fa fa-refresh"
+								update=":frm:tableItemFolhaPagamento"
+								action="#{folhaPagamentoBean.updateItemFolhaPagamento()}"
+								rendered="#{folhaPagamentoBean.itemFolhaPagamento.funcionario.nome != null}" />
+
+							<p:commandButton value="Cancelar" styleClass="btn-orange"
+								icon="fa fa-close" process="@this"
+								oncomplete="PF('dados').hide()" immediate="true" />
+
+							<p:spacer width="20" height="0" />
+						</h:panelGrid>
+					</div>
+				</p:dialog>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

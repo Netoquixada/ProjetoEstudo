@@ -1,0 +1,410 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:t="http://myfaces.apache.org/tomahawk"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="controle_pedido.png"
+						width="60px" style="float: left" />
+				</div>
+
+				<h1>#{controlePedidoBean.controlePedido.id == null ? 'Cadastrar
+					Controle de Pedido' : 'Atualizar Controle de Pedido'}</h1>
+				<h3>#{controlePedidoBean.controlePedido.id == null ? 'Preencha
+					o formulário abaixo para cadastrar um novo controle de pedido.' :
+					'Preencha o formulário abaixo para atualizar o controle de
+					pedido.'}</h3>
+
+				<div class="links-funcionais">
+					<p:link id="lista" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/lista/listarControlePedido.xhtml">
+						<i class="material-icons md-32">list</i>
+						<br />
+					</p:link>
+					<p:tooltip for="lista" position="top"
+						value="Listar Controles de Pedidos" />
+
+					<p:link styleClass="link-funcional" outcome="/private/index.xhtml"
+						id="inicio">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+			<p:panel style="margin-top: 15px" styleClass="my-panel">
+				<p:outputLabel value="(" />
+				<p:outputLabel value="*" styleClass="campoObrigatorio" />
+				<p:outputLabel value=") Campos obrigatórios." />
+			</p:panel>
+
+			<t:saveState value="#{controlePedidoBean.controlePedido}" />
+			<t:saveState value="#{controlePedidoBean.controlePedidos}" />
+
+			<h:form id="frm">
+				<div class="ui-fluid">
+					<p:messages showDetail="true" autoUpdate="true" closable="true" />
+
+					<p:tabView style="margin-top: 15px">
+						<p:tab title="Sequência e Movimentação">
+							<p:panelGrid columns="2" style="margin-top: 20px" layout="grid"
+								styleClass="ui-panelgrid-blank"
+								columnClasses="ui-grid-col-6,ui-grid-col-6">
+								<h:panelGrid columns="3">
+									<p:outputLabel value="Sequência da Venda: "
+										styleClass="my-label" style="vertical-align: text-top;"
+										for="sequencia" />
+									<p:inputText id="sequencia"
+										value="#{controlePedidoBean.controlePedido.sequenciaVenda}"
+										required="true" requiredMessage="Digite a sequencia da venda" />
+									<p:commandButton icon="fa fa-search"
+										process="@this sequencia grid-cliente"
+										style="margin-left: 5px; width: 100px !important"
+										update="table-controle grid-cliente"
+										action="#{controlePedidoBean.movimentacoesProduto()}" />
+
+									<h:panelGrid columns="2" id="grid-cliente">
+										<p:outputLabel value="Data: " styleClass="my-label"
+											style="vertical-align: text-top;" />
+										<p:outputLabel value="#{controlePedidoBean.venda.data}">
+										
+											<f:convertDateTime pattern="dd/MM/yyyy" />
+										</p:outputLabel>
+										<p:outputLabel value="Cliente: " styleClass="my-label"
+											style="vertical-align: text-top;" />
+
+										<p:outputLabel
+											value="#{controlePedidoBean.venda.cliente.nome}" />
+
+										<p:outputLabel value="Telefone: " styleClass="my-label"
+											style="vertical-align: text-top;" />
+
+										<p:outputLabel
+											value="#{controlePedidoBean.venda.cliente.fone}" />
+
+										<p:outputLabel value="Total da Venda: " styleClass="my-label"
+											style="vertical-align: text-top;" />
+
+										<p:outputLabel value="#{controlePedidoBean.venda.totalVenda}">
+											<f:convertNumber minFractionDigits="2" type="currency"
+												maxFractionDigits="2" />
+										</p:outputLabel>
+									</h:panelGrid>
+								</h:panelGrid>
+
+								<h:panelGroup>
+									<p:dataTable id="table-controle"
+										value="#{controlePedidoBean.movimentacoes}" var="entity"
+										paginator="true" style="margin-top: 15px"
+										emptyMessage="Nenhum registro encontrado!"
+										paginatorPosition="bottom" paginatorAlwaysVisible="false"
+										rows="10" lazy="true">
+
+										<f:facet name="header">
+											<p:outputLabel value="Movimentação da Saída" />
+										</f:facet>
+
+<!-- 										<p:column headerText="Data" style="color: #000 !important"> -->
+<!-- 											<p:outputLabel value="#{entity.data}"> -->
+<!-- 												<f:convertDateTime pattern="dd/MM/yyyy" /> -->
+<!-- 											</p:outputLabel> -->
+<!-- 										</p:column> -->
+
+										<p:column headerText="Sequencia"
+											style="color: #000 !important">
+											<p:outputLabel value="#{entity.sequencia}" />
+										</p:column>
+										
+										<p:column headerText="Linha"
+											style="color: #000 !important">
+											<p:outputLabel value="#{entity.linha}" />
+										</p:column>
+
+										<p:column headerText="Refência Produto"
+											style="color: #000 !important">
+											<p:outputLabel value="#{entity.produto.id}" />
+										</p:column>
+
+										<p:column headerText="Nome" style="color: #000 !important">
+											<p:outputLabel value="#{entity.produto.nome}" />
+										</p:column>
+
+										<f:facet name="footer">
+											<p:outputLabel value="Quantidade de Itens: " />
+											<p:outputLabel
+												value="#{controlePedidoBean.movimentacoes.size()}" />
+										</f:facet>
+
+									</p:dataTable>
+								</h:panelGroup>
+							</p:panelGrid>
+
+						</p:tab>
+						<p:tab title="Informações">
+							<h:panelGrid cellpadding="20" columns="5"
+								style="margin-top: 10px" id="grid">
+								<h:panelGroup>
+									<p:outputLabel value="Empacotamento: " styleClass="my-label"
+										style="vertical-align: text-top;" for="func" />
+									<br />
+									<p:selectOneMenu
+										value="#{controlePedidoBean.controlePedido.despachante}"
+										id="func" required="true"
+										requiredMessage="Selecione o empacotamento"
+										converter="funcionarioConverter">
+										<f:selectItem itemLabel="Selecione" />
+										<f:selectItems value="#{funcionarioBean.listaFuncionarios}"
+											var="func" itemLabel="#{func.nome}" itemValue="#{func}" />
+									</p:selectOneMenu>
+								</h:panelGroup>
+
+								<h:panelGroup>
+									<p:outputLabel value="NFE: " styleClass="my-label"
+										style="vertical-align: text-top;" />
+									<br />
+									<p:selectOneRadio
+										value="#{controlePedidoBean.controlePedido.nfe}">
+										<f:selectItem itemLabel="Sim" itemValue="true" />
+										<f:selectItem itemLabel="Não" itemValue="false" />
+										<p:ajax update="grid-nfe" />
+									</p:selectOneRadio>
+								</h:panelGroup>
+								<h:panelGrid id="grid-nfe">
+									<h:panelGroup
+										rendered="#{controlePedidoBean.controlePedido.nfe}">
+										<p:outputLabel value="Número da NFE: " styleClass="my-label"
+											style="vertical-align: text-top;" />
+										<br />
+										<p:inputText
+											value="#{controlePedidoBean.controlePedido.numeroNfe}" />
+									</h:panelGroup>
+								</h:panelGrid>
+								<h:panelGroup>
+									<p:outputLabel value="Envio: " styleClass="my-label"
+										style="vertical-align: text-top;" for="envio" />
+									<br />
+									<p:selectOneMenu id="envio"
+										value="#{controlePedidoBean.controlePedido.envio}">
+										<f:selectItem itemLabel="Selecione" />
+										<f:selectItem itemLabel="Correios" itemValue="Correios" />
+										<f:selectItem itemLabel="Avião" itemValue="Avião" />
+										<f:selectItem itemLabel="Transportadora"
+											itemValue="Transportadora" />
+										<f:selectItem itemLabel="Outros" itemValue="Outros" />
+									</p:selectOneMenu>
+								</h:panelGroup>
+								<h:panelGroup>
+									<p:outputLabel value="Valor do Frete " styleClass="my-label"
+										style="vertical-align: text-top;" for="valorFrete" />
+									<br />
+									<p:inputText id="valorFrete" styleClass="moeda" maxlength="10"
+										value="#{controlePedidoBean.controlePedido.valorFrete}">
+										<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+											minFractionDigits="2" type="number" />
+									</p:inputText>
+								</h:panelGroup>
+								<h:panelGroup>
+									<p:outputLabel value="Rastreio Pedido: " styleClass="my-label"
+										style="vertical-align: text-top;" for="rastreio" />
+									<br />
+									<p:inputText id="rastreio"
+										value="#{controlePedidoBean.controlePedido.rastreio}" />
+								</h:panelGroup>
+								<h:panelGroup>
+									<p:outputLabel value="Status Pedido: " styleClass="my-label"
+										style="vertical-align: text-top;" for="status-envio" />
+									<br />
+									<p:selectOneMenu id="status-envio"
+										value="#{controlePedidoBean.controlePedido.envioStatus}">
+										<f:selectItem itemLabel="Selecione" />
+										<f:selectItem itemLabel="Empacotamento"
+											itemValue="Empacotamento" />
+										<f:selectItem itemLabel="Enviado" itemValue="Enviado" />
+										<f:selectItem itemLabel="Estraviado" itemValue="Estraviado" />
+										<f:selectItem itemLabel="Entregue" itemValue="Entregue" />
+										<p:ajax update="l-data-entrega l-grid-envio" />
+									</p:selectOneMenu>
+								</h:panelGroup>
+								<h:panelGrid id="l-grid-envio">
+									<h:panelGroup
+										rendered="#{controlePedidoBean.controlePedido.envioStatus eq 'Enviado'}">
+										<p:outputLabel value="Data do Envio: " styleClass="my-label"
+											style="vertical-align: text-top;" for="data-envio" />
+										<br />
+										<p:calendar size="10" navigator="true" id="data-envio"
+											value="#{controlePedidoBean.controlePedido.dataEnvio}"
+											pattern="dd/MM/yyyy" />
+									</h:panelGroup>
+									<h:panelGroup
+										rendered="#{controlePedidoBean.controlePedido.envioStatus eq 'Enviado'}">
+										<p:outputLabel value="Responsável Envio: "
+											styleClass="my-label" style="vertical-align: text-top;"
+											for="func-envio" />
+										<br />
+										<p:selectOneMenu
+											value="#{controlePedidoBean.controlePedido.responsavelEnvio}"
+											id="func-envio" required="true"
+											requiredMessage="Selecione o responsável pelo envio"
+											converter="funcionarioConverter">
+											<f:selectItem itemLabel="Selecione" />
+											<f:selectItems value="#{funcionarioBean.listaFuncionarios}"
+												var="func" itemLabel="#{func.nome}" itemValue="#{func}" />
+										</p:selectOneMenu>
+									</h:panelGroup>
+								</h:panelGrid>
+								<h:panelGrid id="l-data-entrega">
+									<h:panelGroup
+										rendered="#{controlePedidoBean.controlePedido.envioStatus eq 'Entregue'}">
+										<p:outputLabel value="Data da Entrega: " styleClass="my-label"
+											style="vertical-align: text-top;" for="data-entrega" />
+										<br />
+										<p:calendar size="10" navigator="true" id="data-entrega"
+											value="#{controlePedidoBean.controlePedido.dataEntraga}"
+											pattern="dd/MM/yyyy" />
+									</h:panelGroup>
+								</h:panelGrid>
+								<h:panelGroup>
+									<p:outputLabel value="Pós-Venda?: " styleClass="my-label"
+										style="vertical-align: text-top;" for="pos-venda" />
+									<br />
+									<p:selectOneRadio id="pos-venda"
+										value="#{controlePedidoBean.controlePedido.posVenda}">
+										<f:selectItem itemLabel="Sim" itemValue="True" />
+										<f:selectItem itemLabel="Não" itemValue="False" />
+										<p:ajax update="l-data-pos-venda" />
+									</p:selectOneRadio>
+								</h:panelGroup>
+								<h:panelGrid id="l-data-pos-venda">
+									<h:panelGroup
+										rendered="#{controlePedidoBean.controlePedido.posVenda}">
+										<p:outputLabel value="Data da Pós-Venda: "
+											styleClass="my-label" style="vertical-align: text-top;"
+											for="data-pos-venda" />
+										<br />
+										<p:calendar size="10" navigator="true" id="data-pos-venda"
+											value="#{controlePedidoBean.controlePedido.dataPosVenda}"
+											pattern="dd/MM/yyyy" />
+									</h:panelGroup>
+								</h:panelGrid>
+							</h:panelGrid>
+							<br />
+							<h:panelGroup>
+								<p:outputLabel value="Descrição:" styleClass="my-label"
+									style="vertical-align: text-top;" />
+								<br />
+								<p:inputTextarea id="descricao"
+									placeholder="Descreva uma observação sobre a conferência(opcional)!"
+									value="#{controlePedidoBean.controlePedido.observacao}"
+									label="Descrição" rows="4" cols="60" />
+							</h:panelGroup>
+						</p:tab>
+						<p:tab title="Comprovantes"
+							rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR'}">
+							<p:panelGrid columns="3" style="margin-top: 20px" layout="grid"
+								styleClass="ui-panelgrid-blank"
+								columnClasses="ui-grid-col-2,ui-grid-col-6,ui-grid-col-4">
+								<h:panelGroup>
+									<p:outputLabel value="Valor do Frete Pago"
+										styleClass="my-label" style="vertical-align: text-top;"
+										for="valorFretePago" />
+									<br />
+									<p:inputText id="valorFretePago" styleClass="moeda"
+										maxlength="10"
+										value="#{controlePedidoBean.controlePedido.valorFretePago}">
+										<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+											minFractionDigits="2" type="number" />
+									</p:inputText>
+								</h:panelGroup>
+								<h:panelGroup>
+									<p:outputLabel value="Anexar Comprovante: "
+										styleClass="my-label" />
+									<br />
+									<p:fileUpload immediate="true" mode="advanced"
+										value="#{controlePedidoBean.comprovante.arquivo}"
+										label="Escolher arquivo"
+										invalidFileMessage="Extensões permitidas: .pdf, .png, .gif, .jpg ou .jpeg"
+										fileUploadListener="#{controlePedidoBean.uploadFile}"
+										fileLimitMessage="Apenas um arquivo por vez!"
+										dragDropSupport="true" multiple="false" cancelLabel="Cancelar"
+										uploadLabel="Enviar" update="table-comprovante"
+										allowTypes="/(\.|\/)(gif|jpe?g|png|pdf)$/" />
+								</h:panelGroup>
+
+								<p:dataTable id="table-comprovante"
+									value="#{controlePedidoBean.comprovanteList}" var="entity"
+									paginator="true" style="margin-top: 15px"
+									emptyMessage="Nenhum registro encontrado!"
+									paginatorPosition="bottom" paginatorAlwaysVisible="false"
+									rows="10">
+
+									<f:facet name="header">
+										<p:outputLabel value="Lista de comprovantes" />
+									</f:facet>
+									<p:column headerText="Nome" style="color: #000 !important">
+										<p:outputLabel value="#{entity.nome}" />
+									</p:column>
+
+									<p:column headerText="Excluir" style="color: #000 !important"
+										width="60" styleClass="centralizado">
+										<p:commandLink styleClass="link" process="@this" ajax="false"
+											immediate="true" id="donwload">
+											<f:setPropertyActionListener
+												target="#{controlePedidoBean.comprovante}" value="#{entity}" />
+											<i class="material-icons GrayDark">get_app</i>
+											<p:fileDownload
+												value="#{controlePedidoBean.downloadArquivo()}" />
+										</p:commandLink>
+										<p:tooltip for="donwload"
+											value="Clique para excluir o comprovante" />
+										<p:commandLink id="removeitem"
+											action="#{controlePedidoBean.removerComprovante()}"
+											update="table-comprovante" process="@this">
+											<i class="material-icons GrayDark">delete_forever</i>
+											<f:setPropertyActionListener
+												target="#{controlePedidoBean.comprovante}" value="#{entity}" />
+										</p:commandLink>
+										<p:tooltip for="removeitem"
+											value="Clique para excluir o comprovante" />
+									</p:column>
+
+								</p:dataTable>
+
+							</p:panelGrid>
+						</p:tab>
+
+					</p:tabView>
+					<br /> <br />
+					<p:separator />
+					<h:panelGrid columns="3">
+						<p:commandButton value="Salvar" icon="fa fa-floppy-o"
+							action="#{controlePedidoBean.save}" update="frm"
+							rendered="#{controlePedidoBean.controlePedido.id == null}" />
+
+						<p:commandButton value="Atualizar" icon="fa fa-floppy-o"
+							action="#{controlePedidoBean.update}"
+							rendered="#{controlePedidoBean.controlePedido.id != null}" />
+
+						<p:spacer width="20" height="0" />
+
+						<p:commandButton value="Cancelar" action="/private/index.xhtml"
+							immediate="true"
+							rendered="#{controlePedidoBean.controlePedido.id == null}"
+							icon="fa fa-ban" ajax="false" />
+
+						<p:commandButton value="Cancelar"
+							action="#{controlePedidoBean.goToList()}" immediate="true"
+							rendered="#{controlePedidoBean.controlePedido.id != null}"
+							icon="fa fa-ban" ajax="false" />
+					</h:panelGrid>
+				</div>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

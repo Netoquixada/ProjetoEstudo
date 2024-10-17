@@ -1,0 +1,297 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="money.png" width="60"
+						style="float: left" />
+				</div>
+
+				<h1>Lista de Vendas</h1>
+				<h3>Listagem de vendas cadastradas no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{vendasBean.vendas}" />
+			<t:saveState value="#{vendasBean.lazy}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<br />
+
+				<p:panelGrid columns="4" style="width: 100%" layout="grid"
+					id="grid-dash">
+					<h:panelGroup style="width: 25%">
+						<div class="panel-total-projeto shadow-effect">
+							<div class="panel-icon" style="background-color: #283593;">
+								<div class="marginTop10"></div>
+								<i class="material-icons md-48 md-light">account_balance</i>
+							</div>
+
+							<div class="panel-infor" style="background-color: #3f51b5;">
+								<div class="marginTop10"></div>
+								<div style="font-size: 12px" class="Fs16">Depósito/Transferencia</div>
+								<div style="font-size: 22px" class="animated pulse infinite">
+									<p:outputLabel value="#{vendasBean.vendasTotais.bancoValor}">
+										<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+											minFractionDigits="2" type="currency" />
+									</p:outputLabel>
+								</div>
+							</div>
+						</div>
+					</h:panelGroup>
+					<h:panelGroup style="width: 25%">
+						<div class="panel-total-projeto shadow-effect">
+							<div class="panel-icon" style="background-color: #283593;">
+								<div class="marginTop10"></div>
+								<i class="material-icons md-48 md-light">credit_card</i>
+							</div>
+
+							<div class="panel-infor" style="background-color: #3f51b5;">
+								<div class="marginTop10"></div>
+								<div style="font-size: 12px" class="Fs16">Cartão Débito</div>
+								<div style="font-size: 22px" class="animated pulse infinite">
+									<p:outputLabel value="#{vendasBean.vendasTotais.cartoesDebito}">
+										<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+											minFractionDigits="2" type="currency" />
+									</p:outputLabel>
+								</div>
+							</div>
+						</div>
+					</h:panelGroup>
+					<h:panelGroup style="width: 25%">
+						<div class="panel-total-projeto shadow-effect">
+							<div class="panel-icon" style="background-color: #d86b26;">
+								<div class="marginTop10"></div>
+								<i class="material-icons md-48 md-light">credit_card</i>
+							</div>
+
+							<div class="panel-infor" style="background-color: #ec9454;">
+								<div class="marginTop10"></div>
+								<div style="font-size: 12px" class="Fs16">Cartão Crédito</div>
+								<div style="font-size: 22px" class="animated pulse infinite">
+									<p:outputLabel
+										value="#{vendasBean.vendasTotais.cartoesCredito}">
+										<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+											minFractionDigits="2" type="currency" />
+									</p:outputLabel>
+								</div>
+							</div>
+						</div>
+					</h:panelGroup>
+					<h:panelGroup style="width: 25%">
+						<div class="panel-total-projeto shadow-effect">
+							<div class="panel-icon" style="background-color: #757B7E;">
+								<div class="marginTop10"></div>
+								<i class="material-icons md-48 md-light">attach_money</i>
+							</div>
+
+							<div class="panel-infor" style="background-color: #8094A1;">
+								<div class="marginTop10"></div>
+								<div style="font-size: 12px" class="Fs16">Dinheiro</div>
+								<div style="font-size: 22px" class="animated pulse infinite">
+									<p:outputLabel
+										value="#{vendasBean.vendasTotais.dinheiro  - vendasBean.vendasTotais.troco}">
+										<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+											minFractionDigits="2" type="currency" />
+									</p:outputLabel>
+								</div>
+							</div>
+						</div>
+					</h:panelGroup>
+					<h:panelGroup style="width: 25%">
+						<div class="panel-total-projeto shadow-effect">
+							<div class="panel-icon" style="background-color: #2E7D32;">
+								<div class="marginTop10"></div>
+								<i class="material-icons md-48 md-light">check_circle</i>
+							</div>
+
+							<div class="panel-infor" style="background-color: #4CAF50;">
+								<div class="marginTop10"></div>
+								<div style="font-size: 12px" class="Fs16">TOTAL</div>
+								<div style="font-size: 22px" class="animated pulse infinite">
+									<p:outputLabel
+										value="#{vendasBean.vendasTotais.total - vendasBean.vendasTotais.troco}">
+										<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+											minFractionDigits="2" type="currency" />
+									</p:outputLabel>
+								</div>
+							</div>
+						</div>
+					</h:panelGroup>
+					<!-- 					<h:panelGroup style="width: 25%"> -->
+					<!-- 						<div class="panel-total-projeto shadow-effect"> -->
+					<!-- 							<div class="panel-icon" style="background-color: #283593;"> -->
+					<!-- 								<div class="marginTop10"></div> -->
+					<!-- 								<i class="material-icons md-48 md-light">account_balance</i> -->
+					<!-- 							</div> -->
+
+					<!-- 							<div class="panel-infor" style="background-color: #3f51b5;"> -->
+					<!-- 								<div class="marginTop10"></div> -->
+					<!-- 								<div style="font-size: 12px" class="Fs16">Troco</div> -->
+					<!-- 								<div style="font-size: 22px" class="animated pulse infinite"> -->
+					<!-- 									<p:outputLabel value="#{vendasBean.vendasTotais.troco}"> -->
+					<!-- 										<f:convertNumber locale="pt_BR" maxFractionDigits="2" -->
+					<!-- 											minFractionDigits="2" type="currency" /> -->
+					<!-- 									</p:outputLabel> -->
+					<!-- 								</div> -->
+					<!-- 							</div> -->
+					<!-- 						</div> -->
+					<!-- 					</h:panelGroup> -->
+				</p:panelGrid>
+
+
+
+
+				<p:panel styleClass="panel-pesquisa" style="margin-top: 15px">
+					<div class="lupa">
+						<p:graphicImage library="imagens" name="SearchLupa.png" />
+					</div>
+					<!-- 					<div class="lupa1"> -->
+					<!-- 						<p:outputLabel value="Vendedor: " styleClass="my-label" -->
+					<!-- 							style="Center-align:center" /> -->
+					<!-- 					</div> -->
+
+					<h:panelGrid columns="2" cellpadding="10">
+						<p:graphicImage name="demo/images/godfather/godfather1.jpg" />
+<!-- 						<h:outputText value="The story begins as Don Vito Corleone..." /> -->
+						<p:outputLabel value="Vendedor: "/>
+					</h:panelGrid>
+					<h:panelGrid columns="10" cellpadding="-50">
+						<p:autoComplete value="#{vendasBean.vendasFilter.vendedor}" 
+												autocomplete="true" size="15" id="cortador"
+												completeMethod="#{funcionarioBean.getFuncionarioAutoComplete}"
+												forceSelection="true" minQueryLength="1" maxResults="30"
+												dropdown="true"
+												converterMessage="Não foi possível selecionar o funcionário (Erro ao converter o objeto)"
+												converter="funcionarioConverter" var="func"
+												itemLabel="#{func.nome}" itemValue="#{func}"
+												placeholder="Pesquise pelo nome">
+											</p:autoComplete>
+					</h:panelGrid>
+
+					<!-- 					<div class="ui-fluid"></div> -->
+
+					<!-- 					<h:panelGrid columns="9" cellpadding="3" size="sm"> -->
+					<!-- 						<h:panelGroup> -->
+					<!-- 							<p:outputLabel value="Vendedor: " styleClass="my-label" -->
+					<!-- 								style="vertical-align: text-top; width: 40%" for="cortador" /> -->
+					<!-- 						</h:panelGroup> -->
+					<!-- 						<p:autoComplete value="#{vendasBean.vendasFilter.vendedor}" -->
+					<!-- 							autocomplete="true" size="15" id="cortador" -->
+					<!-- 							completeMethod="#{funcionarioBean.getFuncionarioAutoComplete}" -->
+					<!-- 							forceSelection="true" minQueryLength="1" maxResults="30" -->
+					<!-- 							dropdown="true" -->
+					<!-- 							converterMessage="Não foi possível selecionar o funcionário (Erro ao converter o objeto)" -->
+					<!-- 							converter="funcionarioConverter" var="func" -->
+					<!-- 							itemLabel="#{func.nome}" itemValue="#{func}" -->
+					<!-- 							placeholder="Pesquise pelo nome"> -->
+					<!-- 						</p:autoComplete> -->
+
+					<!-- 						<h:panelGroup> -->
+					<!-- 							<p:outputLabel value="Cliente: " styleClass="my-label" -->
+					<!-- 								style="vertical-align: text-top;" for="cliente" /> -->
+					<!-- 						</h:panelGroup> -->
+					<!-- 						<p:autoComplete value="#{vendasBean.vendasFilter.cliente}" -->
+					<!-- 							autocomplete="true" size="25" id="cliente" -->
+					<!-- 							completeMethod="#{clienteBean.getClienteAutoComplete}" -->
+					<!-- 							forceSelection="true" minQueryLength="1" maxResults="500" -->
+					<!-- 							dropdown="true" -->
+					<!-- 							converterMessage="Não foi possível selecionar o cliente (Erro ao converter o objeto)" -->
+					<!-- 							converter="clienteConverter" var="cli" itemLabel="#{cli.nome}" -->
+					<!-- 							itemValue="#{cli}" placeholder="Pesquise pelo nome"> -->
+					<!-- 						</p:autoComplete> -->
+
+					<!-- 												<p:selectOneMenu  -->
+					<!-- 												id="cliente" value="#{vendasBean.vendasFilter.cliente}" converter="clienteConverter"> -->
+					<!-- 													<f:selectItem itemLabel="Selecione" /> -->
+					<!-- 													<f:selectItems value="#{clienteBean.listaClientes}" var="cli" -->
+					<!-- 														itemLabel="#{cli.nome}" itemValue="#{cli}" /> -->
+					<!-- 												</p:selectOneMenu> -->
+
+					<!-- 						<p:outputLabel value="De: " styleClass="my-label" /> -->
+					<!-- 						<p:calendar size="10" navigator="true" -->
+					<!-- 							value="#{vendasBean.vendasFilter.dataVendaInicio}" -->
+					<!-- 							pattern="dd/MM/yyyy" /> -->
+					<!-- 						<p:outputLabel value="Até: " styleClass="my-label" /> -->
+					<!-- 						<p:calendar size="10" navigator="true" -->
+					<!-- 							value="#{vendasBean.vendasFilter.dataVendaFim}" -->
+					<!-- 							pattern="dd/MM/yyyy" /> -->
+
+					<!-- 						<p:commandButton value="Pesquisar" -->
+					<!-- 							style="margin-left: 5px; width: 100px !important" -->
+					<!-- 							update="table-vendas grid-dash" action="#{vendasBean.list()}" /> -->
+					<!-- 					</h:panelGrid> -->
+				</p:panel>
+				<p:dataTable id="table-vendas" value="#{vendasBean.listaVendass}"
+					var="entity" paginator="true" reflow="true"
+					style="margin-top: 15px" paginatorAlwaysVisible="false" rows="20"
+					lazy="true"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					paginatorPosition="bottom">
+
+					<p:column headerText="Data Venda" style="width: 90px"
+						styleClass="Center">
+						<p:outputLabel value="#{entity.dataVenda}" />
+					</p:column>
+
+					<p:column headerText="Sequencia" styleClass="Center" width="70">
+						<p:outputLabel value="#{entity.sequencia}" />
+					</p:column>
+
+					<p:column headerText="Vendedor">
+						<p:outputLabel value="#{entity.vendedor.nome}" />
+					</p:column>
+
+					<p:column headerText="Cliente">
+						<p:outputLabel value="#{entity.cliente.nome}" />
+					</p:column>
+
+					<p:column headerText="Tabela" styleClass="Center">
+						<p:outputLabel value="#{entity.tabela}" />
+					</p:column>
+
+					<p:column headerText="Valor Venda" styleClass="Center">
+						<p:outputLabel value="#{entity.valorVenda}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="TOTAL" styleClass="Center">
+						<p:outputLabel value="#{entity.totalVenda}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Efetivada" styleClass="Center" width="70">
+						<h:panelGroup rendered="#{entity.efetivadaFinanceiro == 0}">
+							<i class="material-icons Red" title="Não">remove_circle</i>
+						</h:panelGroup>
+
+						<h:panelGroup rendered="#{entity.efetivadaFinanceiro == 1}">
+							<i class="material-icons Green" title="Sim">check_circle</i>
+						</h:panelGroup>
+					</p:column>
+				</p:dataTable>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

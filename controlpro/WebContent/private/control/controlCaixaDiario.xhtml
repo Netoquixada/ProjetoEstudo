@@ -1,0 +1,304 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="caixa-diario.png"
+						width="60px" style="float: left" />
+				</div>
+
+				<h1>Controle de Caixa Diário</h1>
+				<h3>Listagem de movimentações do caixa diário.</h3>
+
+				<div class="links-funcionais">
+					<p:commandLink id="cadastrar" styleClass="link-funcional"
+						style="margin-top: 3px" update=":form-cadastro:dados"
+						oncomplete="PF('dados').show()">
+						<i class="material-icons md-32">add_to_photos</i>
+						<br />
+					</p:commandLink>
+					<p:tooltip for="cadastrar" position="top" value="Movimentar Caixa" />
+
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{caixaDiarioBean.caixaDiario}" />
+			<t:saveState value="#{caixaDiarioBean.caixaDiarios}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="false" closable="true" />
+
+				<p:panel header="Pesquisa" style="margin-top: 15px">
+
+					<h:panelGrid columns="10">
+						<h:panelGroup>
+							<p:outputLabel value="Descrição: " styleClass="my-label" />
+							<br />
+							<p:inputText
+								value="#{caixaDiarioBean.caixaDiarioFilter.descricao}" size="30"/>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Tipo: " styleClass="my-label" />
+							<br />
+							<p:selectOneMenu required="true"
+														value="#{caixaDiarioBean.caixaDiarioFilter.tipo}">
+							<f:selectItem itemLabel="Selecione" />
+							<f:selectItem itemLabel="Crédito" itemValue="Crédito" />
+							<f:selectItem itemLabel="Débito" itemValue="Débito" />
+						</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="De: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{caixaDiarioBean.caixaDiarioFilter.dataPesquisaInicio}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Até: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{caixaDiarioBean.caixaDiarioFilter.dataPesquisaFim}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+
+						<h:panelGroup>
+							<br />
+							<p:commandButton value="Pesquisar" icon="fa fa-search"
+								style="margin-left: 5px; width: 100px !important"
+								update="table-caixaDiario" action="#{caixaDiarioBean.list()}" />
+							<p:commandButton id="report"
+								actionListener="#{caixaDiarioBean.gerarPDF}"
+								icon="fa fa-download" value="Gerar PDF"
+								onclick="this.form.target='_blank'" ajax="false">
+							</p:commandButton>
+						</h:panelGroup>
+					</h:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-caixaDiario"
+					value="#{caixaDiarioBean.caixaDiarios}" var="entity"
+					paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10"
+					lazy="true">
+
+					<p:column headerText="Tipo" styleClass="Center">
+						<p:outputLabel value="#{entity.tipo}" rendered="#{entity.tipo eq 'Crédito'}"
+						styleClass="my-label-green"/>
+						<p:outputLabel value="#{entity.tipo}" rendered="#{entity.tipo eq 'Débito'}"
+						styleClass="my-label-red"/>
+					</p:column>
+					<p:column headerText="Data Sangria">
+						<p:outputLabel value="#{entity.data}" />
+					</p:column>
+					<p:column headerText="Venda">
+						<p:outputLabel value="#{entity.venda}" />
+					</p:column>
+					<p:column headerText="Pagamento">
+						<p:outputLabel value="#{entity.opcoesPagamento}" />
+					</p:column>
+					<p:column headerText="Descrição">
+						<p:outputLabel value="#{entity.descricao}" />
+					</p:column>
+					<p:column headerText="Valor">
+						<p:outputLabel value="#{entity.valor}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+					<p:column headerText="Ações" style="width: 60px"
+						styleClass="Center">
+						<p:commandLink id="lnkEditar" rendered="#{entity.status}"
+							oncomplete="PF('dados').show()" style="text-decoration: none"
+							update=":form-cadastro:dados">
+							<i class="material-icons GrayDark">mode_edit</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{caixaDiarioBean.caixaDiario}" />
+						</p:commandLink>
+
+						<p:tooltip for="lnkEditar" value="Editar" position="top" />
+					</p:column>
+
+<!-- 					<f:facet name="footer"> -->
+<!-- 						<div align="right"> -->
+<!-- 							<h1> -->
+<!-- 								<p:outputLabel value="Total: " style="color: #fff !important" /> -->
+<!-- 								<p:outputLabel value="#{caixaDiarioBean.total}" -->
+<!-- 									style="color: #fff !important"> -->
+<!-- 									<f:convertNumber minFractionDigits="2" type="currency" -->
+<!-- 										maxFractionDigits="2" /> -->
+<!-- 								</p:outputLabel> -->
+<!-- 							</h1> -->
+<!-- 						</div> -->
+<!-- 					</f:facet> -->
+				</p:dataTable>
+			</h:form>
+
+			<h:form id="form-cadastro">
+				<p:dialog modal="true" id="dados" widgetVar="dados"
+					resizable="false" width="40%">
+
+					<f:facet name="header">
+					#{caixaDiarioBean.caixaDiario.id == null ? 'Movimentar Caixa' :
+					'Editar Movimentação'}
+					</f:facet>
+
+					<!-- 					<div class="scroll-dialog"> -->
+					<p:messages id="msg-dlg" showDetail="true" autoUpdate="true" closable="true" />
+
+					<h:panelGrid columns="2" style="margin-top: 20px"
+						id="grid-cadastro" cellpadding="10">
+
+						<h:panelGroup>
+							<p:outputLabel value="Tipo: " styleClass="my-label"
+								style="vertical-align: text-top;" for="tipo" />
+						</h:panelGroup>
+						<p:selectOneMenu required="true" id="tipo"
+							value="#{caixaDiarioBean.caixaDiario.tipo}">
+							<f:selectItem itemLabel="Selecione" />
+							<f:selectItem itemLabel="Crédito" itemValue="Crédito" />
+							<f:selectItem itemLabel="Débito" itemValue="Débito" />
+						</p:selectOneMenu>
+
+						<h:panelGroup>
+							<p:outputLabel value="Venda: " styleClass="my-label"
+								style="vertical-align: text-top;" for="venda" />
+						</h:panelGroup>
+						<p:selectOneMenu required="true" id="venda"
+							value="#{caixaDiarioBean.caixaDiario.venda}">
+							<f:selectItem itemLabel="Selecione" />
+							<f:selectItem itemLabel="Loja" itemValue="Loja" />
+							<f:selectItem itemLabel="On-line" itemValue="On-line" />
+							<p:ajax update="group-pedido-1 group-pedido-2" />
+						</p:selectOneMenu>
+						<h:panelGroup id="group-pedido-1">
+							<p:outputLabel value="Pedido: " styleClass="my-label"
+								rendered="#{caixaDiarioBean.caixaDiario.venda eq 'On-line'}"
+								style="vertical-align: text-top;" for="pedido" />
+						</h:panelGroup>
+						<h:panelGroup id="group-pedido-2">
+							<p:inputText value="#{caixaDiarioBean.caixaDiario.numeroPedido}"
+								rendered="#{caixaDiarioBean.caixaDiario.venda eq 'On-line'}"
+								id="pedido" />
+						</h:panelGroup>
+
+						<h:panelGroup>
+							<p:outputLabel value="Data: " styleClass="my-label"
+								style="vertical-align: text-top;" for="data" />
+						</h:panelGroup>
+						<p:calendar size="10" navigator="true" required="true"
+							requiredMessage="Digite a data da caixaDiario" id="data"
+							value="#{caixaDiarioBean.caixaDiario.data}" pattern="dd/MM/yyyy" />
+
+						<h:panelGroup>
+							<p:outputLabel value="Valor(R$):" styleClass="my-label"
+								style="vertical-align: text-top;" for="valor" />
+						</h:panelGroup>
+						<p:inputText required="true" id="valor"
+							requiredMessage="Campo 'Valor' é obrigatório!" styleClass="moeda"
+							maxlength="10" value="#{caixaDiarioBean.caixaDiario.valor}">
+							<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+								minFractionDigits="2" type="number" />
+						</p:inputText>
+
+						<h:panelGroup>
+							<p:outputLabel value="Opção de Pagamento: " styleClass="my-label"
+								style="vertical-align: text-top;" for="opcao" />
+						</h:panelGroup>
+						<p:selectOneMenu required="true" id="opcao"
+							value="#{caixaDiarioBean.caixaDiario.opcoesPagamento}">
+							<f:selectItem itemLabel="Selecione" />
+							<f:selectItems value="#{caixaDiarioBean.opcoesPagamento}"
+								var="op" itemLabel="#{op.descricao}" itemValue="#{op}" />
+							<p:ajax
+								update="group-conta-1 group-conta-2 group-adm-1 group-adm-2" />
+						</p:selectOneMenu>
+						<h:panelGroup id="group-conta-1">
+							<p:outputLabel value="Conta: " styleClass="my-label"
+								style="vertical-align: text-top;" for="conta"
+								rendered="#{caixaDiarioBean.caixaDiario.opcoesPagamento eq 'DEPOSITO' or
+								caixaDiarioBean.caixaDiario.opcoesPagamento eq 'TRANSFERENCIA'}" />
+						</h:panelGroup>
+						<h:panelGroup id="group-conta-2">
+							<p:selectOneMenu required="true" id="conta"
+								converter="contaConverter"
+								rendered="#{caixaDiarioBean.caixaDiario.opcoesPagamento eq 'DEPOSITO' or
+								caixaDiarioBean.caixaDiario.opcoesPagamento eq 'TRANSFERENCIA'}"
+								value="#{caixaDiarioBean.caixaDiario.contaBAncaria}">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{caixaDiarioBean.contasBancarias()}"
+									var="c" itemLabel="#{c.nome}" itemValue="#{c}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup id="group-adm-1">
+							<p:outputLabel value="Adm. Cartão: " styleClass="my-label"
+								style="vertical-align: text-top;" for="adm"
+								rendered="#{caixaDiarioBean.caixaDiario.opcoesPagamento eq 'CARTAO'}" />
+						</h:panelGroup>
+						<h:panelGroup id="group-adm-2">
+							<p:selectOneMenu required="true" id="adm"
+								converter="admCartaoConverter"
+								rendered="#{caixaDiarioBean.caixaDiario.opcoesPagamento eq 'CARTAO'}"
+								value="#{caixaDiarioBean.caixaDiario.admCartao}">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{caixaDiarioBean.admCartao()}" var="a"
+									itemLabel="#{a.nome}" itemValue="#{a}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Descrição: " styleClass="my-label"
+								style="vertical-align: text-top;" for="desc" />
+						</h:panelGroup>
+						<p:inputText value="#{caixaDiarioBean.caixaDiario.descricao}"
+							id="desc" />
+
+						<!-- 							<h:panelGroup> -->
+						<!-- 								<p:outputLabel value="Favorecido: " styleClass="my-label" -->
+						<!-- 									style="vertical-align: text-top;" for="func" /> -->
+						<!-- 							</h:panelGroup> -->
+
+						<!-- 							<p:selectOneMenu value="#{caixaDiarioBean.caixaDiario.favorecido}" -->
+						<!-- 								id="func" required="true" -->
+						<!-- 								requiredMessage="Selecione o funcionário" -->
+						<!-- 								converter="funcionarioConverter"> -->
+						<!-- 								<f:selectItem itemLabel="Selecione" /> -->
+						<!-- 								<f:selectItems value="#{funcionarioBean.listaFuncionarios}" -->
+						<!-- 									var="func" itemLabel="#{func.nome}" itemValue="#{func}" /> -->
+						<!-- 							</p:selectOneMenu> -->
+
+
+					</h:panelGrid>
+					<p:separator />
+					<h:panelGrid columns="3">
+						<p:commandButton value="Salvar" icon="fa fa-floppy-o"
+							action="#{caixaDiarioBean.save}"
+							update="grid-cadastro :frm:table-caixaDiario msg-dlg"
+							rendered="#{caixaDiarioBean.caixaDiario.id == null}" />
+
+						<p:commandButton value="Atualizar" icon="fa fa-floppy-o"
+							action="#{caixaDiarioBean.update}" update="msg-dlg"
+							rendered="#{caixaDiarioBean.caixaDiario.id != null}" />
+
+						<p:spacer width="20" height="0" />
+					</h:panelGrid>
+					
+					<!-- 					</div> -->
+				</p:dialog>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

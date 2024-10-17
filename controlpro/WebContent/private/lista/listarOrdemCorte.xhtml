@@ -1,0 +1,380 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="avaliacao.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>Lista de Ordens de Corte</h1>
+				<h3>Listagem de ordens de cortes cadastradas no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:link id="cadastrar" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/cadastro/cadastrarOrdemCorte.xhtml">
+						<i class="material-icons md-32">add_to_photos</i>
+						<br />
+					</p:link>
+					<p:tooltip for="cadastrar" position="top"
+						value="Cadastrar Ordem de Corte" />
+
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{ordemCorteBean.ordemCorte}" />
+			<t:saveState value="#{ordemCorteBean.gradeOrdemList}" />
+			<t:saveState value="#{ordemCorteBean.ordemCortes}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel styleClass="panel-pesquisa" style="margin-top: 15px">
+					<div class="lupa">
+						<p:graphicImage library="imagens" name="SearchLupa.png" />
+					</div>
+					<h:panelGrid columns="15">
+						<p:outputLabel value="Protocolo: " styleClass="my-label" />
+						<p:inputText value="#{ordemCorteBean.ordemCorteFilter.protocolo}"
+							size="10" />
+						<p:outputLabel value="Situação: " styleClass="my-label" />
+						<p:selectOneMenu
+							value="#{ordemCorteBean.ordemCorteFilter.situacao}">
+							<f:selectItem itemLabel="-- Selecione --" />
+							<f:selectItems value="#{ordemCorteBean.situacoes}" var="sit"
+								itemLabel="#{sit.descricao}" itemValue="#{sit}" />
+						</p:selectOneMenu>
+						<p:outputLabel value="De: " styleClass="my-label" />
+						<p:calendar size="10" navigator="true"
+							value="#{ordemCorteBean.ordemCorteFilter.dataCadastroInicio}"
+							pattern="dd/MM/yyyy" />
+						<p:outputLabel value="Até: " styleClass="my-label" />
+						<p:calendar size="10" navigator="true"
+							value="#{ordemCorteBean.ordemCorteFilter.dataCadastroFim}"
+							pattern="dd/MM/yyyy" />
+						<p:commandButton value="Pesquisar" icon="fa fa-search"
+							style="margin-left: 5px; width: 100px !important"
+							update="table-ordem" action="#{ordemCorteBean.list()}" />
+
+						<p:commandButton id="report"
+							rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' or escopoSessaoBean.usuarioLogado.perfilUser eq 'CORTADOR'}"
+							actionListener="#{ordemCorteBean.gerarPDF}" icon="fa fa-download"
+							value="Gerar PDF" onclick="this.form.target='_blank'"
+							ajax="false">
+						</p:commandButton>
+					</h:panelGrid>
+
+				</p:panel>
+
+				<p:dataTable id="table-ordem" value="#{ordemCorteBean.ordemCortes}"
+					var="entity" paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10"
+					lazy="true">
+
+					<!-- 					<p:column headerText="Status" style="width: 50px" -->
+					<!-- 						styleClass="Center" -->
+					<!-- 						rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR'}"> -->
+					<!-- 						<p:commandLink id="lnkAlterarStatus" -->
+					<!-- 							action="#{ordemCorteBean.updateStatus()}" update="table-ordem" -->
+					<!-- 							title="#{entity.status ? 'Desativar' : 'Ativar'}"> -->
+
+					<!-- 							<h:panelGroup rendered="#{!entity.status}"> -->
+					<!-- 								<i class="material-icons Red">remove_circle</i> -->
+					<!-- 							</h:panelGroup> -->
+
+					<!-- 							<h:panelGroup rendered="#{entity.status}"> -->
+					<!-- 								<i class="material-icons Green">check_circle</i> -->
+					<!-- 							</h:panelGroup> -->
+
+					<!-- 							<f:setPropertyActionListener -->
+					<!-- 								target="#{ordemCorteBean.ordemCorte}" value="#{entity}" /> -->
+					<!-- 						</p:commandLink> -->
+					<!-- 					</p:column> -->
+
+					<p:column headerText="Situação" styleClass="Center">
+						<p:outputLabel value="#{entity.situacao}"
+							styleClass="negrito Green"
+							rendered="#{entity.situacao eq 'FINALIZADA'}" />
+						<p:outputLabel value="#{entity.situacao}" styleClass="negrito Red"
+							rendered="#{entity.situacao eq 'CANCELADA'}" />
+						<p:outputLabel value="#{entity.situacao}"
+							styleClass="negrito Blue"
+							rendered="#{entity.situacao eq 'ANDAMENTO'}" />
+					</p:column>
+
+					<p:column headerText="Protocolo" styleClass="Center">
+						<p:outputLabel id="lb" value="#{entity.protocolo}"
+							styleClass="label-vermelho"
+							rendered="#{ordemCorteBean.isAtrasado(entity)}" />
+						<p:tooltip value="Atrasada" for="lb" position="top" />
+						<p:outputLabel value="#{entity.protocolo}"
+							rendered="#{ordemCorteBean.isAtrasado(entity) == false}" />
+					</p:column>
+
+					<p:column headerText="Data de cadastro" styleClass="Center">
+						<p:outputLabel value="#{entity.dataCadastro}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Prévisão de término" styleClass="Center">
+						<p:outputLabel value="#{entity.previsaoTermino}" />
+					</p:column>
+
+					<p:column headerText="Pedido" width="80" styleClass="Center">
+						<p:outputLabel value="#{entity.numeroPedido}" />
+					</p:column>
+
+					<p:column headerText="Qtd. Itens Prog." styleClass="Center">
+						<p:outputLabel value="#{ordemCorteBean.getTotalPorOrdem(entity)}" />
+					</p:column>
+
+					<p:column headerText="Ações" style="width: 160px"
+						styleClass="Center">
+
+						<p:commandLink id="lnkAlter" rendered="#{entity.status}"
+							oncomplete="PF('alter').show()" style="text-decoration: none"
+							update=":frm:alter" title="Atualizar corte"
+							action="#{ordemCorteBean.carregarListaGradeOrdem()}">
+							<i class="material-icons GrayDark">input</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{ordemCorteBean.ordemCorte}" />
+						</p:commandLink>
+						<p:spacer />
+
+						<p:commandLink id="lnkDetail" rendered="#{entity.status}"
+							oncomplete="PF('dados').show()" style="text-decoration: none"
+							update=":frm:dados" title="Detalhes"
+							action="#{ordemCorteBean.carregarListaGradeOrdem()}">
+							<i class="material-icons GrayDark">assignment</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{ordemCorteBean.ordemCorte}" />
+						</p:commandLink>
+						<p:spacer />
+						<p:link ajax="false" id="lnkEditar" title="Editar"
+							rendered="#{entity.status and (escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' or escopoSessaoBean.usuarioLogado.perfilUser eq 'CORTADOR')}"
+							outcome="#{ordemCorteBean.prepareUpdate()}"
+							style="text-decoration: none">
+							<i class="material-icons GrayDark">mode_edit</i>
+							<f:param name="id" value="#{entity.id}" />
+						</p:link>
+						<p:spacer />
+						<p:commandLink id="pdf" ajax="false"
+							action="#{ordemCorteBean.gerarPDFOrdemCorte()}" title="Download"
+							style="text-decoration: none">
+							<i class="material-icons GrayDark">get_app</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{ordemCorteBean.ordemCorte}" />
+						</p:commandLink>
+						<p:spacer />
+						<p:commandLink id="lnkCancelar"
+							rendered="#{entity.situacao eq 'ANDAMENTO'}"
+							oncomplete="PF('cancel').show()" style="text-decoration: none"
+							update=":frm:cancel" title="Cancelar Ordem"
+							action="#{ordemCorteBean.carregarListaGradeOrdem()}">
+							<i class="material-icons GrayDark">cancel</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{ordemCorteBean.ordemCorte}" />
+						</p:commandLink>
+					</p:column>
+				</p:dataTable>
+
+				<p:dialog header="Detalhes da Ordem de Corte" modal="true"
+					closable="true" width="1000" closeOnEscape="true" draggable="false"
+					id="dados" widgetVar="dados" resizable="false">
+
+					<div class="scroll-dialog">
+						<h:panelGrid columns="2">
+							<p:outputLabel value="Protocolo: " styleClass="my-label" />
+							<p:outputLabel value="#{ordemCorteBean.ordemCorte.protocolo}" />
+							<p:outputLabel value="Situação: " styleClass="my-label" />
+							<p:outputLabel value="#{ordemCorteBean.ordemCorte.situacao}" />
+							<p:outputLabel value="Data: " styleClass="my-label" />
+							<p:outputLabel value="#{ordemCorteBean.ordemCorte.dataCadastro}">
+								<f:convertDateTime pattern="dd/MM/yyyy" />
+							</p:outputLabel>
+						</h:panelGrid>
+
+						<ui:include src="/private/fragmentos/historico-corte.xhtml" />
+						<br />
+						<ui:include src="/private/fragmentos/lista-grade-ordem.xhtml" />
+						<br />
+						<ui:include src="/private/fragmentos/lista-enfesto-ordem.xhtml" />
+						<br />
+					</div>
+				</p:dialog>
+
+				<p:dialog header="Cancelar a Ordem de Corte" modal="true"
+					closable="true" closeOnEscape="true" draggable="false" id="cancel"
+					widgetVar="cancel" resizable="false">
+
+					<h:panelGrid columns="2">
+						<p:outputLabel value="Protocolo: " styleClass="my-label" />
+						<p:outputLabel value="#{ordemCorteBean.ordemCorte.protocolo}" />
+						<p:outputLabel value="Situação: " styleClass="my-label" />
+						<p:outputLabel value="#{ordemCorteBean.ordemCorte.situacao}" />
+						<p:outputLabel value="Data: " styleClass="my-label" />
+						<p:outputLabel value="#{ordemCorteBean.ordemCorte.dataCadastro}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</h:panelGrid>
+					<br />
+					<p:separator />
+					<p:outputLabel value="Deseja realmente cancelar a ordem de corte? "
+						styleClass="my-label-red" />
+					<br />
+					<br />
+					<p:commandButton value="Sim" id="btn-cancel"
+						action="#{ordemCorteBean.cancelarOrdem}" ajax="false" />
+
+					<p:commandButton value="Não" oncomplete="PF('cancel').hide()"
+						ajax="false" />
+				</p:dialog>
+
+				<p:dialog header="Atualizar Ordem de Corte" modal="true"
+					closable="false" width="96%" closeOnEscape="true" draggable="false"
+					id="alter" widgetVar="alter" resizable="false">
+
+					<div class="scroll-dialog">
+						<br />
+						<p:messages id="msg-update" closable="true" showDetail="true"
+							showSummary="true" />
+						<h:panelGroup id="group">
+							<p:outputLabel value="Situação: " styleClass="my-label" />
+							<p:outputLabel value="#{ordemCorteBean.ordemCorte.situacao}"
+								styleClass="negrito Green"
+								rendered="#{ordemCorteBean.ordemCorte.situacao eq 'FINALIZADA'}" />
+							<p:outputLabel value="#{ordemCorteBean.ordemCorte.situacao}"
+								styleClass="negrito Red"
+								rendered="#{ordemCorteBean.ordemCorte.situacao eq 'CANCELADA'}" />
+							<p:outputLabel value="#{ordemCorteBean.ordemCorte.situacao}"
+								styleClass="negrito Blue"
+								rendered="#{ordemCorteBean.ordemCorte.situacao eq 'ANDAMENTO'}" />
+							<br />
+							<br />
+							<p:commandButton value="Finalizar Ordem de Corte" id="btn-fila"
+								rendered="#{ordemCorteBean.ordemCorte.situacao ne 'FINALIZADA'}"
+								action="#{ordemCorteBean.finalizarOrdem}" ajax="false" />
+						</h:panelGroup>
+						<br /> <br />
+						<p:dataTable id="tableGradeOrdemAlter" var="gradeOrdem"
+							value="#{ordemCorteBean.gradeOrdemList}" editable="true"
+							emptyMessage="Nenhuma atividade foi adicionada">
+
+							<p:ajax event="rowEdit" listener="#{ordemCorteBean.onRowEdit}"
+								update="tableGradeOrdemAlter :frm:msg-update" />
+
+							<f:facet name="header">
+								<p:outputLabel value="Listar de itens na ordem de corte" />
+							</f:facet>
+
+							<p:column headerText="Cortador" width="140"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{gradeOrdem.cortador.nome}" />
+							</p:column>
+
+							<p:column headerText="Produto" width="140"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{gradeOrdem.produto.nome}" />
+							</p:column>
+
+							<!-- 							<p:column headerText="Unidade" width="50" -->
+							<!-- 								style="color: #000000 !important"> -->
+							<!-- 								<p:outputLabel value="#{gradeOrdem.produto.unidadeVenda}" /> -->
+							<!-- 							</p:column> -->
+
+							<p:column headerText="Ref." width="40"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{gradeOrdem.produto.id}" />
+							</p:column>
+
+							<p:column headerText="Grade" styleClass="Center"
+								style="color: #000000 !important" width="50">
+								<p:outputLabel value="#{gradeOrdem.grade.nome}" />
+							</p:column>
+
+							<p:column headerText="Qtd." styleClass="Center"
+								style="color: #000000 !important" width="40">
+								<p:outputLabel value="#{gradeOrdem.quantidade}" />
+							</p:column>
+							<p:column headerText="Cortadas" style="color: #000000 !important"
+								styleClass="Center" width="50">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{gradeOrdem.prontas}"
+											styleClass="Green tam-14 negrito" />
+									</f:facet>
+									<f:facet name="input">
+								#{gradeOrdem.prontas}	+
+										<p:inputText value="#{gradeOrdem.prontasAux}"
+											style="width:50%" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+							<p:column headerText="Data do Corte"
+								style="color: #000000 !important" styleClass="Center" width="70">
+								<p:cellEditor>
+									<f:facet name="output">
+										<p:outputLabel value="#{gradeOrdem.dataCorteAux}"
+											styleClass="Green tam-14 negrito">
+											<f:convertDateTime pattern="dd/MM/yyyy" />
+										</p:outputLabel>
+									</f:facet>
+									<f:facet name="input">
+										<p:inputMask mask="99/99/9999" style="width:85%"
+											value="#{gradeOrdem.dataCorteAux}" required="true"
+											requiredMessage="Informe a data de corte!"
+											styleClass="Green tam-14 negrito">
+											<f:convertDateTime pattern="dd/MM/yyyy" />
+										</p:inputMask>
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<p:column headerText="Justificativa"
+								style="color: #000000 !important" styleClass="Center"
+								width="240">
+								<p:cellEditor>
+									<f:facet name="output">
+										<p:outputLabel value="-" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputTextarea value="#{gradeOrdem.justificativaAux}"
+											rows="4" cols="30" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<p:column headerText="Atualizar corte" width="90"
+								styleClass="Center"
+								rendered="#{ordemCorteBean.ordemCorte.situacao eq 'ANDAMENTO'}"
+								style="width:32px; color: #000000 !important">
+								<p:rowEditor />
+							</p:column>
+						</p:dataTable>
+						<br /> <br />
+						<div align="center">
+							<p:commandButton oncomplete="PF('dados').hide()" ajax="false"
+								update=":frm:table-ordem" value="Voltar" style="width:250px;" />
+						</div>
+					</div>
+				</p:dialog>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

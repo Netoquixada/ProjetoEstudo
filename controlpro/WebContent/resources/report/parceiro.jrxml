@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="parceiro" language="groovy" pageWidth="240" pageHeight="153" orientation="Landscape" columnWidth="240" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="edba0020-1ac9-4e10-997e-925c69fbca8b">
+	<property name="ireport.zoom" value="2.200000000000004"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="FRENTE" class="java.lang.String"/>
+	<parameter name="VERSO" class="java.lang.String"/>
+	<parameter name="FOTO" class="java.io.InputStream"/>
+	<field name="nome" class="java.lang.String"/>
+	<field name="codigoCartao" class="java.lang.String"/>
+	<detail>
+		<band height="153" splitType="Stretch">
+			<image>
+				<reportElement x="0" y="0" width="240" height="153" backcolor="#000000" uuid="8316c8ae-409d-43d5-b140-9539cb9994c9"/>
+				<imageExpression><![CDATA[$P{FRENTE}]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="16" y="124" width="208" height="22" isPrintWhenDetailOverflows="true" forecolor="#FFFFFF" uuid="e2f5aee5-b1e6-485f-9510-ef0898e8af89"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nome}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="16" y="82" width="208" height="30" forecolor="#FFFFFF" uuid="299ea7fb-3497-473d-97ba-4d94d0e567cf"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="SansSerif" size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{codigoCartao}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

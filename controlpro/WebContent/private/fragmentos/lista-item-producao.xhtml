@@ -1,0 +1,147 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:t="http://myfaces.apache.org/tomahawk"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+	<br />
+	<p:outputLabel value="Lista de itens na ordem de produção"
+		styleClass="my-label-titulo" />
+	<br />
+	<br />
+	<center>
+		<p:tabView>
+			<p:tab title="Enviado">
+				<p:dataTable id="tableItemProducao" var="item"
+					value="#{ordemProducaoBean.itemProducaoList}"
+					emptyMessage="Nenhuma atividade foi adicionada">
+
+					<p:column headerText="Tipo" style="color: #000000 !important">
+						<h:panelGroup rendered="#{!item.itemReenviado}">
+							<p:outputLabel value="Enviado" styleClass="my-label-blue" />
+						</h:panelGroup>
+						<h:panelGroup rendered="#{item.itemReenviado}">
+							<p:outputLabel value="Reenviado" styleClass="my-label-orange" />
+						</h:panelGroup>
+					</p:column>
+
+					<p:column headerText="Produto" style="color: #000000 !important">
+						<p:outputLabel value="#{item.produto.nome}" />
+					</p:column>
+
+<!-- 					<p:column headerText="Unidade" width="50" -->
+<!-- 						style="color: #000000 !important"> -->
+<!-- 						<p:outputLabel value="#{item.produto.unidadeVenda}" /> -->
+<!-- 					</p:column> -->
+
+					<p:column headerText="Ref." width="50"
+						style="color: #000000 !important">
+						<p:outputLabel value="#{item.produto.id}" />
+					</p:column>
+
+					<p:column headerText="Valor unitário"
+						style="color: #000000 !important">
+						<p:outputLabel value="#{item.valor}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Valor total"
+						style="color: #000000 !important">
+						<p:outputLabel value="#{item.valorTotal}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Quantidade" width="75" styleClass="Center"
+						style="color: #000000 !important">
+						<p:outputLabel value="#{item.quantidade}" />
+					</p:column>
+					<p:column headerText="Prontas" width="75" styleClass="Center"
+						style="color: #000000 !important">
+						<p:outputLabel value="#{item.prontas}" />
+					</p:column>
+					<p:column headerText="Defeito" width="75" styleClass="Center"
+						style="color: #000000 !important">
+						<p:outputLabel value="#{item.defeito}" />
+					</p:column>
+					<p:column headerText="Falta" width="75" styleClass="Center"
+						style="color: #000000 !important">
+						<p:outputLabel value="#{item.faltaAux}" />
+					</p:column>
+
+					<p:column headerText="Comprovante" width="80" styleClass="Center"
+						style="color: #000000 !important">
+						<p:commandLink id="pdf" ajax="false"
+							action="#{ordemProducaoBean.gerarPDFComprovanteOrdemProducao()}"
+							title="Download" style="text-decoration: none">
+							<i class="material-icons GrayDark">get_app</i>
+							<f:setPropertyActionListener value="#{item}"
+								target="#{ordemProducaoBean.itemProducao}" />
+						</p:commandLink>
+					</p:column>
+
+				</p:dataTable>
+			</p:tab>
+			<p:tab title="Reenviado">
+				<p:dataTable var="item"
+					value="#{ordemProducaoBean.itemReenviarProducaoList}"
+					emptyMessage="Nenhuma atividade foi adicionada">
+
+					<p:column headerText="Tipo" style="color: #000000 !important">
+						<h:panelGroup rendered="#{!item.itemReenviado}">
+							<p:outputLabel value="Enviado" styleClass="my-label-blue" />
+						</h:panelGroup>
+						<h:panelGroup rendered="#{item.itemReenviado}">
+							<p:outputLabel value="Reenviado" styleClass="my-label-orange" />
+						</h:panelGroup>
+					</p:column>
+					<p:column headerText="Produto" style="color: #000000 !important">
+						<p:outputLabel value="#{item.produto.nome}" />
+					</p:column>
+<!-- 					<p:column headerText="Unidade" width="50" -->
+<!-- 						style="color: #000000 !important"> -->
+<!-- 						<p:outputLabel value="#{item.produto.unidadeVenda}" /> -->
+<!-- 					</p:column> -->
+					<p:column headerText="Ref." width="50"
+						style="color: #000000 !important">
+						<p:outputLabel value="#{item.produto.id}" />
+					</p:column>
+					<p:column headerText="Valor unitário"
+						style="color: #000000 !important">
+						<p:outputLabel value="#{item.valor}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+					<p:column headerText="Valor total"
+						style="color: #000000 !important">
+						<p:outputLabel value="#{item.valorTotal}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+					<p:column headerText="Quantidade" width="75" styleClass="Center"
+						style="color: #000000 !important">
+						<p:outputLabel value="#{item.quantidade}" />
+					</p:column>
+					<p:column headerText="Prontas" width="75" styleClass="Center"
+						style="color: #000000 !important">
+						<p:outputLabel value="#{item.prontas}" />
+					</p:column>
+					<p:column headerText="Defeito" width="75" styleClass="Center"
+						style="color: #000000 !important">
+						<p:outputLabel value="#{item.defeito}" />
+					</p:column>
+					<p:column headerText="Falta" width="75" styleClass="Center"
+						style="color: #000000 !important">
+						<p:outputLabel value="#{item.faltaAux}" />
+					</p:column>
+				</p:dataTable>
+			</p:tab>
+		</p:tabView>
+	</center>
+</ui:composition>

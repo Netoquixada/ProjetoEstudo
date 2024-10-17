@@ -1,0 +1,161 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="cargo.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>Lista de Cargos</h1>
+				<h3>Listagem de cargos cadastradas no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:commandLink id="cadastrar" styleClass="link-funcional"
+						style="margin-top: 3px" update=":form-cadastro:dados"
+						oncomplete="PF('dados').show()">
+						<i class="material-icons md-32">add_to_photos</i>
+						<br />
+					</p:commandLink>
+					<p:tooltip for="cadastrar" position="top" value="Cadastrar cargo" />
+
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{cargoBean.cargo}" />
+			<t:saveState value="#{cargoBean.lazy}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel styleClass="panel-pesquisa" style="margin-top: 15px">
+					<div class="lupa">
+						<p:graphicImage library="imagens" name="SearchLupa.png" />
+					</div>
+
+					<h:panelGrid columns="10">
+						<p:outputLabel value="Nome: " styleClass="my-label" />
+						<p:inputText value="#{cargoBean.cargoFilter.nome}" size="30"
+							id="nome" />
+
+						<p:commandButton value="Pesquisar" icon="fa fa-search"
+							style="margin-left: 5px; width: 100px !important"
+							update="table-cargo" action="#{cargoBean.list()}" />
+
+<!-- 						<p:commandButton id="report" -->
+<!-- 							actionListener="#{cargoBean.gerarPDF}" icon="fa fa-download" -->
+<!-- 							value="Gerar PDF" -->
+<!-- 							onclick="this.form.target='_blank'" ajax="false"> -->
+<!-- 						</p:commandButton> -->
+					</h:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-cargo" value="#{cargoBean.lazy}" var="entity"
+					paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10"
+					lazy="true">
+
+					<p:column headerText="Status" style="width: 50px"
+						styleClass="Center">
+						<p:commandLink id="lnkAlterarStatus"
+							action="#{cargoBean.updateStatus()}" update="table-cargo"
+							title="#{entity.status ? 'Desativar' : 'Ativar'}">
+
+							<h:panelGroup rendered="#{!entity.status}">
+								<i class="material-icons Red">remove_circle</i>
+							</h:panelGroup>
+
+							<h:panelGroup rendered="#{entity.status}">
+								<i class="material-icons Green">check_circle</i>
+							</h:panelGroup>
+
+							<f:setPropertyActionListener target="#{cargoBean.cargo}"
+								value="#{entity}" />
+						</p:commandLink>
+					</p:column>
+
+					<p:column headerText="Nome">
+						<p:outputLabel value="#{entity.nome}" />
+					</p:column>
+					<p:column headerText="Observação">
+						<p:outputLabel value="#{entity.observacao}" />
+					</p:column>
+
+					<p:column headerText="Ações" style="width: 60px"
+						styleClass="Center">
+
+						<p:commandLink id="lnkEditar" rendered="#{entity.status}"
+							oncomplete="PF('dados').show()" style="text-decoration: none"
+							update=":form-cadastro:dados">
+							<i class="material-icons GrayDark">mode_edit</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{cargoBean.cargo}" />
+						</p:commandLink>
+
+						<p:tooltip for="lnkEditar" value="Editar" position="top" />
+					</p:column>
+				</p:dataTable>
+			</h:form>
+
+			<h:form id="form-cadastro">
+				<p:dialog modal="true" id="dados" widgetVar="dados" width="50%"
+					resizable="false">
+
+					<f:facet name="header">
+					#{cargoBean.cargo.id == null ? 'Cadastrar Cargo' :
+					'Atualizar Cargo'}
+					</f:facet>
+
+					<div class="ui-fluid">
+						<p:messages showDetail="true" autoUpdate="true" closable="true" />
+
+						<h:panelGrid columns="2" style="margin-top: 20px"
+							id="grid-cadastro">
+
+							<h:panelGroup>
+								<p:outputLabel value="Nome: " styleClass="my-label"
+									style="vertical-align: text-top;" for="nome" />
+							</h:panelGroup>
+							<p:inputText id="nome" value="#{cargoBean.cargo.nome}"
+								required="true" label="Nome"
+								requiredMessage="Nome é obrigatório." />
+							<h:panelGroup>
+								<p:outputLabel value="Observação: " styleClass="my-label"
+									style="vertical-align: text-top;" for="observacao" />
+							</h:panelGroup>
+							<p:inputTextarea rows="6" cols="60" id="observacao"
+								value="#{cargoBean.cargo.observacao}" label="Observação" />
+						</h:panelGrid>
+						<p:separator />
+						<h:panelGrid columns="3">
+							<p:commandButton value="Salvar" icon="fa fa-floppy-o"
+								action="#{cargoBean.save}"
+								update="grid-cadastro :frm:table-cargo"
+								rendered="#{cargoBean.cargo.id == null}" />
+
+							<p:commandButton value="Atualizar" icon="fa fa-floppy-o"
+								action="#{cargoBean.update}"
+								rendered="#{cargoBean.cargo.id != null}" />
+
+							<p:spacer width="20" height="0" />
+						</h:panelGrid>
+					</div>
+				</p:dialog>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

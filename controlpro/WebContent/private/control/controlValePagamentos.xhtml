@@ -1,0 +1,158 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="vale.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>Controle de Pagamentos de Vales</h1>
+				<h3>Listagem de vales Pagos.</h3>
+
+				<div class="links-funcionais">
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{valePagamentosBean.vale}" />
+			<t:saveState value="#{valePagamentosBean.vales}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel header="Painel de Pesquisa" style="margin-top: 15px">
+
+					<h:panelGrid columns="10">
+
+						<h:panelGroup>
+							<p:outputLabel value="Funcionário" styleClass="my-label" />
+							<br />
+							<p:selectOneMenu
+								value="#{valePagamentosBean.valeFilter.funcionario}" id="func"
+								converter="funcionarioConverter">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{funcionarioBean.listaFuncionarios}"
+									var="func" itemLabel="#{func.nome}" itemValue="#{func}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Loja" styleClass="my-label" />
+							<br />
+							<p:selectOneMenu value="#{valePagamentosBean.valeFilter.loja}">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{valePagamentosBean.lojas}" var="l"
+									itemLabel="#{l.descricao}" itemValue="#{l}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+
+						<h:panelGroup>
+							<p:outputLabel value="De: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{valePagamentosBean.valeFilter.dataPesquisaInicio}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Até: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{valePagamentosBean.valeFilter.dataPesquisaFim}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<br />
+							<p:commandButton value="Pesquisar"
+								style="margin-left: 5px; width: 100px !important"
+								update="table-vale" action="#{valePagamentosBean.list()}" />
+							<p:commandButton id="report"
+								actionListener="#{valePagamentosBean.gerarPDF}"
+								icon="fa fa-download" value="Gerar PDF"
+								onclick="this.form.target='_blank'" ajax="false">
+							</p:commandButton>
+						</h:panelGroup>
+
+
+					</h:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-vale" value="#{valePagamentosBean.vales}"
+					var="entity" paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10"
+					lazy="true">
+
+					<p:column headerText="Status Vale" styleClass="Center">
+						<p:outputLabel value="#{entity.statusVale.descricao}"
+							styleClass="label-verde"
+							rendered="#{entity.statusVale.descricao eq 'Pago'}" />
+						<p:outputLabel value="#{entity.statusVale.descricao}"
+							styleClass="label-vermelho"
+							rendered="#{entity.statusVale.descricao eq 'Aberto'}" />
+					</p:column>
+
+					<p:column headerText="Loja">
+						<p:outputLabel value="#{entity.loja.descricao}" />
+					</p:column>
+
+
+					<p:column headerText="Data do Vale">
+						<p:outputLabel value="#{entity.dataVale}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Funcionário">
+						<p:outputLabel value="#{entity.funcionario.nome}" />
+					</p:column>
+
+					<p:column headerText="Valor" styleClass="Center">
+						<p:outputLabel value="#{entity.valor}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+					<p:column headerText="Observação">
+						<p:outputLabel value="#{entity.observacao}" />
+					</p:column>
+
+					<p:column headerText="Data do Pagamento">
+						<p:outputLabel value="#{entity.dataPagamento}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Forma de Pagamento">
+						<p:outputLabel value="#{entity.opcoesPagamento}" />
+					</p:column>
+
+					<f:facet name="footer">
+						<div align="right">
+							<h1>
+								<p:outputLabel value="Total:" style="color:#fff" />
+								<p:outputLabel value="#{valePagamentosBean.total}"
+									style="color:#fff">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</h1>
+						</div>
+					</f:facet>
+				</p:dataTable>
+			</h:form>
+
+		</div>
+	</ui:define>
+</ui:composition>

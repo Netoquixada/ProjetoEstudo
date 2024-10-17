@@ -1,0 +1,57 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:t="http://myfaces.apache.org/tomahawk"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+	<br />
+	<p:outputLabel value="Lista de enfesto na ordem de corte"
+		styleClass="my-label-titulo" />
+	<br />
+	<br />
+	<center>
+		<p:dataTable id="tableItemEnfesto" var="enfesto"
+			value="#{ordemCorteBean.itemEnfestoCorteList}"
+			emptyMessage="Nenhuma atividade foi adicionada">
+
+			<p:column headerText="Matéria Prima"
+				style="color: #000000 !important">
+				<p:outputLabel value="#{enfesto.materiaPrima.nome}" />
+			</p:column>
+
+			<p:column headerText="Unidade de Medida"
+				style="color: #000000 !important">
+				<p:outputLabel value="#{enfesto.materiaPrima.unidadeMedida}" />
+			</p:column>
+
+			<p:column headerText="Comprimento" style="color: #000000 !important">
+				<p:outputLabel value="#{enfesto.comprimento}" />
+			</p:column>
+
+			<p:column headerText="Largura" style="color: #000000 !important">
+				<p:outputLabel value="#{enfesto.largura}" />
+			</p:column>
+
+			<p:column headerText="Metro Folha" style="color: #000000 !important">
+				<p:outputLabel value="#{enfesto.metroFolha}" />
+			</p:column>
+
+			<p:column headerText="Folha" style="color: #000000 !important">
+				<p:outputLabel value="#{enfesto.folha}" />
+			</p:column>
+			
+			<p:column headerText="Qtd. por Folha" style="color: #000000 !important">
+				<p:outputLabel value="#{enfesto.qtdPorFolha}" />
+			</p:column>
+
+			<p:column headerText="Total" width="90" styleClass="Center"
+				style="color: #000000 !important">
+				<p:outputLabel value="#{enfesto.total}" styleClass="label-laranja"
+					title="Resultado da multiplicação do comprimento pela folha." />
+			</p:column>
+
+		</p:dataTable>
+
+	</center>
+</ui:composition>

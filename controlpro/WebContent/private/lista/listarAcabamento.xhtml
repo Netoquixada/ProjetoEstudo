@@ -1,0 +1,571 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="acabamento.jpg"
+						width="60px" style="float: left" />
+				</div>
+
+				<h1>Lista de Acabamentos</h1>
+				<h3>Listagem de acabamentos cadastradas no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:link id="cadastrar" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/cadastro/cadastrarAcabamento.xhtml">
+						<i class="material-icons md-32">add_to_photos</i>
+						<br />
+					</p:link>
+					<p:tooltip for="cadastrar" position="top"
+						value="Cadastrar Acabamento" />
+
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{acabamentoBean.acabamento}" />
+			<t:saveState value="#{acabamentoBean.acabamentos}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel style="margin-top: 15px">
+					<h:panelGrid columns="15">
+						<h:panelGroup>
+							<p:outputLabel value="Situação: " styleClass="my-label" />
+							<br />
+							<p:selectOneMenu
+								value="#{acabamentoBean.acabamentoFilter.situacao}">
+								<f:selectItem itemLabel="-- Selecione --" />
+								<f:selectItems value="#{acabamentoBean.situacoes}" var="sit"
+									itemLabel="#{sit.descricao}" itemValue="#{sit}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Origem: " styleClass="my-label" />
+							<br />
+							<p:selectOneMenu
+								value="#{acabamentoBean.acabamentoFilter.origem}">
+								<f:selectItem itemLabel="-- Selecione --" />
+								<f:selectItems value="#{acabamentoBean.origens}" var="sit"
+									itemLabel="#{sit.descricao}" itemValue="#{sit}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Protocolo: " styleClass="my-label" />
+							<br />
+							<p:inputText value="#{acabamentoBean.acabamentoFilter.protocolo}"
+								size="10" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Facção: " styleClass="my-label"
+								style="vertical-align: text-top;" for="faccao" />
+							<br />
+							<p:autoComplete value="#{acabamentoBean.acabamentoFilter.faccao}"
+								autocomplete="true" size="36" id="faccao"
+								completeMethod="#{faccaoBean.getFaccaoAutoComplete}"
+								forceSelection="true" minQueryLength="1" maxResults="30"
+								dropdown="true"
+								converterMessage="Não foi possível selecionar a facção(Erro ao converter o objeto)"
+								converter="genericConverter" var="faccao"
+								itemLabel="#{faccao.nome}" itemValue="#{faccao}"
+								placeholder="Pesquise pelo nome da facção">
+							</p:autoComplete>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="De: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{acabamentoBean.acabamentoFilter.dataCadastroInicio}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Até: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{acabamentoBean.acabamentoFilter.dataCadastroFim}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<br />
+							<p:commandButton icon="fa fa-search" id="pesquisar"
+								style="margin-left: 5px;" update="table-acabamento"
+								action="#{acabamentoBean.list()}" />
+							<p:tooltip for="pesquisar" value="Pesquisar" position="top" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<br />
+							<p:commandButton id="report"
+								actionListener="#{acabamentoBean.gerarPDF}"
+								icon="fa fa-download" onclick="this.form.target='_blank'"
+								ajax="false">
+							</p:commandButton>
+							<p:tooltip for="pesquisar" value="Download" position="top" />
+						</h:panelGroup>
+					</h:panelGrid>
+
+
+				</p:panel>
+
+				<p:dataTable id="table-acabamento"
+					value="#{acabamentoBean.acabamentos}" var="entity" paginator="true"
+					style="margin-top: 15px" emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10"
+					lazy="true">
+
+					<p:column headerText="Status" style="width: 50px"
+						styleClass="Center"
+						rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR'}">
+						<p:commandLink id="lnkAlterarStatus"
+							action="#{acabamentoBean.updateStatus()}"
+							update="table-acabamento"
+							title="#{entity.status ? 'Desativar' : 'Ativar'}">
+
+							<h:panelGroup rendered="#{!entity.status}">
+								<i class="material-icons Red">remove_circle</i>
+							</h:panelGroup>
+
+							<h:panelGroup rendered="#{entity.status}">
+								<i class="material-icons Green">check_circle</i>
+							</h:panelGroup>
+
+							<f:setPropertyActionListener
+								target="#{acabamentoBean.acabamento}" value="#{entity}" />
+						</p:commandLink>
+					</p:column>
+
+					<!-- 					<p:column headerText="Situação" styleClass="Center"> -->
+					<!-- 						<p:outputLabel value="#{entity.statusAcabamento.descricao}" -->
+					<!-- 							styleClass="label-verde" -->
+					<!-- 							rendered="#{entity.statusAcabamento.descricao eq 'Pago'}" /> -->
+					<!-- 						<p:outputLabel value="#{entity.statusAcabamento.descricao}" -->
+					<!-- 							styleClass="label-vermelho" -->
+					<!-- 							rendered="#{entity.statusAcabamento.descricao eq 'Aberto'}" /> -->
+					<!-- 					</p:column> -->
+					<p:column headerText="Situação" styleClass="Center" width="120">
+						<p:outputLabel value="#{entity.situacao}"
+							styleClass="negrito Green"
+							rendered="#{entity.situacao eq 'FINALIZADA'}" />
+						<p:outputLabel value="#{entity.situacao}" styleClass="negrito Red"
+							rendered="#{entity.situacao eq 'CANCELADA'}" />
+						<p:outputLabel value="#{entity.situacao}"
+							styleClass="negrito Blue"
+							rendered="#{entity.situacao eq 'ANDAMENTO'}" />
+					</p:column>
+
+					<p:column headerText="Protocolo" styleClass="Center" width="120">
+						<p:outputLabel value="#{entity.protocolo}" />
+					</p:column>
+
+					<p:column headerText="Origem" styleClass="Center" width="80">
+						<p:outputLabel value="#{entity.origem.descricao}" />
+					</p:column>
+
+					<p:column headerText="Cadastro" styleClass="Center" width="90">
+						<p:outputLabel value="#{entity.dataCadastro}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Facção" styleClass="Center">
+						<p:outputLabel value="#{entity.faccao.nome}" />
+					</p:column>
+
+					<p:column headerText="Prévisão de término" width="90" styleClass="Center">
+						<p:outputLabel value="#{entity.previsaoTermino}" />
+					</p:column>
+					
+					<p:column headerText="Valor Total" styleClass="Center" width="85">
+						<p:outputLabel
+							value="#{acabamentoBean.getValoresTotais(entity)[0]}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Quantidade Total" styleClass="Center" width="85">
+						<p:outputLabel
+							value="#{acabamentoBean.getValoresTotais(entity)[1]}">
+							<f:convertNumber minFractionDigits="0" type="number"
+								maxFractionDigits="0" />
+						</p:outputLabel>
+					</p:column>
+					
+
+<!-- 					<p:column headerText="Data do Pagamento"> -->
+<!-- 						<p:outputLabel value="#{entity.dataPagamento}"> -->
+<!-- 							<f:convertDateTime pattern="dd/MM/yyyy" /> -->
+<!-- 						</p:outputLabel> -->
+<!-- 					</p:column> -->
+
+<!-- 					<p:column headerText="Forma de Pagamento"> -->
+<!-- 						<p:outputLabel value="#{entity.opcoesPagamento}" /> -->
+<!-- 					</p:column> -->
+
+					<p:column headerText="Ações" width="115"
+						styleClass="Center">
+						<p:commandLink id="lnkAquisicao" rendered="#{entity.status}"
+							oncomplete="PF('dados-aquisicao').show()"
+							style="text-decoration: none" update=":form:dados-aquisicao"
+							title="Aquisição de Saída"
+							action="#{acabamentoBean.carregarListaItemAcabamento()}">
+							<i class="material-icons GrayDark">chrome_reader_mode</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{acabamentoBean.acabamento}" />
+						</p:commandLink>
+
+<!-- 						<p:commandLink id="lnkPagamento" -->
+<!-- 							rendered="#{entity.statusAcabamento eq 'ABERTO'}" -->
+<!-- 							oncomplete="PF('pagamento').show()" style="text-decoration: none" -->
+<!-- 							update=":form-pagamento:pagamento"> -->
+<!-- 							<i class="material-icons GrayDark">offline_pin</i> -->
+<!-- 							<f:setPropertyActionListener value="#{entity}" -->
+<!-- 								target="#{acabamentoBean.acabamento}" /> -->
+<!-- 						</p:commandLink> -->
+
+						<p:commandLink id="lnkDetail" rendered="#{entity.status}"
+							oncomplete="PF('dados').show()" style="text-decoration: none"
+							update=":frm:dados" title="Detalhes"
+							action="#{acabamentoBean.carregarListaItemAcabamento()}">
+							<i class="material-icons GrayDark">assignment</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{acabamentoBean.acabamento}" />
+						</p:commandLink>
+						<p:spacer />
+						<p:link ajax="false" id="lnkEditar" title="Editar"
+							rendered="#{entity.status}"
+							outcome="#{acabamentoBean.prepareUpdate()}"
+							style="text-decoration: none">
+							<i class="material-icons GrayDark">mode_edit</i>
+							<f:param name="id" value="#{entity.id}" />
+						</p:link>
+						<p:spacer />
+						<p:commandLink id="pdf" ajax="false"
+							action="#{acabamentoBean.gerarPDFAcabamento()}" title="Download"
+							style="text-decoration: none">
+							<i class="material-icons GrayDark">get_app</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{acabamentoBean.acabamento}" />
+						</p:commandLink>
+					</p:column>
+				</p:dataTable>
+
+				<p:dialog header="Detalhes do Acabamento" modal="true"
+					closable="true" width="1000" closeOnEscape="true" draggable="false"
+					id="dados" widgetVar="dados" resizable="false">
+
+					<div class="scroll-dialog">
+						<br />
+						<p:messages id="msg-update" closable="true" showDetail="true"
+							showSummary="true" />
+						<h:panelGroup id="group">
+							<p:outputLabel value="Protocolo: " styleClass="my-label" />
+							<p:outputLabel value="#{acabamentoBean.acabamento.protocolo}" />
+							<br />
+							<p:outputLabel value="Data: " styleClass="my-label" />
+							<p:outputLabel value="#{acabamentoBean.acabamento.dataCadastro}">
+								<f:convertDateTime pattern="dd/MM/yyyy" />
+							</p:outputLabel>
+
+							<br />
+							<p:outputLabel value="Loja: " styleClass="my-label" />
+							<p:outputLabel
+								value="#{acabamentoBean.acabamento.loja.descricao}" />
+							<br />
+
+							<p:outputLabel value="#{acabamentoBean.acabamento.situacao}"
+								styleClass="negrito Green"
+								rendered="#{acabamentoBean.acabamento.situacao eq 'FINALIZADA'}" />
+							<p:outputLabel value="#{acabamentoBean.acabamento.situacao}"
+								styleClass="negrito Red"
+								rendered="#{acabamentoBean.acabamento.situacao eq 'CANCELADA'}" />
+							<p:outputLabel value="#{acabamentoBean.acabamento.situacao}"
+								styleClass="negrito Blue"
+								rendered="#{acabamentoBean.acabamento.situacao eq 'ANDAMENTO'}" />
+							<br />
+							<p:commandButton value="Finalizar Acabamento" id="btn-fila"
+								style="float: right"
+								rendered="#{acabamentoBean.acabamento.situacao ne 'FINALIZADA'}"
+								action="#{acabamentoBean.finalizarOrdem}" ajax="false" />
+						</h:panelGroup>
+						<!-- 						<ui:include src="/private/fragmentos/lista-item-acabamento.xhtml" /> -->
+						<br />
+						<p:outputLabel value="Lista de itens no acabamento"
+							styleClass="my-label-titulo" />
+						<br /> <br />
+						<p:dataTable id="tableItemAcabamento" var="item" editable="true"
+							value="#{acabamentoBean.itemAcabamentoList}"
+							emptyMessage="Nenhuma atividade foi adicionada">
+
+							<p:ajax event="rowEdit" listener="#{acabamentoBean.onRowEdit}"
+								update=":frm:group tableItemAcabamento :frm:tableHistoricoAcabamento :frm:msg-update" />
+
+							<p:column headerText="Produto" style="color: #000000 !important">
+								<p:outputLabel value="#{item.produto.nome}" />
+							</p:column>
+
+							<p:column headerText="Unidade" width="60"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{item.produto.unidadeVenda}" />
+							</p:column>
+
+							<p:column headerText="Referência" width="110"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{item.produto.id}" />
+							</p:column>
+
+							<p:column headerText="Valor unitário"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{item.valor}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Quantidade" width="90" styleClass="Center"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{item.quantidade}" />
+							</p:column>
+							<p:column headerText="Valor total"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{item.valorTotal}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Recebidas"
+								style="color: #000000 !important" styleClass="Center" width="90">
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{item.prontas}"
+											styleClass="Green tam-14 negrito" />
+									</f:facet>
+									<f:facet name="input">
+								#{item.prontas}	+
+										<p:inputText value="#{item.prontasAux}" style="width:50%" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+							<p:column headerText="Atualizar Recebimento" width="90"
+								styleClass="Center"
+								rendered="#{acabamentoBean.acabamento.situacao eq 'ANDAMENTO'}"
+								style="width:32px; color: #000000 !important">
+								<p:rowEditor />
+							</p:column>
+						</p:dataTable>
+
+						<p:separator />
+						<br />
+						
+						<p:outputLabel value="Lista de itens envolvidos no acabamento"
+							styleClass="my-label-titulo" />
+						<br /> <br />
+						<p:dataTable var="item" editable="true"
+							value="#{acabamentoBean.itemEnvolvidoAcabamentoList}"
+							emptyMessage="Nenhuma atividade foi adicionada">
+
+							<p:column headerText="Produto" style="color: #000000 !important">
+								<p:outputLabel value="#{item.produto.nome}" />
+							</p:column>
+
+							<p:column headerText="Unidade" width="60"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{item.produto.unidadeVenda}" />
+							</p:column>
+
+							<p:column headerText="Referência" width="110"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{item.produto.id}" />
+							</p:column>
+							<p:column headerText="Quantidade" width="90" styleClass="Center"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{item.quantidade}" />
+							</p:column>
+							
+						</p:dataTable>
+
+						<p:separator />
+						<br />
+						<p:outputLabel value="Historico de Recebimento dos Acabamentos"
+							styleClass="my-label-titulo" />
+						<br /> <br />
+						<p:dataTable id="tableHistoricoAcabamento" var="historico"
+							value="#{acabamentoBean.historicoAcabamentoList}"
+							emptyMessage="Nenhuma produto recebido até o momento">
+
+							<p:column headerText="Recebido por"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{historico.usuario.nome}" />
+							</p:column>
+
+							<p:column headerText="Data recebimento"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{historico.dataRecebimento}">
+									<f:convertDateTime pattern="dd/MM/yyyy - HH:mm" />
+								</p:outputLabel>
+							</p:column>
+
+							<p:column headerText="Facção" style="color: #000000 !important">
+								<p:outputLabel value="#{historico.faccao.nome}" />
+							</p:column>
+
+							<p:column headerText="Produto" style="color: #000000 !important">
+								<p:outputLabel value="#{historico.produto.nome}" />
+							</p:column>
+
+							<p:column headerText="Unidade" width="60"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{historico.produto.unidadeVenda}" />
+							</p:column>
+
+							<p:column headerText="Quantidade recebida" width="90"
+								styleClass="Center" style="color: #000000 !important">
+								<p:outputLabel value="#{historico.qtdRecebido}" />
+							</p:column>
+						</p:dataTable>
+					</div>
+				</p:dialog>
+			</h:form>
+			<h:form id="form-pagamento">
+				<p:dialog modal="true" id="pagamento" widgetVar="pagamento"
+					resizable="false">
+
+					<f:facet name="header">
+					Realizar Pagamento
+					</f:facet>
+
+					<div class="ui-fluid">
+						<p:messages showDetail="true" autoUpdate="true" closable="true" />
+
+						<h:panelGrid columns="2" style="margin-top: 20px"
+							id="grid-cadastro">
+
+							<h:panelGroup>
+								<p:outputLabel value="Data do Pagamento: " styleClass="my-label"
+									style="vertical-align: text-top;" for="data-pagamento" />
+							</h:panelGroup>
+
+							<p:calendar size="10" navigator="true" required="true"
+								requiredMessage="Digite a data do pagamento" id="data-pagamento"
+								value="#{acabamentoBean.acabamento.dataPagamento}"
+								pattern="dd/MM/yyyy" />
+
+							<h:panelGroup>
+								<p:outputLabel value="Forma de Pagamento: "
+									styleClass="my-label" style="vertical-align: text-top;"
+									for="op" />
+							</h:panelGroup>
+
+							<p:selectOneMenu
+								value="#{acabamentoBean.acabamento.opcoesPagamento}" id="op"
+								required="true" requiredMessage="Selecione a opção de pagamento">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{acabamentoBean.opcoesPagamento}"
+									var="opc" itemLabel="#{opc.descricao}" itemValue="#{opc}" />
+							</p:selectOneMenu>
+						</h:panelGrid>
+						<p:separator />
+						<h:panelGrid columns="3">
+							<p:commandButton value="Realizar Pagamento" icon="fa fa-floppy-o"
+								action="#{acabamentoBean.updatePagamento}"
+								update=":frm:table-acabamento"
+								oncomplete="PF('pagamento').hide()"
+								rendered="#{acabamentoBean.acabamento.id != null}" />
+
+							<p:spacer width="20" height="0" />
+						</h:panelGrid>
+					</div>
+				</p:dialog>
+			</h:form>
+			<h:form id="form">
+				<p:dialog modal="true" id="dados-aquisicao" width="70%"
+					widgetVar="dados-aquisicao" resizable="false">
+
+					<f:facet name="header">
+					Aquisição de Saída - Acabamento
+					</f:facet>
+
+					<!-- 					<div class="scroll-dialog"> -->
+					<div>
+						<p:messages id="msg" closable="true" showDetail="true"
+							showSummary="true" />
+
+						<h:panelGrid columns="2" style="margin-top: 20px"
+							id="grid-aquisicao" cellpadding="05px">
+
+							<h:panelGroup>
+								<p:outputLabel value="Matéria Prima:" styleClass="my-label" />
+							</h:panelGroup>
+							<p:selectOneMenu id="materia"
+								value="#{acabamentoBean.aquisicaoSaidaAcabamento.materiaPrima}"
+								required="true" requiredMessage="Materia Prima é obrigatório."
+								converter="genericConverter">
+								<f:selectItem itemLabel="-- Selecione --" />
+								<f:selectItems value="#{materiaPrimaBean.materias}" var="mat"
+									itemLabel="#{mat.nome}" itemValue="#{mat}" />
+							</p:selectOneMenu>
+
+							<h:panelGroup>
+								<p:outputLabel value="Quantidade: " styleClass="my-label" />
+							</h:panelGroup>
+							<p:inputText id="quantidade" required="true"
+								requiredMessage="true"
+								value="#{acabamentoBean.aquisicaoSaidaAcabamento.quantidade}" />
+
+						</h:panelGrid>
+						<p:separator />
+						<h:panelGrid columns="3">
+							<p:commandButton value="Adicionar"
+								update="tableAquisicao msg grid-aquisicao"
+								action="#{acabamentoBean.saveAquisicaoSaidaAcabamento()}"
+								icon="fa fa-plus" />
+
+							<p:commandButton value="Cancelar" styleClass="btn-orange"
+								icon="fa fa-close" process="@this"
+								oncomplete="PF('dados-aquisicao').hide()" immediate="true" />
+
+							<p:spacer width="20" height="0" />
+						</h:panelGrid>
+
+						<br />
+
+						<p:dataTable id="tableAquisicao" var="aquisicao"
+							value="#{acabamentoBean.aquisicaoSaidaAcabamentoList}"
+							emptyMessage="Nenhuma atividade foi adicionada">
+
+							<f:facet name="header">
+								<p:outputLabel value="Lista de Aquisições de Saídas" />
+							</f:facet>
+
+							<p:column headerText="Matéria Prima" style="color: #000">
+								<p:outputLabel value="#{aquisicao.materiaPrima.nome}" />
+							</p:column>
+
+							<p:column headerText="Unidade de Medida" style="color: #000">
+								<p:outputLabel value="#{aquisicao.materiaPrima.unidadeMedida}" />
+							</p:column>
+
+							<p:column styleClass="Center" headerText="Quantidade"
+								style="color: #000">
+								<p:outputLabel styleClass="label-laranja"
+									value="#{aquisicao.quantidade}" />
+							</p:column>
+						</p:dataTable>
+					</div>
+				</p:dialog>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

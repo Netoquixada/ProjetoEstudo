@@ -1,0 +1,190 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:t="http://myfaces.apache.org/tomahawk"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="conferencia.png"
+						width="60px" style="float: left" />
+				</div>
+
+				<h1>#{conferenciaBean.conferencia.id == null ? 'Cadastrar
+					Conferência' : 'Atualizar Conferência'}</h1>
+				<h3>#{conferenciaBean.conferencia.id == null ? 'Preencha o
+					formulário abaixo para cadastrar uma nova conferência.' : 'Preencha
+					o formulário abaixo para atualizar a conferência.'}</h3>
+
+				<div class="links-funcionais">
+					<p:link id="lista" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/lista/listarConferencia.xhtml">
+						<i class="material-icons md-32">list</i>
+						<br />
+					</p:link>
+					<p:tooltip for="lista" position="top" value="Listar Conferências" />
+
+					<p:link styleClass="link-funcional" outcome="/private/index.xhtml"
+						id="inicio">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+			<p:panel style="margin-top: 15px" styleClass="my-panel">
+				<p:outputLabel value="(" />
+				<p:outputLabel value="*" styleClass="campoObrigatorio" />
+				<p:outputLabel value=") Campos obrigatórios." />
+			</p:panel>
+
+			<t:saveState value="#{conferenciaBean.conferencia}" />
+			<t:saveState value="#{conferenciaBean.lazy}" />
+
+			<h:form id="frm">
+				<div class="ui-fluid">
+					<p:messages showDetail="true" autoUpdate="true" closable="true" />
+
+					<h:panelGrid cellpadding="10" columns="2" style="margin-top: 10px"
+						styleClass="ui-panelgrid-blank" id="grid">
+
+						<h:panelGroup>
+							<p:outputLabel value="Loja: " styleClass="my-label"
+								style="vertical-align: text-top;" for="loja" />
+							<br />
+							<p:selectOneMenu id="loja" label="Loja"
+								value="#{conferenciaBean.conferencia.loja}" required="true"
+								requiredMessage="Loja obrigatório">
+								<f:selectItem itemLabel="-- Selecione --" />
+								<f:selectItems value="#{conferenciaBean.lojas}" var="loja"
+									itemLabel="#{loja.descricao}" itemValue="#{loja}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+
+						<h:panelGroup>
+							<p:outputLabel value="Banco: " styleClass="my-label"
+								style="vertical-align: text-top;" for="loja" />
+							<br />
+							<p:selectOneMenu id="banco" label="Banco"
+								converter="bancoConverter"
+								value="#{conferenciaBean.conferencia.banco}" required="true"
+								requiredMessage="Banco obrigatório">
+								<f:selectItem itemLabel="-- Selecione --" />
+								<f:selectItems value="#{bancoBean.listaBancos}" var="banco"
+									itemLabel="#{banco.nome}" itemValue="#{banco}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+
+						<h:panelGroup>
+							<p:outputLabel value="Funcionário: " styleClass="my-label"
+								style="vertical-align: text-top;" for="loja" />
+							<br />
+							<p:selectOneMenu id="vendedor" label="Vendedor"
+								converter="funcionarioConverter"
+								value="#{conferenciaBean.conferencia.vendedor}" required="true"
+								requiredMessage="Vendedor obrigatório">
+								<f:selectItem itemLabel="-- Selecione --" />
+								<f:selectItems value="#{funcionarioBean.listaFuncionarios}"
+									var="vend" itemLabel="#{vend.nome}" itemValue="#{vend}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+
+						<h:panelGroup>
+							<p:outputLabel value="Valor(R$):" styleClass="my-label"
+								style="vertical-align: text-top;" />
+							<h:outputText value=" * " styleClass="campoObrigatorio" />
+							<br />
+							<p:inputText required="true" id="valor"
+								requiredMessage="Campo 'Valor' é obrigatório!"
+								styleClass="moeda" maxlength="10"
+								value="#{conferenciaBean.conferencia.valor}">
+								<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+									minFractionDigits="2" type="number" />
+							</p:inputText>
+						</h:panelGroup>
+
+						<h:panelGroup>
+							<p:outputLabel value="Tipo: " styleClass="my-label"
+								style="vertical-align: text-top;" for="tipo" />
+							<br />
+							<p:selectOneMenu id="tipo" label="Tipo"
+								value="#{conferenciaBean.conferencia.tipo}" required="true"
+								requiredMessage="Tipo obrigatório">
+								<f:selectItem itemLabel="-- Selecione --" />
+								<f:selectItems value="#{conferenciaBean.tipos}" var="tipo"
+									itemLabel="#{tipo.descricao}" itemValue="#{tipo}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+
+						<h:panelGroup>
+							<p:outputLabel value="Situação: " styleClass="my-label"
+								style="vertical-align: text-top;" for="situacao" />
+							<br />
+							<p:selectOneMenu id="situacao" label="Situação"
+								value="#{conferenciaBean.conferencia.statusConferencia}"
+								required="true" requiredMessage="Situação obrigatório">
+								<f:selectItem itemLabel="-- Selecione --" />
+								<f:selectItems value="#{conferenciaBean.statusConferencias}"
+									var="sit" itemLabel="#{sit.descricao}" itemValue="#{sit}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						
+						<h:panelGroup>
+							<p:outputLabel value="Pedido: " styleClass="my-label"
+								style="vertical-align: text-top;" for="pedido" />
+							<br />
+							<p:inputTextarea id="pedido" value="#{conferenciaBean.conferencia.pedido}"
+						label="Pedido" rows="1" cols="10" />
+						</h:panelGroup>
+						
+						<h:panelGroup>
+							<p:outputLabel value="Cliente: " styleClass="my-label"
+								style="vertical-align: text-top;" for="cliente" />
+							<br />
+							<p:inputTextarea id="cliente" value="#{conferenciaBean.conferencia.cliente}"
+						label="cliente" rows="1" cols="10" />
+						</h:panelGroup>
+						
+					</h:panelGrid>
+					<h:panelGroup>
+						<p:outputLabel value="Descrição:" styleClass="my-label"
+							style="vertical-align: text-top;" />
+					</h:panelGroup>
+
+					<p:inputTextarea id="descricao"
+						placeholder="Descreva uma observação sobre a conferência(opcional)!"
+						value="#{conferenciaBean.conferencia.observacao}"
+						label="Descrição" rows="4" cols="60" />
+					<br /> <br />
+					<p:separator />
+					<h:panelGrid columns="3">
+						<p:commandButton value="Salvar" icon="fa fa-floppy-o"
+							action="#{conferenciaBean.save}" update="frm"
+							rendered="#{conferenciaBean.conferencia.id == null}" />
+
+						<p:commandButton value="Atualizar" icon="fa fa-floppy-o"
+							action="#{conferenciaBean.update}"
+							rendered="#{conferenciaBean.conferencia.id != null}" />
+
+						<p:spacer width="20" height="0" />
+
+						<p:commandButton value="Cancelar" action="/private/index.xhtml"
+							immediate="true"
+							rendered="#{conferenciaBean.conferencia.id == null}"
+							icon="fa fa-ban" ajax="false" />
+
+						<p:commandButton value="Cancelar"
+							action="#{conferenciaBean.goToList()}" immediate="true"
+							rendered="#{conferenciaBean.conferencia.id != null}"
+							icon="fa fa-ban" ajax="false" />
+					</h:panelGrid>
+				</div>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,108 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="despesa-fixa.jpg"
+						width="60px" style="float: left" />
+				</div>
+
+				<h1>Lista de Despesas Fixas</h1>
+				<h3>Listagem de despesas fixas cadastradas no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:link id="cadastrar" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/cadastro/cadastrarDespesaFixa.xhtml">
+						<i class="material-icons md-32">add_to_photos</i>
+						<br />
+					</p:link>
+					<p:tooltip for="cadastrar" position="top"
+						value="Cadastrar Despesa Fixa" />
+
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{despesaFixaBean.despesaFixa}" />
+			<t:saveState value="#{despesaFixaBean.lazy}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:dataTable id="table-despesa-fixa" value="#{despesaFixaBean.lazy}"
+					var="entity" paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10"
+					lazy="true">
+
+					<p:column headerText="Status" style="width: 50px"
+						styleClass="Center"
+						rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR'}">
+						<p:commandLink id="lnkAlterarStatus"
+							action="#{despesaFixaBean.updateStatus()}"
+							update="table-despesa-fixa"
+							title="#{entity.status ? 'Desativar' : 'Ativar'}">
+
+							<h:panelGroup rendered="#{!entity.status}">
+								<i class="material-icons Red">remove_circle</i>
+							</h:panelGroup>
+
+							<h:panelGroup rendered="#{entity.status}">
+								<i class="material-icons Green">check_circle</i>
+							</h:panelGroup>
+
+							<f:setPropertyActionListener
+								target="#{despesaFixaBean.despesaFixa}" value="#{entity}" />
+						</p:commandLink>
+					</p:column>
+
+					<p:column headerText="Loja" styleClass="Center">
+						<p:outputLabel value="#{entity.loja.descricao}" />
+					</p:column>
+
+					<p:column headerText="Quantidade de Produção" styleClass="Center">
+						<p:outputLabel value="#{entity.quantidadeProducao}" />
+					</p:column>
+
+					<p:column headerText="Data de cadastro" styleClass="Center">
+						<p:outputLabel value="#{entity.dataCadastro}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Ações" style="width: 130px"
+						styleClass="Center">
+						<p:link ajax="false" id="lnkEditar" title="Editar"
+							rendered="#{entity.status}"
+							outcome="#{despesaFixaBean.prepareUpdate()}"
+							style="text-decoration: none">
+							<i class="material-icons GrayDark">mode_edit</i>
+							<f:param name="id" value="#{entity.id}" />
+						</p:link>
+						<p:spacer />
+						<p:commandLink id="pdf" ajax="false"
+							action="#{despesaFixaBean.gerarPDFDespesaFixa()}"
+							title="Download" style="text-decoration: none">
+							<i class="material-icons GrayDark">get_app</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{despesaFixaBean.despesaFixa}" />
+						</p:commandLink>
+					</p:column>
+				</p:dataTable>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

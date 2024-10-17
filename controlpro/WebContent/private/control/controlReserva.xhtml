@@ -1,0 +1,314 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="reserva.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>Lista de Reservas</h1>
+				<h3>Listagem de reservas cadastradas no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:commandLink id="cadastrar" styleClass="link-funcional"
+						style="margin-top: 3px" update=":form-cadastro:dados"
+						oncomplete="PF('dados').show()"
+						action="#{reservaBean.prepareSave()}">
+						<i class="material-icons md-32">add_to_photos</i>
+						<br />
+					</p:commandLink>
+					<p:tooltip for="cadastrar" position="top" value="Cadastrar Reserva" />
+
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{reservaBean.reserva}" />
+			<t:saveState value="#{reservaBean.reservas}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="false" closable="true" />
+
+				<p:panelGrid columns="4" style="width: 100%" layout="grid"
+					id="grid-dash">
+					<h:panelGroup style="width: 25%">
+						<div class="panel-total-projeto shadow-effect">
+							<div class="panel-icon" style="background-color: #1f8936;">
+								<div class="marginTop10"></div>
+								<i class="material-icons md-48 md-light">credit_card</i>
+							</div>
+
+							<div class="panel-infor" style="background-color: #55b94b;">
+								<div class="marginTop10"></div>
+								<div style="font-size: 12px" class="Fs16">CREDITO</div>
+								<div style="font-size: 22px" class="animated pulse infinite">
+									<p:outputLabel value="#{reservaBean.credito}">
+										<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+											minFractionDigits="2" type="currency" />
+									</p:outputLabel>
+								</div>
+							</div>
+						</div>
+					</h:panelGroup>
+					<h:panelGroup style="width: 25%">
+						<div class="panel-total-projeto shadow-effect">
+							<div class="panel-icon" style="background-color: #ad183d;">
+								<div class="marginTop10"></div>
+								<i class="material-icons md-48 md-light">credit_card</i>
+							</div>
+
+							<div class="panel-infor" style="background-color: #cf3f59;">
+								<div class="marginTop10"></div>
+								<div style="font-size: 12px" class="Fs16">DEBITO</div>
+								<div style="font-size: 22px" class="animated pulse infinite">
+									<p:outputLabel value="#{reservaBean.debito}">
+										<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+											minFractionDigits="2" type="currency" />
+									</p:outputLabel>
+								</div>
+							</div>
+						</div>
+					</h:panelGroup>
+					<h:panelGroup style="width: 25%">
+						<div class="panel-total-projeto shadow-effect">
+							<div class="panel-icon" style="background-color: #32439F;">
+								<div class="marginTop10"></div>
+								<i class="material-icons md-48 md-light">attach_money</i>
+							</div>
+
+							<div class="panel-infor" style="background-color: #3966C2;">
+								<div class="marginTop10"></div>
+								<div style="font-size: 12px" class="Fs16">Saldo</div>
+								<div style="font-size: 22px" class="animated pulse infinite">
+									<p:outputLabel value="#{reservaBean.saldo}">
+										<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+											minFractionDigits="2" type="currency" />
+									</p:outputLabel>
+								</div>
+							</div>
+						</div>
+					</h:panelGroup>
+				</p:panelGrid>
+
+				<p:panel styleClass="panel-pesquisa" style="margin-top: 15px">
+					<div class="lupa">
+						<p:graphicImage library="imagens" name="SearchLupa.png" />
+					</div>
+
+					<h:panelGrid columns="12">
+						<p:outputLabel value="Loja: " styleClass="my-label" />
+						<p:selectOneMenu value="#{reservaBean.reservaFilter.loja}">
+							<f:selectItem itemLabel="Selecione" />
+							<f:selectItems value="#{reservaBean.lojas}" var="loja"
+								itemLabel="#{loja.descricao}" itemValue="#{loja}" />
+						</p:selectOneMenu>
+
+						<p:outputLabel value="Tipo: " styleClass="my-label" />
+						<p:selectOneMenu value="#{reservaBean.reservaFilter.tipo}">
+							<f:selectItem itemLabel="Selecione" />
+							<f:selectItem itemLabel="CREDITO" itemValue="CREDITO" />
+							<f:selectItem itemLabel="DEBITO" itemValue="DEBITO" />
+						</p:selectOneMenu>
+
+						<p:outputLabel value="OS: " styleClass="my-label" />
+						<p:inputText value="#{reservaBean.reservaFilter.os}" size="30" />
+
+						<p:outputLabel value="De: " styleClass="my-label" />
+						<p:calendar size="10" navigator="true"
+							value="#{reservaBean.reservaFilter.dataInicio}"
+							pattern="dd/MM/yyyy" />
+						<p:outputLabel value="Até: " styleClass="my-label" />
+						<p:calendar size="10" navigator="true"
+							value="#{reservaBean.reservaFilter.dataFim}" pattern="dd/MM/yyyy" />
+
+						<p:commandButton  icon="fa fa-search"
+							style="margin-left: 5px;"
+							update="table-reserva grid-dash" action="#{reservaBean.list()}" />
+
+						<p:commandButton id="report"
+							actionListener="#{reservaBean.gerarPDF}" icon="fa fa-download"
+							onclick="this.form.target='_blank'"
+							ajax="false">
+						</p:commandButton>
+					</h:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-reserva" value="#{reservaBean.reservas}"
+					var="entity" paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10"
+					lazy="true">
+
+					<p:column headerText="Status" style="width: 50px"
+						styleClass="Center">
+						<p:commandLink id="lnkAlterarStatus"
+							action="#{reservaBean.updateStatus()}" update="table-reserva"
+							title="#{entity.status ? 'Desativar' : 'Ativar'}">
+
+							<h:panelGroup rendered="#{!entity.status}">
+								<i class="material-icons Red">remove_circle</i>
+							</h:panelGroup>
+
+							<h:panelGroup rendered="#{entity.status}">
+								<i class="material-icons Green">check_circle</i>
+							</h:panelGroup>
+
+							<f:setPropertyActionListener target="#{reservaBean.reserva}"
+								value="#{entity}" />
+						</p:commandLink>
+					</p:column>
+					<p:column headerText="Data">
+						<p:outputLabel value="#{entity.data}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+					<p:column headerText="Loja">
+						<p:outputLabel value="#{entity.loja.descricao}" />
+					</p:column>
+					<p:column headerText="Tipo">
+						<p:outputLabel value="#{entity.tipo}" />
+					</p:column>
+					<p:column headerText="OS">
+						<p:outputLabel value="#{entity.os}" />
+					</p:column>
+					<p:column headerText="Valor Vendas" styleClass="Center">
+						<p:outputLabel value="#{entity.valorVendas}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+					<p:column headerText="Valor Reserva" styleClass="Center">
+						<p:outputLabel value="#{entity.valorReserva}" styleClass="negrito">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Ações" style="width: 60px"
+						styleClass="Center">
+
+						<p:commandLink id="lnkEditar" rendered="#{entity.status}"
+							oncomplete="PF('dados').show()" style="text-decoration: none"
+							update=":form-cadastro:dados">
+							<i class="material-icons GrayDark">mode_edit</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{reservaBean.reserva}" />
+						</p:commandLink>
+
+						<p:tooltip for="lnkEditar" value="Editar" position="top" />
+					</p:column>
+				</p:dataTable>
+			</h:form>
+
+			<h:form id="form-cadastro">
+				<p:dialog modal="true" id="dados" widgetVar="dados"
+					resizable="false">
+
+					<f:facet name="header">
+					#{reservaBean.reserva.id == null ? 'Cadastrar Reserva' :
+					'Atualizar Reserva'}
+					</f:facet>
+
+					<div class="ui-fluid">
+						<p:messages showDetail="true" autoUpdate="true" closable="true" />
+						<br />
+						<h:panelGrid columns="2" style="margin-top: 20px"
+							id="grid-cadastro">
+
+							<h:panelGroup>
+								<p:outputLabel value="Data: " styleClass="my-label"
+									style="vertical-align: text-top;" for="data" />
+							</h:panelGroup>
+
+							<p:inputMask mask="99/99/9999" size="10" navigator="true"
+								required="true" requiredMessage="Digite a data" id="data"
+								value="#{reservaBean.reserva.data}">
+								<f:convertDateTime pattern="dd/MM/yyyy" />
+							</p:inputMask>
+
+							<h:panelGroup>
+								<p:outputLabel value="Loja: " styleClass="my-label"
+									style="vertical-align: text-top;" for="loja" />
+							</h:panelGroup>
+							<p:selectOneMenu value="#{reservaBean.reserva.loja}" id="loja"
+								required="true">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{reservaBean.lojas}" var="loja"
+									itemLabel="#{loja.descricao}" itemValue="#{loja}" />
+							</p:selectOneMenu>
+							<h:panelGroup>
+								<p:outputLabel value="Tipo: " styleClass="my-label"
+									style="vertical-align: text-top;" for="tipo" />
+							</h:panelGroup>
+							<p:selectOneMenu value="#{reservaBean.reserva.tipo}" id="tipo"
+								required="true">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItem itemLabel="CREDITO" itemValue="CREDITO" />
+								<f:selectItem itemLabel="DEBITO" itemValue="DEBITO" />
+							</p:selectOneMenu>
+
+							<h:panelGroup>
+								<p:outputLabel value="OS: " styleClass="my-label"
+									style="vertical-align: text-top;" for="os" />
+							</h:panelGroup>
+							<p:inputText id="os" value="#{reservaBean.reserva.os}"
+								required="true" label="OS" requiredMessage="OS é obrigatório." />
+							<h:panelGroup>
+								<p:outputLabel value="Valor Vendas(R$):" styleClass="my-label"
+									style="vertical-align: text-top;" for="valor-vendas" />
+							</h:panelGroup>
+
+							<p:inputText required="true" id="valor-vendas"
+								requiredMessage="Campo 'Valor Vendas' é obrigatório!"
+								styleClass="moeda" maxlength="10"
+								value="#{reservaBean.reserva.valorVendas}">
+								<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+									minFractionDigits="2" type="number" />
+							</p:inputText>
+							<h:panelGroup>
+								<p:outputLabel value="Valor Reserva(R$):" styleClass="my-label"
+									style="vertical-align: text-top;" for="valor-reserva" />
+							</h:panelGroup>
+
+							<p:inputText required="true" id="valor-reserva"
+								requiredMessage="Campo 'Valor Reserva' é obrigatório!"
+								styleClass="moeda" maxlength="10"
+								value="#{reservaBean.reserva.valorReserva}">
+								<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+									minFractionDigits="2" type="number" />
+							</p:inputText>
+						</h:panelGrid>
+						<p:separator />
+						<h:panelGrid columns="3">
+							<p:commandButton value="Salvar" icon="fa fa-floppy-o"
+								action="#{reservaBean.save}"
+								update="grid-cadastro :frm:table-reserva :frm:grid-dash"
+								rendered="#{reservaBean.reserva.id == null}" />
+
+							<p:commandButton value="Atualizar" icon="fa fa-floppy-o"
+								action="#{reservaBean.update}"
+								update=":frm:table-reserva :frm:grid-dash"
+								oncomplete="PF('dados').hide()"
+								rendered="#{reservaBean.reserva.id != null}" />
+
+							<p:spacer width="20" height="0" />
+						</h:panelGrid>
+					</div>
+				</p:dialog>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

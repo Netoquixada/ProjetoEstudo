@@ -1,0 +1,194 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="money.png" width="60"
+						style="float: left" />
+				</div>
+
+				<h1>Lista de Vendas Por Finalizadora</h1>
+				<h3>Listagem de vendas cadastradas no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{vendasBean.vendas}" />
+			<t:saveState value="#{vendasBean.lazy}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel styleClass="panel-pesquisa" style="margin-top: 15px">
+					<div class="lupa">
+						<p:graphicImage library="imagens" name="SearchLupa.png" />
+					</div>
+
+					<h:panelGrid columns="10">
+						<h:panelGroup>
+							<p:outputLabel value="Vendedor: " styleClass="my-label"
+								style="vertical-align: text-top;" for="cortador" />
+						</h:panelGroup>
+						<p:autoComplete value="#{vendasBean.vendasFilter.vendedor}"
+							autocomplete="true" size="25" id="cortador"
+							completeMethod="#{funcionarioBean.getFuncionarioAutoComplete}"
+							forceSelection="true" minQueryLength="1" maxResults="30"
+							dropdown="true"
+							converterMessage="Não foi possível selecionar o funcionário (Erro ao converter o objeto)"
+							converter="funcionarioConverter" var="func"
+							itemLabel="#{func.nome}" itemValue="#{func}"
+							placeholder="Pesquise pelo nome">
+						</p:autoComplete>
+						
+						<h:panelGroup>
+							<p:outputLabel value="Cliente: " styleClass="my-label"
+								style="vertical-align: text-top;" for="cliente" />
+						</h:panelGroup>
+						<p:autoComplete value="#{vendasBean.vendasFilter.cliente}"
+							autocomplete="true" size="25" id="cliente"
+							completeMethod="#{clienteBean.getClienteAutoComplete}"
+							forceSelection="true" minQueryLength="1" maxResults="500"
+							dropdown="true"
+							converterMessage="Não foi possível selecionar o cliente (Erro ao converter o objeto)"
+							converter="clienteConverter" var="cli"
+							itemLabel="#{cli.nome}" itemValue="#{cli}"
+							placeholder="Pesquise pelo nome">
+						</p:autoComplete>
+						
+<!-- 						<p:selectOneMenu  -->
+<!-- 						id="cliente" value="#{vendasBean.vendasFilter.cliente}" converter="clienteConverter"> -->
+<!-- 							<f:selectItem itemLabel="Selecione" /> -->
+<!-- 							<f:selectItems value="#{clienteBean.listaClientes}" var="cli" -->
+<!-- 								itemLabel="#{cli.nome}" itemValue="#{cli}" /> -->
+<!-- 						</p:selectOneMenu> -->
+						
+						<p:outputLabel value="De: " styleClass="my-label" />
+						<p:calendar size="10" navigator="true"
+							value="#{vendasBean.vendasFilter.dataVendaInicio}"
+							pattern="dd/MM/yyyy" />
+						<p:outputLabel value="Até: " styleClass="my-label" />
+						<p:calendar size="10" navigator="true"
+							value="#{vendasBean.vendasFilter.dataVendaFim}"
+							pattern="dd/MM/yyyy" />
+
+						<p:commandButton value="Pesquisar"
+							style="margin-left: 5px; width: 100px !important"
+							update="table-vendas" action="#{vendasBean.list()}" />
+					</h:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-vendas" value="#{vendasBean.lazy}"
+					var="entity" paginator="true" style="margin-top: 15px"
+					paginatorAlwaysVisible="false" rows="20" lazy="true"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					paginatorPosition="bottom">
+
+					<p:column headerText="Data Venda" style="width: 90px"
+						styleClass="Center">
+						<p:outputLabel value="#{entity.dataVenda}" />
+					</p:column>
+
+					<p:column headerText="Sequencia" styleClass="Center" width="70">
+						<p:outputLabel value="#{entity.sequencia}" />
+					</p:column>
+
+					<p:column headerText="Vendedor">
+						<p:outputLabel value="#{entity.vendedor.nome}" />
+					</p:column>
+
+					<p:column headerText="Dinheiro" styleClass="Center" width="70">
+						<p:outputLabel value="#{entity.dinheiro}">
+						<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+					
+					<p:column headerText="C. Credito" styleClass="Center" width="70">
+						<p:outputLabel value="#{entity.cartoesCredito}">
+						<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+					
+					<p:column headerText="C. Debito" styleClass="Center" width="70">
+						<p:outputLabel value="#{entity.cartoesDebito}" >
+						<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+						
+					</p:column>
+
+					
+					<p:column headerText="Valor Venda" styleClass="Center">
+						<p:outputLabel value="#{entity.valorVenda}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="TOTAL" styleClass="Center">
+						<p:outputLabel value="#{entity.totalVenda}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Efetivada" styleClass="Center" width="70">
+						<h:panelGroup rendered="#{entity.efetivadaFinanceiro == 0}">
+							<i class="material-icons Red" title="Não">remove_circle</i>
+						</h:panelGroup>
+
+						<h:panelGroup rendered="#{entity.efetivadaFinanceiro == 1}">
+							<i class="material-icons Green" title="Sim">check_circle</i>
+						</h:panelGroup>
+					</p:column>
+				</p:dataTable>
+				<br />
+				<p:panel header="Totais" id="painel"
+					rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR'}">
+					<h:panelGrid columns="2">
+						<p:outputLabel value="C.Débito:" />
+						<p:outputLabel value="#{VendasBean.vendasTotais.cartoesDebito}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+
+						<p:outputLabel value="C.Crédito:" />
+						<p:outputLabel value="#{VendasBean.vendasTotais.cartoesCredito}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+
+						<p:outputLabel value="Dinheiro:" />
+						<p:outputLabel value="#{VendasBean.vendasTotais.dinheiro}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+
+						<p:outputLabel value="TOTAL:" />
+						<p:outputLabel value="#{VendasBean.vendasTotais.total}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</h:panelGrid>
+				</p:panel>
+				
+				
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

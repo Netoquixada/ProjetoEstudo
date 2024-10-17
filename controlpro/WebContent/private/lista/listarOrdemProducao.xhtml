@@ -1,0 +1,834 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="producao.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>Lista de Ordens de Produção</h1>
+				<h3>Listagem de ordens de produção cadastradas no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:link id="cadastrar" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/cadastro/cadastrarOrdemProducao.xhtml">
+						<i class="material-icons md-32">add_to_photos</i>
+						<br />
+					</p:link>
+					<p:tooltip for="cadastrar" position="top"
+						value="Cadastrar Ordem de Produção" />
+
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{ordemProducaoBean.ordemProducao}" />
+			<t:saveState value="#{ordemProducaoBean.ordemProducaos}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel style="margin-top: 15px">
+					<h:panelGrid columns="5">
+						<h:panelGroup>
+							<p:outputLabel value="Protocolo: " styleClass="my-label" />
+							<br />
+							<p:inputText
+								value="#{ordemProducaoBean.ordemProducaoFilter.protocolo}"
+								size="10" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Tipo de Serviço: " styleClass="my-label" />
+							<br />
+							<p:selectOneMenu
+								value="#{ordemProducaoBean.ordemProducaoFilter.tipoCostura}">
+								<f:selectItem itemLabel="-- Selecione --" />
+								<f:selectItems value="#{ordemProducaoBean.tiposCostura}"
+									var="tip" itemLabel="#{tip.descricao}" itemValue="#{tip}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Situação: " styleClass="my-label" />
+							<br />
+							<p:selectOneMenu
+								value="#{ordemProducaoBean.ordemProducaoFilter.situacao}">
+								<f:selectItem itemLabel="-- Selecione --" />
+								<f:selectItems value="#{ordemProducaoBean.situacoes}" var="sit"
+									itemLabel="#{sit.descricao}" itemValue="#{sit}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Facção: " styleClass="my-label"
+								style="vertical-align: text-top;" for="faccao" />
+							<br />
+							<p:autoComplete
+								value="#{ordemProducaoBean.ordemProducaoFilter.faccao}"
+								autocomplete="true" id="faccao"
+								completeMethod="#{faccaoBean.getFaccaoAutoComplete}"
+								forceSelection="true" minQueryLength="1" maxResults="30"
+								dropdown="true"
+								converterMessage="Não foi possível selecionar a facção(Erro ao converter o objeto)"
+								converter="genericConverter" var="faccao"
+								itemLabel="#{faccao.nome}" itemValue="#{faccao}"
+								placeholder="Pesquise pelo nome da facção">
+							</p:autoComplete>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Coleção: " styleClass="my-label"
+								style="vertical-align: text-top;" for="colecao" />
+							<br />
+							<p:selectOneMenu converter="genericConverter"
+								value="#{ordemProducaoBean.ordemProducaoFilter.colecao}"
+								id="colecao">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{colecaoBean.colecaos}" var="c"
+									itemLabel="#{c.nome}" itemValue="#{c}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="De: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{ordemProducaoBean.ordemProducaoFilter.dataCadastroInicio}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Até: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{ordemProducaoBean.ordemProducaoFilter.dataCadastroFim}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<h:panelGroup
+							rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR'}">
+							<p:outputLabel value="Ocorrencia finalizada? "
+								styleClass="my-label" />
+							<br />
+							<p:selectOneMenu
+								value="#{ordemProducaoBean.ordemProducaoFilter.statusOcorrencia}">
+								<f:selectItem itemLabel="Todos" itemValue="0" />
+								<f:selectItem itemLabel="Sim" itemValue="2" />
+								<f:selectItem itemLabel="Não" itemValue="1" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup>
+							<br />
+							<p:commandButton icon="fa fa-search" id="pesquisar"
+								style="margin-left: 5px;" update="table-producao"
+								action="#{ordemProducaoBean.list()}" value="Pesquisar" />
+							<p:tooltip for="pesquisar" value="Pesquisar" position="top" />
+							<p:commandButton id="report" value="Gerar PDF"
+								actionListener="#{ordemProducaoBean.gerarPDF}"
+								icon="fa fa-download" onclick="this.form.target='_blank'"
+								ajax="false">
+							</p:commandButton>
+							<p:tooltip for="report" value="Gerar PDF" position="top" />
+						</h:panelGroup>
+					</h:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-producao"
+					value="#{ordemProducaoBean.ordemProducaos}" var="entity"
+					paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10"
+					lazy="true">
+
+					<p:column headerText="Ocorência" styleClass="Center"
+						style="width: 60px">
+
+						<p:commandLink id="lnkOcorrencia" rendered="#{entity.status}"
+							oncomplete="PF('dados-historico').show()"
+							style="text-decoration: none"
+							update=":form-historico:dados-historico"
+							title="Historico de Ocorrências"
+							action="#{ordemProducaoBean.carregarListaItemProducao()}">
+							<p:outputLabel rendered="#{entity.statusOcorrencia == 0}">
+								<i class="material-icons GrayDark">class</i>
+							</p:outputLabel>
+							<p:outputLabel rendered="#{entity.statusOcorrencia == 2}">
+								<i class="material-icons GrayDark Green">class</i>
+							</p:outputLabel>
+							<p:outputLabel rendered="#{entity.statusOcorrencia == 1}">
+								<i class="material-icons GrayDark Red">class</i>
+							</p:outputLabel>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{ordemProducaoBean.ordemProducao}" />
+						</p:commandLink>
+						<p:tooltip for="lnkOcorrencia" value="Ocorrências" position="top" />
+					</p:column>
+
+					<p:column headerText="Protocolo" styleClass="Center"
+						style="width: 90px">
+						<p:outputLabel id="lb" value="#{entity.protocolo}"
+							styleClass="label-vermelho"
+							rendered="#{ordemProducaoBean.isAtrasado(entity)}" />
+						<p:tooltip value="Atrasada" for="lb" position="top" />
+						<p:outputLabel value="#{entity.protocolo}"
+							rendered="#{ordemProducaoBean.isAtrasado(entity) == false}" />
+					</p:column>
+
+					<p:column headerText="Situação" styleClass="Center"
+						style="width: 100px">
+						<p:outputLabel value="#{entity.situacao}"
+							styleClass="negrito Green"
+							rendered="#{entity.situacao eq 'FINALIZADA'}" />
+						<p:outputLabel value="#{entity.situacao}" styleClass="negrito Red"
+							rendered="#{entity.situacao eq 'CANCELADA'}" />
+						<p:outputLabel value="#{entity.situacao}"
+							styleClass="negrito Blue"
+							rendered="#{entity.situacao eq 'ANDAMENTO'}" />
+					</p:column>
+
+					<p:column headerText="Tipo de Serviço" styleClass="Center"
+						width="90">
+						<p:outputLabel value="#{entity.tipoCostura}" />
+					</p:column>
+
+					<p:column headerText="Facção" styleClass="Center">
+						<p:outputLabel value="#{entity.faccao.nome}" />
+					</p:column>
+
+					<p:column headerText="Coleção" styleClass="Center">
+						<p:outputLabel value="#{entity.colecao.nome}" />
+					</p:column>
+
+					<p:column headerText="Cadastro" styleClass="Center" width="75">
+						<p:outputLabel value="#{entity.dataCadastro}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Prév. de término" width="75">
+						<p:outputLabel value="#{entity.previsaoTermino}" />
+					</p:column>
+
+					<p:column headerText="R$ Ordem" styleClass="Center" width="85">
+						<p:outputLabel
+							value="#{ordemProducaoBean.getValorTotalOrdem(entity)}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Opções" styleClass="Center" width="110">
+						<p:menuButton value="Selecione">
+							<p:menuitem value="Aquisição de Saída" icon="fa fa-plus"
+								rendered="#{entity.status}"
+								oncomplete="PF('dados-aquisicao').show()"
+								style="text-decoration: none" update=":form:dados-aquisicao"
+								title="Aquisição de Saída"
+								action="#{ordemProducaoBean.carregarListaItemProducao()}">
+								<i class="material-icons GrayDark">chrome_reader_mode</i>
+								<f:setPropertyActionListener value="#{entity}"
+									target="#{ordemProducaoBean.ordemProducao}" />
+							</p:menuitem>
+							<p:menuitem value="Receber produto" icon="fa fa-archive"
+								rendered="#{entity.status}" oncomplete="PF('alter').show()"
+								style="text-decoration: none" update=":frm:alter"
+								title="Receber produto"
+								action="#{ordemProducaoBean.carregarListaItemProducao()}">
+								<i class="material-icons GrayDark">input</i>
+								<f:setPropertyActionListener value="#{entity}"
+									target="#{ordemProducaoBean.ordemProducao}" />
+							</p:menuitem>
+							<p:menuitem value="Reenviar produto" icon="fa fa-archive"
+								rendered="#{entity.status}"
+								oncomplete="PF('reenviar-item').show()"
+								style="text-decoration: none" update=":frm:reenviar-item"
+								title="Reenviar produto"
+								action="#{ordemProducaoBean.carregarListaItemProducao()}">
+								<i class="material-icons GrayDark">input</i>
+								<f:setPropertyActionListener value="#{entity}"
+									target="#{ordemProducaoBean.ordemProducao}" />
+							</p:menuitem>
+							<p:menuitem value="Detalhes" icon="fa fa-clipboard"
+								oncomplete="PF('dados').show()" style="text-decoration: none"
+								update=":frm:dados" title="Detalhes"
+								action="#{ordemProducaoBean.carregarListaItemProducao()}">
+								<i class="material-icons GrayDark">assignment</i>
+								<f:setPropertyActionListener value="#{entity}"
+									target="#{ordemProducaoBean.ordemProducao}" />
+							</p:menuitem>
+							<p:menuitem value="Editar" icon="fa fa-edit"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' or escopoSessaoBean.usuarioLogado.perfilUser eq 'PRODUCAO'}"
+								outcome="#{ordemProducaoBean.prepareUpdate()}"
+								style="text-decoration: none">
+								<i class="material-icons GrayDark">mode_edit</i>
+								<f:param name="id" value="#{entity.id}" />
+							</p:menuitem>
+							<p:menuitem value="Download" icon="fa fa-fw fa-download"
+								update=":frm:downloads" oncomplete="PF('downloads').show()"
+								title="Download" style="text-decoration: none">
+								<i class="material-icons GrayDark">get_app</i>
+								<f:setPropertyActionListener value="#{entity}"
+									target="#{ordemProducaoBean.ordemProducao}" />
+							</p:menuitem>
+						</p:menuButton>
+					</p:column>
+				</p:dataTable>
+
+				<p:dialog id="reenviar-item" modal="true" widgetVar="reenviar-item"
+					resizable="false"
+					header="#{ordemProducaoBean.ordemProducao.protocolo} - Reenviar produto"
+					width="96%">
+					<div class="scroll-dialog">
+						<br />
+						<p:messages id="msg-update-reenviar" closable="true"
+							showDetail="true" showSummary="true" />
+						<p:dataTable id="tableItemProducaoReenviar" var="item"
+							value="#{ordemProducaoBean.itemProducaoList}" editable="true"
+							emptyMessage="Nenhuma atividade foi adicionada">
+
+							<p:ajax event="rowEdit"
+								listener="#{ordemProducaoBean.onRowEditReenviar}"
+								update=":frm:msg-update-reenviar" />
+
+<!-- 														<p:column headerText="Teste" style="color: #000000 !important" width="70"> -->
+<!-- 															<h:panelGroup rendered="#{!item.itemReenviado}"> -->
+<!-- 																<p:outputLabel value="Enviado" styleClass="my-label-blue" /> -->
+<!-- 															</h:panelGroup> -->
+<!-- 															<h:panelGroup rendered="#{item.itemReenviado}"> -->
+<!-- 																<p:outputLabel value="Reenviado" styleClass="my-label-orange" /> -->
+<!-- 															</h:panelGroup> -->
+<!-- 														</p:column> -->
+
+							<p:column headerText="Produto" style="color: #000000 !important">
+								<p:outputLabel value="#{item.produto.nome}" />
+							</p:column>
+
+							<p:column headerText="Ref." width="50"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{item.produto.id}" />
+							</p:column>
+
+							<p:column headerText="R$ Unitário" width="75"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{item.valor}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+
+							<p:column headerText="R$ Total" width="75"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{item.valorTotal}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+
+							<p:column headerText="Qtd." width="50" styleClass="Center"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{item.quantidade}" />
+							</p:column>
+							<p:column headerText="Prontas" width="50" styleClass="Center"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{item.prontas}" />
+							</p:column>
+							<p:column headerText="Defeito" width="50" styleClass="Center"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{item.defeito}" />
+							</p:column>
+							<p:column headerText="Falta" width="50" styleClass="Center"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{item.faltaAux}" />
+							</p:column>
+							<p:column headerText="Renviar" style="color: #000000 !important"
+								styleClass="Center" width="50">
+								<p:cellEditor>
+									<f:facet name="output">
+										<p:outputLabel value="#{item.reenviado}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{item.qtdEnviarAux}" style="width:50%"
+											required="true" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<p:column headerText="Justificativa"
+								style="color: #000000 !important" styleClass="Center"
+								width="270">
+								<p:cellEditor>
+									<f:facet name="output">
+										<p:outputLabel value="-" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputTextarea value="#{item.justificativaAux}" rows="4"
+											cols="30" required="true"
+											requiredMessage="Informa a justificativa" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+							<p:column headerText="Reenviar item" width="90"
+								styleClass="Center"
+								style="width:32px; color: #000000 !important">
+								<p:rowEditor />
+							</p:column>
+						</p:dataTable>
+					</div>
+				</p:dialog>
+
+
+				<p:dialog id="downloads" modal="true" widgetVar="downloads"
+					resizable="false" header="Selecione a opção">
+					<h:panelGrid columns="3" cellpadding="20">
+						<p:commandButton value="Completo" ajax="false"
+							oncomplete="PF('downloads').hide()"
+							action="#{ordemProducaoBean.gerarPDFOrdemProducao()}" />
+						<p:commandButton value="Resumido" ajax="false"
+							oncomplete="PF('downloads').hide()"
+							action="#{ordemProducaoBean.gerarPDFOrdemProducaoResumido()}" />
+						<p:commandButton value="Remessa/Retorno" ajax="false"
+							oncomplete="PF('downloads').hide()"
+							action="#{ordemProducaoBean.gerarPDFOrdemProducaoRemessaRetorno()}" />
+					</h:panelGrid>
+				</p:dialog>
+
+				<p:dialog header="Detalhes da Ordem de Produção" modal="true"
+					closable="true" width="95%" closeOnEscape="true" draggable="false"
+					id="dados" widgetVar="dados" resizable="false">
+
+					<div class="scroll-dialog">
+						<h:panelGrid columns="2">
+							<p:outputLabel value="Protocolo: " styleClass="my-label" />
+							<p:outputLabel
+								value="#{ordemProducaoBean.ordemProducao.protocolo}" />
+							<p:outputLabel value="Loja: " styleClass="my-label" />
+							<p:outputLabel
+								value="#{ordemProducaoBean.ordemProducao.loja.descricao}" />
+							<p:outputLabel value="Situação: " styleClass="my-label" />
+							<p:outputLabel
+								value="#{ordemProducaoBean.ordemProducao.situacao}" />
+							<p:outputLabel value="Data: " styleClass="my-label" />
+							<p:outputLabel
+								value="#{ordemProducaoBean.ordemProducao.dataCadastro}">
+								<f:convertDateTime pattern="dd/MM/yyyy" />
+							</p:outputLabel>
+							<p:outputLabel value="Protocolo da Ordem de Corte: "
+								styleClass="my-label" />
+							<p:outputLabel
+								value="#{ordemProducaoBean.ordemProducao.protocoloCorte}" styleClass="my-label-blue" />
+						</h:panelGrid>
+						<ui:include src="/private/fragmentos/historico-producao.xhtml" />
+						<br />
+						<!-- 						<ui:include src="/private/fragmentos/lista-item-producao.xhtml" /> -->
+						<!-- 						<br /> -->
+					</div>
+				</p:dialog>
+				<p:dialog header="Recebimento de produto - Ordem de produção"
+					modal="true" closable="true" width="90%" closeOnEscape="true"
+					draggable="false" id="alter" widgetVar="alter" resizable="false">
+
+					<div class="scroll-dialog">
+						<br />
+						<p:messages id="msg-update" closable="true" showDetail="true"
+							showSummary="true" />
+
+						<DIV align="right">
+							<p:commandButton id="infop" type="button" icon="fa fa-info"
+								value="Informações" styleClass="btn-blue" />
+							<p:overlayPanel showCloseIcon="true" showEffect="fade"
+								id="imagePanelp" for="infop" hideEffect="explode" modal="true"
+								style="width: 40%;">
+
+								<h:panelGrid cellpadding="15">
+									<p:outputLabel
+										value="CERTIFIQUE QUE AS IFNORMAÇÕES ESTÃO CORRETA QUANDO SE REFERE AS QUANTIDADES RECEBIDAS! "
+										styleClass="Red my-label" />
+								</h:panelGrid>
+							</p:overlayPanel>
+						</DIV>
+						<h:panelGroup id="group">
+							<p:outputLabel value="Situação: " styleClass="my-label" />
+							<p:outputLabel
+								value="#{ordemProducaoBean.ordemProducao.situacao}"
+								styleClass="negrito Green"
+								rendered="#{ordemProducaoBean.ordemProducao.situacao eq 'FINALIZADA'}" />
+							<p:outputLabel
+								value="#{ordemProducaoBean.ordemProducao.situacao}"
+								styleClass="negrito Red"
+								rendered="#{ordemProducaoBean.ordemProducao.situacao eq 'CANCELADA'}" />
+							<p:outputLabel
+								value="#{ordemProducaoBean.ordemProducao.situacao}"
+								styleClass="negrito Blue"
+								rendered="#{ordemProducaoBean.ordemProducao.situacao eq 'ANDAMENTO'}" />
+							<br />
+							<p:commandButton value="Finalizar Ordem de Produção"
+								id="btn-fila"
+								rendered="#{ordemProducaoBean.ordemProducao.situacao ne 'FINALIZADA'}"
+								action="#{ordemProducaoBean.finalizarOrdem}" ajax="false" />
+						</h:panelGroup>
+
+						<br /> <br />
+						<p:tabView>
+							<p:tab title="Enviado">
+								<p:dataTable id="tableItemProducaoAlter" var="item"
+									value="#{ordemProducaoBean.itemProducaoList}" editable="true"
+									emptyMessage="Nenhuma atividade foi adicionada">
+
+									<p:ajax event="rowEdit"
+										listener="#{ordemProducaoBean.receberItemEnviado}"
+										update=":frm:group :frm:btn-fila tableItemProducaoAlter :frm:msg-update" />
+
+									<f:facet name="header">
+										<p:outputLabel value="Lista de itens na ordem de produção" />
+									</f:facet>
+
+									<p:column headerText="Produto"
+										style="color: #000000 !important">
+										<p:outputLabel value="#{item.produto.nome}" />
+									</p:column>
+									<p:column headerText="Referência"
+										style="color: #000000 !important">
+										<p:outputLabel value="#{item.produto.id}" />
+									</p:column>
+									<p:column headerText="Quantidade" styleClass="Center"
+										style="color: #000000 !important" width="80">
+										<p:outputLabel value="#{item.quantidade}" />
+									</p:column>
+									<p:column headerText="R$ Unitário" width="75"
+										style="color: #000000 !important">
+										<p:outputLabel value="#{item.valor}">
+											<f:convertNumber minFractionDigits="2" type="currency"
+												maxFractionDigits="2" />
+										</p:outputLabel>
+									</p:column>
+									<p:column headerText="Recebidas"
+										style="color: #000000 !important" styleClass="Center"
+										width="90">
+										<p:cellEditor>
+											<f:facet name="output">
+												<h:outputText value="#{item.prontas}"
+													styleClass="Green tam-14 negrito" />
+											</f:facet>
+											<f:facet name="input">
+								#{item.prontas}	+
+										<p:inputText value="#{item.prontasAux}" style="width:50%" />
+											</f:facet>
+										</p:cellEditor>
+									</p:column>
+									<p:column headerText="Defeito"
+										style="color: #000000 !important" styleClass="Center"
+										width="90">
+										<p:cellEditor>
+											<f:facet name="output">
+												<h:outputText value="#{item.defeito}"
+													styleClass="Red tam-14 negrito" />
+											</f:facet>
+											<f:facet name="input">
+								#{item.defeito}	+
+										<p:inputText value="#{item.defeitoAux}" style="width:50%" />
+											</f:facet>
+										</p:cellEditor>
+									</p:column>
+									<p:column headerText="Bônus" style="color: #000000 !important"
+										styleClass="Center" width="90">
+										<p:cellEditor>
+											<f:facet name="output">
+												<p:outputLabel value="#{item.bonusAux}"
+													styleClass="Green tam-14 negrito">
+													<f:convertNumber minFractionDigits="2" type="currency"
+														maxFractionDigits="2" />
+												</p:outputLabel>
+											</f:facet>
+											<f:facet name="input">
+												<p:inputText value="#{item.bonusAux}" style="width:50%"
+													styleClass="moeda">
+													<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+														minFractionDigits="2" type="number" />
+												</p:inputText>
+											</f:facet>
+										</p:cellEditor>
+									</p:column>
+									<p:column headerText="Falta" styleClass="Center"
+										style="color: #000000 !important" width="80">
+										<p:outputLabel value="#{item.faltaAux}" />
+									</p:column>
+									<p:column headerText="Atualizar recebimento" width="90"
+										styleClass="Center"
+										rendered="#{ordemProducaoBean.ordemProducao.situacao eq 'ANDAMENTO'}"
+										style="width:32px; color: #000000 !important">
+										<p:rowEditor rendered="#{item.faltaAux ne 0}" />
+									</p:column>
+								</p:dataTable>
+							</p:tab>
+							<p:tab title="Reenviado">
+								<p:dataTable id="tableItemReenviarProducaoAlter" var="item"
+									value="#{ordemProducaoBean.itemReenviarProducaoList}"
+									editable="true" emptyMessage="Nenhuma atividade foi adicionada">
+
+									<p:ajax event="rowEdit"
+										listener="#{ordemProducaoBean.receberItemReenviado}"
+										update=":frm:group :frm:btn-fila tableItemReenviarProducaoAlter :frm:msg-update" />
+
+									<f:facet name="header">
+										<p:outputLabel
+											value="Lista de itens reenviados na ordem de produção" />
+									</f:facet>
+
+									<p:column headerText="Produto"
+										style="color: #000000 !important">
+										<p:outputLabel value="#{item.produto.nome}" />
+									</p:column>
+									<p:column headerText="Referência"
+										style="color: #000000 !important">
+										<p:outputLabel value="#{item.produto.id}" />
+									</p:column>
+									<p:column headerText="Quantidade" styleClass="Center"
+										style="color: #000000 !important" width="80">
+										<p:outputLabel value="#{item.quantidade}" />
+									</p:column>
+									<p:column headerText="Recebidas"
+										style="color: #000000 !important" styleClass="Center"
+										width="90">
+										<p:cellEditor>
+											<f:facet name="output">
+												<h:outputText value="#{item.prontas}"
+													styleClass="Green tam-14 negrito" />
+											</f:facet>
+											<f:facet name="input">
+								#{item.prontas}	+
+										<p:inputText value="#{item.prontasAux}" style="width:50%" />
+											</f:facet>
+										</p:cellEditor>
+									</p:column>
+									<p:column headerText="Defeito"
+										style="color: #000000 !important" styleClass="Center"
+										width="90">
+										<p:cellEditor>
+											<f:facet name="output">
+												<h:outputText value="#{item.defeito}"
+													styleClass="Red tam-14 negrito" />
+											</f:facet>
+											<f:facet name="input">
+								#{item.defeito}	+
+										<p:inputText value="#{item.defeitoAux}" style="width:50%" />
+											</f:facet>
+										</p:cellEditor>
+									</p:column>
+									<p:column headerText="Falta" styleClass="Center"
+										style="color: #000000 !important" width="80">
+										<p:outputLabel value="#{item.faltaAux}" />
+									</p:column>
+									<p:column headerText="Atualizar recebimento" width="90"
+										styleClass="Center"
+										rendered="#{ordemProducaoBean.ordemProducao.situacao eq 'ANDAMENTO'}"
+										style="width:32px; color: #000000 !important">
+										<p:rowEditor rendered="#{item.faltaAux ne 0}" />
+									</p:column>
+								</p:dataTable>
+							</p:tab>
+						</p:tabView>
+						<br /> <br />
+						<div align="center">
+							<p:commandButton oncomplete="PF('dados').hide()" ajax="false"
+								update=":frm:table-ordem" value="Voltar" style="width:250px;" />
+						</div>
+					</div>
+				</p:dialog>
+			</h:form>
+			<h:form id="form">
+				<p:dialog modal="true" id="dados-aquisicao" width="70%"
+					widgetVar="dados-aquisicao" resizable="false">
+
+					<f:facet name="header">
+					Aquisição de Saída - Ordem de Produção
+					</f:facet>
+
+					<!-- 					<div class="scroll-dialog"> -->
+					<div>
+						<p:messages id="msg" closable="true" showDetail="true"
+							showSummary="true" />
+
+						<h:panelGrid columns="2" style="margin-top: 20px"
+							id="grid-aquisicao" cellpadding="05px">
+
+							<h:panelGroup>
+								<p:outputLabel value="Matéria Prima:" styleClass="my-label" />
+							</h:panelGroup>
+							<p:selectOneMenu id="materia"
+								value="#{ordemProducaoBean.aquisicaoSaida.materiaPrima}"
+								required="true" requiredMessage="Materia Prima é obrigatório."
+								converter="genericConverter">
+								<f:selectItem itemLabel="-- Selecione --" />
+								<f:selectItems value="#{materiaPrimaBean.materias}" var="mat"
+									itemLabel="#{mat.nome}" itemValue="#{mat}" />
+							</p:selectOneMenu>
+
+							<h:panelGroup>
+								<p:outputLabel value="Quantidade: " styleClass="my-label" />
+							</h:panelGroup>
+							<p:inputText id="quantidade" required="true"
+								requiredMessage="true"
+								value="#{ordemProducaoBean.aquisicaoSaida.quantidade}" />
+
+						</h:panelGrid>
+						<p:separator />
+						<h:panelGrid columns="3">
+							<p:commandButton value="Adicionar"
+								update="tableAquisicao msg grid-aquisicao"
+								action="#{ordemProducaoBean.saveAquisicaoSaida()}"
+								icon="fa fa-plus"
+								rendered="#{ordemProducaoBean.itemAviamentoProducao.materiaPrima.nome == null}" />
+
+							<p:commandButton value="Cancelar" styleClass="btn-orange"
+								icon="fa fa-close" process="@this"
+								oncomplete="PF('dados-aquisicao').hide()" immediate="true" />
+
+							<p:spacer width="20" height="0" />
+						</h:panelGrid>
+
+						<br />
+
+						<p:dataTable id="tableAquisicao" var="aquisicao"
+							value="#{ordemProducaoBean.aquisicaoSaidaList}"
+							emptyMessage="Nenhuma atividade foi adicionada">
+
+							<f:facet name="header">
+								<p:outputLabel value="Lista de Aquisições de Saídas" />
+							</f:facet>
+
+							<p:column headerText="Matéria Prima" style="color: #000">
+								<p:outputLabel value="#{aquisicao.materiaPrima.nome}" />
+							</p:column>
+
+							<p:column headerText="Unidade de Medida" style="color: #000">
+								<p:outputLabel value="#{aquisicao.materiaPrima.unidadeMedida}" />
+							</p:column>
+
+							<p:column styleClass="Center" headerText="Quantidade"
+								style="color: #000">
+								<p:outputLabel styleClass="label-laranja"
+									value="#{aquisicao.quantidade}" />
+							</p:column>
+						</p:dataTable>
+					</div>
+				</p:dialog>
+			</h:form>
+			<h:form id="form-historico">
+				<p:dialog modal="true" id="dados-historico" width="70%"
+					widgetVar="dados-historico" resizable="false">
+
+					<f:facet name="header">
+					Historico de Ocorrências
+					</f:facet>
+
+					<div class="scroll-dialog">
+						<div>
+							<p:messages id="msg" closable="true" showDetail="true"
+								showSummary="true" />
+
+							<h:panelGrid columns="2" style="margin-top: 20px"
+								id="grid-historico" cellpadding="05px">
+
+								<h:panelGroup>
+									<p:outputLabel value="Data Ocorrência:" styleClass="my-label" />
+								</h:panelGroup>
+								<p:calendar
+									value="#{ordemProducaoBean.ocorrencia.dataOcorrencia}"
+									pattern="dd/MM/yyyy">
+								</p:calendar>
+
+								<h:panelGroup>
+									<p:outputLabel value="Origem ocorrência:" styleClass="my-label" />
+								</h:panelGroup>
+								<p:selectOneMenu required="true"
+									requiredMessage="Selecione o tipo de ocorrência" id="canal"
+									value="#{ordemProducaoBean.ocorrencia.origemOcorrencia}">
+									<f:selectItem itemLabel="Selecione" />
+									<f:selectItems value="#{ordemProducaoBean.origens}"
+										var="tipo" itemLabel="#{tipo.descricao}" itemValue="#{tipo}" />
+								</p:selectOneMenu>
+
+								<h:panelGroup>
+									<p:outputLabel value="Descrição: " styleClass="my-label" />
+								</h:panelGroup>
+								<p:inputTextarea cols="60" rows="4" id="descricao"
+									required="true" requiredMessage="true"
+									value="#{ordemProducaoBean.ocorrencia.descricao}" />
+
+							</h:panelGrid>
+							<p:separator />
+							<h:panelGrid columns="3">
+								<p:commandButton value="Adicionar"
+									update="tableHistorico msg grid-historico"
+									action="#{ordemProducaoBean.saveOcorrencia()}"
+									icon="fa fa-plus" />
+
+								<p:commandButton value="Cancelar" styleClass="btn-orange"
+									icon="fa fa-close" process="@this"
+									oncomplete="PF('dados-historico').hide()" immediate="true" />
+
+								<p:commandButton value="Finalizar Ocorrência" immediate="true"
+									update="tableHistorico msg grid-historico"
+									oncomplete="PF('dados-historico').hide()"
+									rendered="#{ordemProducaoBean.ordemProducao.statusOcorrencia != 2 and 
+									escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR'}"
+									action="#{ordemProducaoBean.finalizarOcorrencia()}"
+									icon="fa fa-plus" />
+
+								<p:spacer width="20" height="0" />
+							</h:panelGrid>
+
+							<br />
+
+							<p:dataTable id="tableHistorico" var="historico"
+								value="#{ordemProducaoBean.ocorrenciaList}"
+								emptyMessage="Nenhuma atividade foi adicionada">
+
+								<f:facet name="header">
+									<p:outputLabel value="Lista de historico de Ocorrências" />
+								</f:facet>
+
+								<p:column headerText="Protocolo" style="color: #000">
+									<p:outputLabel value="#{historico.protocolo}" />
+								</p:column>
+
+								<p:column headerText="Origem" style="color: #000">
+									<p:outputLabel value="#{historico.origemOcorrencia.descricao}" />
+								</p:column>
+
+								<p:column headerText="Data de Cadastro" style="color: #000">
+									<p:outputLabel value="#{historico.dataCadastro}">
+										<f:convertDateTime pattern="dd/MM/yyyy" />
+									</p:outputLabel>
+								</p:column>
+
+								<p:column headerText="Responsável" style="color: #000">
+									<p:outputLabel value="#{historico.usuario.nome}" />
+								</p:column>
+
+								<p:column headerText="Data da Ocorrência" style="color: #000">
+									<p:outputLabel value="#{historico.dataOcorrencia}">
+										<f:convertDateTime pattern="dd/MM/yyyy" />
+									</p:outputLabel>
+								</p:column>
+
+								<p:column headerText="Descrição" style="color: #000">
+									<p:outputLabel value="#{historico.descricao}" />
+								</p:column>
+
+							</p:dataTable>
+						</div>
+					</div>
+				</p:dialog>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

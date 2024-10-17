@@ -1,0 +1,320 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="item-producao.png"
+						width="60px" style="float: left" />
+				</div>
+
+				<h1>Produção Analistica</h1>
+				<h3></h3>
+
+				<div class="links-funcionais">
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel header="Filtros" style="margin-top: 15px">
+
+					<p:panelGrid columns="5" columnClasses="ui-md-2,ui-md-4,ui-md-2"
+						layout="grid" styleClass="ui-panelgrid-blank">
+
+						<h:panelGroup>
+							<p:outputLabel value="Protocolo: " styleClass="my-label" />
+							<br />
+							<p:inputText value="#{producaoAnalisticaBean.protocoloFilter}" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Facção: " styleClass="my-label" />
+							<br />
+							<p:autoComplete value="#{producaoAnalisticaBean.faccaoFilter}"
+								autocomplete="true" size="36" id="faccao"
+								completeMethod="#{faccaoBean.getFaccaoAutoComplete}"
+								forceSelection="true" minQueryLength="1" maxResults="30"
+								dropdown="true"
+								converterMessage="Não foi possível selecionar a facção(Erro ao converter o objeto)"
+								converter="genericConverter" var="faccao"
+								itemLabel="#{faccao.nome}" itemValue="#{faccao}"
+								placeholder="Pesquise pelo nome da facção">
+							</p:autoComplete>
+						</h:panelGroup>
+						<h:panelGroup>
+							<br />
+							<p:commandButton value="Pesquisar" icon="fa fa-search"
+								style="margin-left: 5px; width: 100px !important"
+								update=":frm:tab:table-itens :frm:tab:table-historico :frm:tab:table-pagamentos"
+								action="#{producaoAnalisticaBean.list}" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<br />
+							<p:commandButton id="report"
+								actionListener="#{producaoAnalisticaBean.gerarPDFProducaoAnalistica}"
+								icon="fa fa-download" value="Gerar PDF"
+								onclick="this.form.target='_blank'" ajax="false">
+							</p:commandButton>
+						</h:panelGroup>
+					</p:panelGrid>
+				</p:panel>
+
+				<p:spacer />
+
+				<p:tabView id="tab">
+					<p:tab title="Itens Enviados">
+						<p:dataTable id="table-itens"
+							value="#{producaoAnalisticaBean.itemProducaoList}" var="item"
+							paginator="true" style="margin-top: 15px"
+							emptyMessage="Nenhum registro encontrado!"
+							paginatorPosition="bottom" paginatorAlwaysVisible="false"
+							rows="10">
+
+							<p:column headerText="Protocolo" width="90"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{item.ordemProducao.protocolo}" />
+							</p:column>
+
+							<p:column headerText="Data envio"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{item.ordemProducao.dataCadastro}">
+									<f:convertDateTime pattern="dd/MM/yyyy - HH:mm" />
+								</p:outputLabel>
+							</p:column>
+
+							<p:column headerText="Facção" style="color: #000000 !important">
+								<p:outputLabel value="#{item.ordemProducao.faccao.nome}" />
+							</p:column>
+
+							<p:column headerText="Referência" width="90" styleClass="Center"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{item.produto.id}" />
+							</p:column>
+							<p:column headerText="Quantidade enviada" width="90"
+								styleClass="Center" style="color: #000000 !important">
+								<p:outputLabel value="#{item.quantidade}" />
+							</p:column>
+							<p:column headerText="Valor Unitária" styleClass="Center"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{item.valor}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Valor Total" styleClass="Center"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{item.valorTotal}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+
+							<p:columnGroup type="footer">
+								<p:row>
+									<p:column colspan="4" style="text-align:right"
+										footerText="Total:" styleClass="negrito" />
+									<p:column>
+										<f:facet name="footer">
+											<p:outputLabel styleClass="negrito"
+												value="#{producaoAnalisticaBean.qtdEnviado}" />
+										</f:facet>
+									</p:column>
+									<p:column colspan="1" />
+									<p:column>
+										<f:facet name="footer">
+											<p:outputLabel styleClass="negrito"
+												value="#{producaoAnalisticaBean.totalItens}">
+												<f:convertNumber minFractionDigits="2" type="currency"
+													maxFractionDigits="2" />
+											</p:outputLabel>
+										</f:facet>
+									</p:column>
+								</p:row>
+							</p:columnGroup>
+						</p:dataTable>
+
+					</p:tab>
+					<p:tab title="Recebimentos">
+						<p:dataTable id="table-historico" var="historico"
+							style="margin-top: 15px"
+							value="#{producaoAnalisticaBean.historicoProducaoList}"
+							emptyMessage="Nenhuma produto recebido até o momento">
+
+							<p:column headerText="Data recebimento"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{historico.dataRecebimento}">
+									<f:convertDateTime pattern="dd/MM/yyyy - HH:mm" />
+								</p:outputLabel>
+							</p:column>
+
+							<p:column headerText="Referência" styleClass="Center"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{historico.produto.id}" />
+							</p:column>
+
+							<p:column headerText="Quantidade recebida" styleClass="Center"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{historico.qtdRecebido}" />
+							</p:column>
+
+							<p:column headerText="Quantidade defeito" styleClass="Center"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{historico.qtdDefeito}" />
+							</p:column>
+
+							<p:column headerText="Valor Bônus" styleClass="Center"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{historico.valorBonus}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+
+							<p:columnGroup type="footer">
+								<p:row>
+									<p:column colspan="2" style="text-align:right"
+										footerText="Total:" styleClass="negrito" />
+									<p:column>
+										<f:facet name="footer">
+											<p:outputLabel styleClass="negrito"
+												value="#{producaoAnalisticaBean.qtdRecebida}" />
+										</f:facet>
+									</p:column>
+									<p:column>
+										<f:facet name="footer">
+											<p:outputLabel styleClass="negrito"
+												value="#{producaoAnalisticaBean.qtdDefeito}" />
+										</f:facet>
+									</p:column>
+									<p:column colspan="1" />
+								</p:row>
+							</p:columnGroup>
+						</p:dataTable>
+
+					</p:tab>
+					<p:tab title="Pagamentos">
+						<p:dataTable id="table-pagamentos" var="entity" paginator="true"
+							style="margin-top: 15px"
+							value="#{producaoAnalisticaBean.pagamentosProducaoList}"
+							paginatorAlwaysVisible="false" rows="10" lazy="true"
+							paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+							paginatorPosition="bottom">
+
+							<!-- 					<p:column headerText="Protocolo da Ordem" -->
+							<!-- 						style="color: #000000 !important" styleClass="Center"> -->
+							<!-- 						<p:outputLabel -->
+							<!-- 							value="#{entity.contaPagar.itemProducao.ordemProducao.protocolo}" /> -->
+							<!-- 					</p:column> -->
+
+							<!-- 					<p:column headerText="Facção" style="color: #000000 !important" -->
+							<!-- 						styleClass="Center"> -->
+							<!-- 						<p:outputLabel value="#{entity.faccao.nome}" /> -->
+							<!-- 					</p:column> -->
+							<p:column headerText="Data pagamento"
+								style="color: #000000 !important" styleClass="Center">
+								<p:outputLabel value="#{entity.dataPagamento}">
+									<f:convertDateTime pattern="dd/MM/yyyy" />
+								</p:outputLabel>
+							</p:column>
+							<p:column styleClass="Center" headerText="Conta"
+								style="color: #000000 !important">
+								<p:outputLabel
+									value="#{entity.contaPagar.valor - entity.valorJuros}"
+									styleClass="negrito">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Bonus" style="color: #000000 !important"
+								styleClass="Center">
+								<p:outputLabel value="#{entity.valorJuros}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Desconto" style="color: #000000 !important"
+								styleClass="Center">
+								<p:outputLabel value="#{entity.valorDesconto}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+							<p:column styleClass="Center" headerText="Conta Total"
+								style="color: #000000 !important">
+								<p:outputLabel
+									value="#{entity.contaPagar.valor - entity.valorDesconto}"
+									styleClass="negrito">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+							<p:column styleClass="Center" headerText="Valor Pago"
+								style="color: #000000 !important">
+								<p:outputLabel value="#{entity.valorPago}" styleClass="negrito">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Forma" style="color: #000000 !important"
+								styleClass="Center">
+								<p:outputLabel value="#{entity.opcaoPagamento.descricao}" />
+							</p:column>
+
+							<p:columnGroup type="footer">
+								<p:row>
+									<p:column colspan="2" style="text-align:right"
+										footerText="Total:" styleClass="negrito" />
+
+									<p:column>
+										<f:facet name="footer">
+											<p:outputLabel styleClass="negrito"
+												value="#{producaoAnalisticaBean.totalBonus}">
+												<f:convertNumber minFractionDigits="2" type="currency"
+													maxFractionDigits="2" />
+											</p:outputLabel>
+										</f:facet>
+									</p:column>
+									<p:column>
+										<f:facet name="footer">
+											<p:outputLabel styleClass="negrito"
+												value="#{producaoAnalisticaBean.totalDesconto}">
+												<f:convertNumber minFractionDigits="2" type="currency"
+													maxFractionDigits="2" />
+											</p:outputLabel>
+										</f:facet>
+									</p:column>
+									<p:column colspan="1" />	
+									<p:column>
+										<f:facet name="footer">
+											<p:outputLabel styleClass="negrito"
+												value="#{producaoAnalisticaBean.totalPago}">
+												<f:convertNumber minFractionDigits="2" type="currency"
+													maxFractionDigits="2" />
+											</p:outputLabel>
+										</f:facet>
+									</p:column>
+									<p:column colspan="1" />
+								</p:row>
+							</p:columnGroup>
+						</p:dataTable>
+					</p:tab>
+				</p:tabView>
+
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

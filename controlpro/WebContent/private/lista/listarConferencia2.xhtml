@@ -1,0 +1,297 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="conferencia.png"
+						width="60px" style="float: left" />
+				</div>
+
+				<h1 styleClass="header1">Lista de Conferências</h1>
+				<h3 styleClass="header1">Listagem de conferências cadastradas no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:link id="cadastrar" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/cadastro/cadastrarConferencia.xhtml">
+						<i class="material-icons md-32">add_to_photos</i>
+						<br />
+					</p:link>
+					<p:tooltip for="cadastrar" position="top" value="Cadastrar facção" />
+
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{conferenciaBean.conferencia}" />
+			<t:saveState value="#{conferenciaBean.lazy}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel style="margin-top: 15px">
+					<!-- 					<div class="lupa"> -->
+					<!-- 						<p:graphicImage library="imagens" name="SearchLupa.png" /> -->
+					<!-- 					</div> -->
+
+					<h:panelGrid columns="10">
+						<h:panelGroup>
+							<p:outputLabel value="Loja" styleClass="my-label" />
+							<br />
+							<p:selectOneMenu
+								value="#{conferenciaBean.conferenciaFilter.loja}">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{conferenciaBean.lojas}" var="loja"
+									itemLabel="#{loja.descricao}" itemValue="#{loja}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Situação" styleClass="my-label" />
+							<br />
+							<p:selectOneMenu
+								value="#{conferenciaBean.conferenciaFilter.statusConferencia}">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{conferenciaBean.statusConferencias}"
+									var="sit" itemLabel="#{sit.descricao}" itemValue="#{sit}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Vendedor: " styleClass="my-label"
+								style="vertical-align: text-top;" for="ved" />
+							<br />
+							<p:autoComplete
+								value="#{conferenciaBean.conferenciaFilter.vendedor}"
+								autocomplete="true" size="25" id="ved"
+								completeMethod="#{funcionarioBean.getFuncionarioAutoComplete}"
+								forceSelection="true" minQueryLength="1" maxResults="30"
+								dropdown="true"
+								converterMessage="Não foi possível selecionar o funcionário (Erro ao converter o objeto)"
+								converter="funcionarioConverter" var="func"
+								itemLabel="#{func.nome}" itemValue="#{func}"
+								placeholder="Pesquise pelo nome">
+							</p:autoComplete>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="De: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{conferenciaBean.conferenciaFilter.dataInicio}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Até: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{conferenciaBean.conferenciaFilter.dataFim}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<h:panelGroup>
+						<p:outputLabel value="" styleClass="my-label" />
+							<br />
+						<p:commandButton value="Pesquisar"
+							style="margin-left: 5px; width: 100px !important"
+							update="table-conferencia" action="#{conferenciaBean.list()}" />
+							</h:panelGroup>
+					</h:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-conferencia" value="#{conferenciaBean.lazy}"
+					var="entity" paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10"
+					lazy="true">
+
+					<!-- 					<p:column headerText="Status" style="width: 50px" -->
+					<!-- 						styleClass="Center"> -->
+					<!-- 						<p:commandLink id="lnkAlterarStatus" -->
+					<!-- 							action="#{conferenciaBean.updateStatus()}" -->
+					<!-- 							update="table-conferencia" -->
+					<!-- 							title="#{entity.status ? 'Desativar' : 'Ativar'}"> -->
+
+					<!-- 							<h:panelGroup rendered="#{!entity.status}"> -->
+					<!-- 								<i class="material-icons Red">remove_circle</i> -->
+					<!-- 							</h:panelGroup> -->
+
+					<!-- 							<h:panelGroup rendered="#{entity.status}"> -->
+					<!-- 								<i class="material-icons Green">check_circle</i> -->
+					<!-- 							</h:panelGroup> -->
+
+					<!-- 							<f:setPropertyActionListener -->
+					<!-- 								target="#{conferenciaBean.conferencia}" value="#{entity}" /> -->
+					<!-- 						</p:commandLink> -->
+					<!-- 					</p:column> -->
+
+					<p:column headerText="Situação" style="width: 90px"
+						styleClass="Center">
+						<p:outputLabel value="#{entity.statusConferencia.descricao}"
+							styleClass="negrito Green"
+							rendered="#{entity.statusConferencia eq 'CONFIRMADO'}" />
+						<p:outputLabel value="#{entity.statusConferencia.descricao}"
+							styleClass="negrito Red"
+							rendered="#{entity.statusConferencia eq 'CANCELADO'}" />
+						<p:outputLabel value="#{entity.statusConferencia.descricao}"
+							styleClass="negrito Blue"
+							rendered="#{entity.statusConferencia eq 'PENDENTE'}" />
+					</p:column>
+
+					<p:column headerText="Data Cadastro" style="width: 90px"
+						styleClass="Center">
+						<p:outputLabel value="#{entity.dataCadastro}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Loja" style="width: 90px"
+						styleClass="Center">
+						<p:outputLabel value="#{entity.loja.descricao}" />
+					</p:column>
+
+					<p:column headerText="Pedido" style="width: 50px"
+						styleClass="Center">
+						<p:outputLabel value="#{entity.pedido}" />
+					</p:column>
+
+					<p:column headerText="Cliente" style="width: 90px"
+						styleClass="Center">
+						<p:outputLabel value="#{entity.cliente}" />
+					</p:column>
+
+					<p:column headerText="Valor (R$)" style="width: 90px"
+						styleClass="Center">
+						<p:outputLabel value="#{entity.valor}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Data Confirmação" style="width: 90px"
+						styleClass="Center">
+						<p:outputLabel value="#{entity.dataStatus}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Tipo" style="width: 90px"
+						styleClass="Center">
+						<p:outputLabel value="#{entity.tipo.descricao}" />
+					</p:column>
+
+<!-- 					<p:column headerText="Donwload" styleClass="centralizado" -->
+<!-- 						width="150"> -->
+<!-- 						<p:commandLink styleClass="link" process="@this" ajax="false" -->
+<!-- 							immediate="true" value="Comprovante"> -->
+<!-- 							<f:setPropertyActionListener -->
+<!-- 								target="#{conferenciaBean.conferencia}" value="#{entity}" /> -->
+<!-- 							<p:fileDownload value="#{conferenciaBean.downloadArquivo()}" /> -->
+<!-- 						</p:commandLink> -->
+<!-- 					</p:column> -->
+
+<!-- 					<p:column headerText="Ações" style="width: 90px" -->
+<!-- 						styleClass="Center"> -->
+
+<!-- 						<p:commandLink id="lnkConfirma" rendered="#{entity.status}" -->
+<!-- 							oncomplete="PF('dlg-confirma').show()" -->
+<!-- 							style="text-decoration: none" update=":frm:dlg-confirma"> -->
+<!-- 							<i class="material-icons GrayDark">done_all</i> -->
+<!-- 							<f:setPropertyActionListener value="#{entity}" -->
+<!-- 								target="#{conferenciaBean.conferencia}" /> -->
+<!-- 						</p:commandLink> -->
+<!-- 						<p:tooltip for="lnkConfirma" value="Confirmar Baixa" -->
+<!-- 							position="top" /> -->
+<!-- 						<p:spacer /> -->
+<!-- 												<p:commandLink id="lnkDetail" rendered="#{entity.status}" -->
+<!-- 													oncomplete="PF('dados').show()" style="text-decoration: none" -->
+<!-- 													update=":frm:dados"> -->
+<!-- 													<i class="material-icons GrayDark">assignment</i> -->
+<!-- 													<f:setPropertyActionListener value="#{entity}" -->
+<!-- 														target="#{conferenciaBean.conferencia}" /> -->
+<!-- 												</p:commandLink> -->
+<!-- 												<p:tooltip for="lnkDetail" value="Detalhes" position="top" /> -->
+<!-- 												<p:spacer /> -->
+<!-- 						<p:commandLink ajax="false" id="lnkEditar" -->
+<!-- 							rendered="#{entity.status}" -->
+<!-- 							action="#{conferenciaBean.prepareUpdate()}" -->
+<!-- 							style="text-decoration: none"> -->
+<!-- 							<i class="material-icons GrayDark">mode_edit</i> -->
+
+<!-- 							<f:setPropertyActionListener value="#{entity}" -->
+<!-- 								target="#{conferenciaBean.conferencia}" /> -->
+<!-- 						</p:commandLink> -->
+
+<!-- 						<p:tooltip for="lnkEditar" value="Editar" position="top" /> -->
+<!-- 					</p:column> -->
+				</p:dataTable>
+
+				<p:dialog header="Confirmar" modal="true" width="35%"
+					id="dlg-confirma" widgetVar="dlg-confirma">
+					<p:growl autoUpdate="false" id="grol" />
+					<h:panelGrid columns="2" id="grid">
+						<h:panelGroup>
+							<p:outputLabel value="Data: " styleClass="my-label"
+								style="vertical-align: text-top;" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{conferenciaBean.conferencia.dataStatus}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Situação: " styleClass="my-label"
+								style="vertical-align: text-top;" for="situacao" />
+							<br />
+							<p:selectOneMenu id="situacao" label="Situação"
+								value="#{conferenciaBean.conferencia.statusConferencia}">
+								<f:selectItem itemLabel="-- Selecione --" />
+								<f:selectItems value="#{conferenciaBean.statusConferencias}"
+									var="sit" itemLabel="#{sit.descricao}" itemValue="#{sit}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+					</h:panelGrid>
+					<h:panelGroup>
+						<p:outputLabel value="Anexar Comprovante: " />
+						<br />
+						<p:fileUpload immediate="true" mode="advanced"
+							value="#{conferenciaBean.conferencia.arquivo}"
+							label="Escolher arquivo" update="grol"
+							invalidFileMessage="Extensões permitidas: .pdf, .png, .gif, .jpg ou .jpeg"
+							fileUploadListener="#{conferenciaBean.uploadFile}" fileLimit="1"
+							fileLimitMessage="Apenas um arquivo por vez!"
+							dragDropSupport="true" multiple="false" cancelLabel="Cancelar"
+							uploadLabel="Enviar" allowTypes="/(\.|\/)(gif|jpe?g|png|pdf)$/" />
+					</h:panelGroup>
+					<br />
+					<br />
+					<br />
+					<br />
+					<br />
+					<p:separator />
+					<p:commandButton styleClass="button-blue" value="Atualizar"
+						rendered="#{conferenciaBean.conferencia.id != null}"
+						action="#{conferenciaBean.update()}"
+						oncomplete="PF('dlg-confirma').hide()"
+						update=":frm:table-conferencia grid" />
+				</p:dialog>
+
+				<p:dialog header="Detalhes da Conferência" modal="true" width="50%"
+					id="dados" widgetVar="dados">
+					<h:panelGrid columns="2">
+						<p:outputLabel value="Vendedor: " styleClass="my-label" />
+						<p:outputLabel
+							value="#{conferenciaBean.conferencia.vendedor.nome}" />
+					</h:panelGrid>
+				</p:dialog>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+		"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+		"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+		
+<!-- 		VERSAO ATUALIZADA 14/10/2024 - Correção no nome parte -->
+
+<hibernate-configuration>
+	<session-factory>
+
+		<!-- DIALECT SQLSERVER -->
+		<property name="hibernate.dialect">org.hibernate.dialect.SQLServerDialect</property>
+
+		<!-- DRIVER DE CONEXÃO -->
+		<property name="connection.driver_class">com.microsoft.sqlserver.jdbc.SQLServerDriver</property>
+
+		<!-- SERVIDOR LOCAL -->
+		<property name="connection.url">jdbc:sqlserver://localhost:1433;databaseName=S8_Real</property>
+<!-- 		<property name="connection.url">jdbc:sqlserver://192.168.1.150:1433;databaseName=S8_Real</property> -->
+<!-- 		<property name="connection.url">jdbc:sqlserver://NETOCEO\SQL2012:1433;databaseName=S8_Real</property> -->
+<!-- 		<property name="connection.url">jdbc:sqlserver://25.1.147.197:1433;databaseName=S8_Real</property> -->
+		<property name="connection.username">sa</property>
+		<property name="connection.password">Senha123</property>
+<!-- 		<property name="connection.password">123456789</property> -->
+
+		<property name="hibernate.hbm2ddl.auto">update</property>
+		<property name="hibernate.show_sql">true</property>
+		<property name="hibernate.format_sql">true</property>
+
+		<mapping class="br.com.controlpro.entity.consultas.Cliente" />
+		<mapping class="br.com.controlpro.entity.consultas.Produto" />
+		<mapping class="br.com.controlpro.entity.consultas.Estoque" />
+		<mapping class="br.com.controlpro.entity.consultas.Funcionario" />
+		<mapping class="br.com.controlpro.entity.consultas.Cidade" />
+		<mapping class="br.com.controlpro.entity.consultas.Vendas" />
+		<mapping class="br.com.controlpro.entity.consultas.Caixa" />
+		<mapping class="br.com.controlpro.entity.consultas.Banco" />
+		<mapping class="br.com.controlpro.entity.consultas.MovimentacaoProduto" />
+		<mapping class="br.com.controlpro.entity.consultas.AdmCartao" />
+		<mapping class="br.com.controlpro.entity.consultas.ContaBancaria" />
+<!-- 		<mapping class="br.com.controlpro.entity.consultas.RankingProduto" /> -->
+		
+
+		<mapping class="br.com.controlpro.entity.Usuario" />
+		<mapping class="br.com.controlpro.entity.Faccao" />
+		<mapping class="br.com.controlpro.entity.FuncionarioControlPro" />
+		<mapping class="br.com.controlpro.entity.ClienteGlamix" />
+		<mapping class="br.com.controlpro.entity.OrdemCorte" />
+		<mapping class="br.com.controlpro.entity.GradeOrdem" />
+		<mapping class="br.com.controlpro.entity.FolhaPagamento" />
+		<mapping class="br.com.controlpro.entity.ItemFolhaPagamento" />
+		<mapping class="br.com.controlpro.entity.OrdemProducao" />
+		<mapping class="br.com.controlpro.entity.ControleManifestacao" />
+		<mapping class="br.com.controlpro.entity.OcorrenciaOrdemProducao" />
+		<mapping class="br.com.controlpro.entity.OcorrenciaControleManifestacao" />
+		<mapping class="br.com.controlpro.entity.ContaPagar" />
+		<mapping class="br.com.controlpro.entity.ContaPagarAcabamento" />
+		<mapping class="br.com.controlpro.entity.HistoricoCorte" />
+		<mapping class="br.com.controlpro.entity.HistoricoAcabamento" />
+		<mapping class="br.com.controlpro.entity.HistoricoProducao" />
+		<mapping class="br.com.controlpro.entity.HistoricoConta" />
+		<mapping class="br.com.controlpro.entity.HistoricoContaAcabamento" />
+		<mapping class="br.com.controlpro.entity.HistoricoControlePedido" />
+		<mapping class="br.com.controlpro.entity.ItemProducao" />
+		<mapping class="br.com.controlpro.entity.ItemProducaoAud" />
+		<mapping class="br.com.controlpro.entity.Grade" />
+		<mapping class="br.com.controlpro.entity.Grupo" />
+		<mapping class="br.com.controlpro.entity.SubGrupo" />
+		<mapping class="br.com.controlpro.entity.Unidade" />
+		<mapping class="br.com.controlpro.entity.Colecao" />
+		<mapping class="br.com.controlpro.entity.Resgate" />
+		<mapping class="br.com.controlpro.entity.Conferencia" />
+		<mapping class="br.com.controlpro.entity.DespesaFixa" />
+		<mapping class="br.com.controlpro.entity.ItemDespesaFixa" />
+
+		<mapping class="br.com.controlpro.entity.MateriaPrima" />
+		<mapping class="br.com.controlpro.entity.ProdutoConsumo" />
+		<mapping class="br.com.controlpro.entity.ItemProdutoConsumo" />
+		<mapping class="br.com.controlpro.entity.EntradaMateriaPrima" />
+		<mapping class="br.com.controlpro.entity.ItemEntradaMateriaPrima" />
+		<mapping class="br.com.controlpro.entity.ItemControleAjuste" />
+		<mapping class="br.com.controlpro.entity.ItemEnfestoCorte" />
+		<mapping class="br.com.controlpro.entity.ItemAviamentoProducao" />
+		<mapping class="br.com.controlpro.entity.AquisicaoSaida" />
+		<mapping class="br.com.controlpro.entity.AquisicaoSaidaAcabamento" />
+		<mapping class="br.com.controlpro.entity.Vale" />
+		<mapping class="br.com.controlpro.entity.Imobilizado" />
+		<mapping class="br.com.controlpro.entity.Adiantamento" />
+		<mapping class="br.com.controlpro.entity.Sangria" />
+		<mapping class="br.com.controlpro.entity.CaixaDiario" />
+
+		<mapping class="br.com.controlpro.entity.ControlePedido" />
+		<mapping class="br.com.controlpro.entity.ControleAjuste" />
+
+		<mapping class="br.com.controlpro.entity.Reserva" />
+		<mapping class="br.com.controlpro.entity.Cofre" />
+		<mapping class="br.com.controlpro.entity.Motoboy" />
+		<mapping class="br.com.controlpro.entity.ComprovanteFrete" />
+		
+		<mapping class="br.com.controlpro.entity.Excursao" />
+
+		<mapping class="br.com.controlpro.entity.Acabamento" />
+		<mapping class="br.com.controlpro.entity.ItemAcabamento" />
+		<mapping class="br.com.controlpro.entity.ItemEnvolvidoAcabamento" />
+		
+		<mapping class="br.com.controlpro.entity.Logistica" />
+		<mapping class="br.com.controlpro.entity.LogisticaAud" />
+		<mapping class="br.com.controlpro.entity.Meta" />
+		<mapping class="br.com.controlpro.entity.ItemMeta" />
+		
+		<mapping class="br.com.controlpro.entity.ControleInterno" />
+		
+		<mapping class="br.com.controlpro.entity.Cargo" />	
+		
+		
+	</session-factory>
+</hibernate-configuration>

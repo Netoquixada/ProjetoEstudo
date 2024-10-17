@@ -1,0 +1,153 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="resgate.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>Resgate de Pontos</h1>
+				<h3></h3>
+
+				<div class="links-funcionais">
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<h:form id="frm">
+				<p:messages id="msg" closable="true" />
+
+				<p:panel style="margin-top: 15px">
+					<h:panelGrid columns="10">
+						<p:outputLabel value="Código: " styleClass="negrito tam-18" />
+						<p:inputText value="#{resgateBean.codigo}" required="true"
+							requiredMessage="Digite o código para pesquisa" placeholder="Digite o código do cliente"/>
+
+						<p:commandButton value="Pesquisar"
+							update="grid cliente msg table-resgate"
+							style="margin-left: 5px; width: 100px !important"
+							action="#{resgateBean.consultarPorCodigo}" />
+
+					</h:panelGrid>
+				</p:panel>
+				<br />
+				<center>
+					<h:outputLabel id="cliente" value="#{resgateBean.cliente.nome}"
+						styleClass="negrito tam-24" />
+				</center>
+
+				<p:panelGrid columns="2" style="margin-top: 20px; width: 100%" layout="grid" id="grid"
+				columnClasses="coluna-30, coluna-70">
+
+					<h:panelGrid columns="1">
+						<h:panelGroup>
+							<h:outputLabel value="Total de Vendas: "
+								styleClass="tam-14 negrito" />
+							<h:outputLabel styleClass="tam-14 negrito Blue"
+								value="#{resgateBean.resgate.totalVendas}">
+								<f:convertNumber minFractionDigits="2" type="currency"
+									maxFractionDigits="2" />
+							</h:outputLabel>
+						</h:panelGroup>
+						<br />
+						<h:panelGroup>
+							<h:outputLabel value="Resgatado: "
+								styleClass="tam-14 negrito marginTop20" />
+							<h:outputLabel styleClass="tam-14 negrito Red"
+								value="#{resgateBean.resgate.totalResgate}">
+								<f:convertNumber minFractionDigits="2" type="currency"
+									maxFractionDigits="2" />
+							</h:outputLabel>
+						</h:panelGroup>
+						<hr />
+						<h:panelGroup>
+							<h:outputLabel value="Saldo: "
+								styleClass="tam-14 negrito marginTop20" />
+							<h:outputLabel styleClass="tam-14 negrito Green"
+								value="#{resgateBean.resgate.saldo}">
+								<f:convertNumber minFractionDigits="2" type="currency"
+									maxFractionDigits="2" />
+							</h:outputLabel>
+						</h:panelGroup>
+						<br />
+						<p:separator />
+
+						<h:panelGroup>
+							<h:outputLabel value="Valor do Resgate: "
+								styleClass="tam-14 negrito marginTop20" />
+						<br />
+							<p:inputText id="valor" styleClass="moeda"
+								value="#{resgateBean.resgate.valorResgate}">
+								<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+									minFractionDigits="2" type="number" />
+							</p:inputText>
+						</h:panelGroup>
+						<br />
+						<p:commandButton value="Salvar" icon="fa fa-floppy-o"
+							action="#{resgateBean.save}" update="frm" />
+					</h:panelGrid>
+
+					<p:dataTable id="table-resgate" value="#{resgateBean.resgates}"
+						var="entity" paginator="true" style="margin-top: 15px; width: 100%;"
+						paginatorAlwaysVisible="false" rows="10" lazy="true"
+						emptyMessage="Nenhum registro encontrado!">
+						
+						<f:facet name="header">
+						<p:outputLabel value="Histórico de Resgates"/>
+						</f:facet>
+
+						<p:column headerText="Data" styleClass="Center my-label"
+						width="210">
+							<p:outputLabel value="#{entity.data}">
+								<f:convertDateTime pattern="dd/MM/yyyy - HH:mm" />
+							</p:outputLabel>
+						</p:column>
+
+						<p:column headerText="Vendas" styleClass="Center my-label">
+							<h:outputLabel value="#{entity.totalVendas}">
+								<f:convertNumber minFractionDigits="2" type="currency"
+									maxFractionDigits="2" />
+							</h:outputLabel>
+						</p:column>
+						<p:column headerText="Resgatado" styleClass="Center my-label">
+							<h:outputLabel value="#{entity.totalResgate}">
+								<f:convertNumber minFractionDigits="2" type="currency"
+									maxFractionDigits="2" />
+							</h:outputLabel>
+						</p:column>
+						<p:column headerText="Saldo" styleClass="Center my-label">
+							<h:outputLabel value="#{entity.saldo}">
+								<f:convertNumber minFractionDigits="2" type="currency"
+									maxFractionDigits="2" />
+							</h:outputLabel>
+						</p:column>
+						<p:column headerText="Resgate" styleClass="Center my-label">
+							<h:outputLabel value="#{entity.valorResgate}">
+								<f:convertNumber minFractionDigits="2" type="currency"
+									maxFractionDigits="2" />
+							</h:outputLabel>
+						</p:column>
+					</p:dataTable>
+
+				</p:panelGrid>
+
+
+
+
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

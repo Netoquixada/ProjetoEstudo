@@ -1,0 +1,298 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<h:form>
+				<p:panelGrid columns="2"
+					columnClasses="ui-g-12 ui-md-4,ui-g-12 ui-md-8" layout="grid"
+					styleClass="ui-panelgrid-blank">
+
+					<h:panelGroup>
+						<div class="image-title">
+							<h:graphicImage library="imagens" name="controle_interno.jpg"
+								width="60px" style="float: left" />
+						</div>
+
+						<h1>Controle Interno</h1>
+						<h3>Listagem de controles internos cadastrados no sistema.</h3>
+					</h:panelGroup>
+
+					<p:menuButton value="Opções" style="float: right">
+						<p:menuitem value="Cadastrar" oncomplete="PF('dados').show()"
+							update=":form-cadastro:dados" icon="fa fa-plus" />
+						<p:menuitem value="Página inicial" outcome="/private/index.xhtml"
+							icon="fa fa-home" />
+					</p:menuButton>
+
+				</p:panelGrid>
+			</h:form>
+			<!-- 			<p:panel styleClass="panel-title"> -->
+			<!-- 				<div class="image-title"> -->
+			<!-- 					<h:graphicImage library="imagens" name="controleInterno.png" width="60px" -->
+			<!-- 						style="float: left" /> -->
+			<!-- 				</div> -->
+
+			<!-- 				<h1>Lista de Vales</h1> -->
+			<!-- 				<h3>Listagem de controleInternos cadastrados no sistema.</h3> -->
+
+			<!-- 				<div class="links-funcionais"> -->
+			<!-- 					<p:commandLink id="cadastrar" styleClass="link-funcional" -->
+			<!-- 						style="margin-top: 3px" update=":form-cadastro:dados" -->
+			<!-- 						oncomplete="PF('dados').show()"> -->
+			<!-- 						<i class="material-icons md-32">add_to_photos</i> -->
+			<!-- 						<br /> -->
+			<!-- 					</p:commandLink> -->
+			<!-- 					<p:tooltip for="cadastrar" position="top" value="Cadastrar controleInterno" /> -->
+
+			<!-- 					<p:link id="inicio" styleClass="link-funcional" -->
+			<!-- 						outcome="/private/index.xhtml"> -->
+			<!-- 						<i class="material-icons md-36">home</i> -->
+			<!-- 						<br /> -->
+			<!-- 					</p:link> -->
+			<!-- 					<p:tooltip for="inicio" position="top" value="Página Inicial" /> -->
+			<!-- 				</div> -->
+			<!-- 			</p:panel> -->
+
+			<t:saveState value="#{controleInternoBean.controleInterno}" />
+			<t:saveState value="#{controleInternoBean.controleInternos}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel header="Painel de Pesquisa" style="margin-top: 15px"
+					toggleable="true" toggleOrientation="vertical">
+
+					<p:panelGrid columns="4" 
+						styleClass="ui-panelgrid-blank">
+
+						<h:panelGroup>
+							<p:outputLabel value="Relato" styleClass="my-label" />
+							<br />
+							<p:selectOneRadio
+								value="#{controleInternoBean.controleInternoFilter.relatoControleInterno}">
+								<f:selectItem itemLabel="Todos" />
+								<f:selectItems
+									value="#{controleInternoBean.relatosControleInterno}" var="s"
+									itemLabel="#{s.descricao}" itemValue="#{s}" />
+							</p:selectOneRadio>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="De: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{controleInternoBean.controleInternoFilter.dataPesquisaInicio}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Até: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{controleInternoBean.controleInternoFilter.dataPesquisaFim}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<br />
+							<p:commandButton value="Pesquisar" icon="fa fa-search"
+								style="margin-left: 5px; width: 100px !important"
+								update="table-controleInterno"
+								action="#{controleInternoBean.list()}" />
+							<p:commandButton id="report"
+								actionListener="#{controleInternoBean.gerarPDF}"
+								icon="fa fa-download" value="Gerar PDF"
+								onclick="this.form.target='_blank'" ajax="f	alse">
+							</p:commandButton>
+						</h:panelGroup>
+					</p:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-controleInterno"
+					value="#{controleInternoBean.controleInternos}" var="entity"
+					paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10"
+					lazy="true">
+
+
+					<p:column headerText="Data do Cadastro">
+						<p:outputLabel value="#{entity.dataCadastro}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Pedido">
+						<p:outputLabel value="#{entity.pedido}" />
+					</p:column>
+
+					<p:column headerText="Local">
+						<p:outputLabel value="#{entity.localControleInterno.descricao}" />
+					</p:column>
+
+					<p:column headerText="Tipo">
+						<p:outputLabel value="#{entity.tipoControleInterno.descricao}" />
+					</p:column>
+
+					<p:column headerText="Valor" styleClass="Center">
+						<p:outputLabel value="#{entity.valor}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Relato">
+						<p:outputLabel value="#{entity.relatoControleInterno.descricao}" />
+					</p:column>
+
+					<p:column headerText="Observação">
+						<p:outputLabel value="#{entity.observacao}" />
+					</p:column>
+
+					<p:column headerText="Ações" style="width: 90px"
+						styleClass="Center">
+
+						<p:commandLink id="lnkEditar" rendered="#{entity.status}"
+							oncomplete="PF('dados').show()" style="text-decoration: none"
+							update=":form-cadastro:dados">
+							<i class="material-icons GrayDark">mode_edit</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{controleInternoBean.controleInterno}" />
+						</p:commandLink>
+						<p:tooltip for="lnkEditar" value="Editar" position="top" />
+					</p:column>
+
+					<f:facet name="footer">
+						<div align="right">
+							<h1>
+								<p:outputLabel value="Total:" style="color:#fff" />
+								<p:outputLabel value="#{controleInternoBean.total}"
+									style="color:#fff">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</h1>
+						</div>
+					</f:facet>
+				</p:dataTable>
+			</h:form>
+
+			<h:form id="form-cadastro">
+				<p:dialog modal="true" id="dados" widgetVar="dados"
+					resizable="false">
+
+					<f:facet name="header">
+					#{controleInternoBean.controleInterno.id == null ? 'Cadastrar' :
+					'Atualizar'}
+					</f:facet>
+
+					<div class="ui-fluid">
+						<p:messages showDetail="true" autoUpdate="true" closable="true" />
+
+						<h:panelGrid columns="2" style="margin-top: 20px"
+							id="grid-cadastro">
+
+							<!-- 							<h:panelGroup> -->
+							<!-- 								<p:outputLabel value="Data do Vale: " styleClass="my-label" -->
+							<!-- 									style="vertical-align: text-top;" for="data" /> -->
+							<!-- 							</h:panelGroup> -->
+
+							<!-- 							<p:calendar size="10" navigator="true" required="true" -->
+							<!-- 								requiredMessage="Digite a data do controleInterno" id="data" -->
+							<!-- 								value="#{controleInternoBean.controleInterno.dataVale}" -->
+							<!-- 								pattern="dd/MM/yyyy" /> -->
+
+							<h:panelGroup>
+								<p:outputLabel value="Pedido: " styleClass="my-label"
+									style="vertical-align: text-top;" for="pedido" />
+							</h:panelGroup>
+
+							<p:inputText id="pedido"
+								value="#{controleInternoBean.controleInterno.pedido}"
+								required="true" />
+								
+							<h:panelGroup>
+								<p:outputLabel value="Local: " styleClass="my-label"
+									style="vertical-align: text-top;" for="local" />
+							</h:panelGroup>
+
+							<p:selectOneMenu
+								value="#{controleInternoBean.controleInterno.localControleInterno}"
+								id="local" required="true" requiredMessage="Selecione o local">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems
+									value="#{controleInternoBean.locaisControleInterno}" var="l"
+									itemLabel="#{l.descricao}" itemValue="#{l}" />
+							</p:selectOneMenu>
+							
+							<h:panelGroup>
+								<p:outputLabel value="Tipo: " styleClass="my-label"
+									style="vertical-align: text-top;" for="tipo" />
+							</h:panelGroup>
+
+							<p:selectOneMenu
+								value="#{controleInternoBean.controleInterno.tipoControleInterno}"
+								id="tipo" required="true" requiredMessage="Selecione o tipo">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems
+									value="#{controleInternoBean.tiposControleInterno}" var="l"
+									itemLabel="#{l.descricao}" itemValue="#{l}" />
+							</p:selectOneMenu>
+
+							<h:panelGroup>
+								<p:outputLabel value="Valor(R$):" styleClass="my-label"
+									style="vertical-align: text-top;" for="valor" />
+							</h:panelGroup>
+
+							<p:inputText required="true" id="valor"
+								requiredMessage="Campo 'Valor' é obrigatório!"
+								styleClass="moeda" maxlength="10"
+								value="#{controleInternoBean.controleInterno.valor}">
+								<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+									minFractionDigits="2" type="number" />
+							</p:inputText>
+							
+							<h:panelGroup>
+								<p:outputLabel value="Relato: " styleClass="my-label"
+									style="vertical-align: text-top;" for="relato" />
+							</h:panelGroup>
+
+							<p:selectOneMenu
+								value="#{controleInternoBean.controleInterno.relatoControleInterno}"
+								id="relato" required="true" requiredMessage="Selecione o relato">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems
+									value="#{controleInternoBean.relatosControleInterno}" var="l"
+									itemLabel="#{l.descricao}" itemValue="#{l}" />
+							</p:selectOneMenu>
+							
+							<h:panelGroup>
+								<p:outputLabel value="Observação: " styleClass="my-label"
+									style="vertical-align: text-top;" for="observacao" />
+							</h:panelGroup>
+							<p:inputTextarea rows="6" cols="60" id="observacao"
+								value="#{controleInternoBean.controleInterno.observacao}"
+								label="Observação" />
+						</h:panelGrid>
+						<p:separator />
+						<h:panelGrid columns="3">
+							<p:commandButton value="Salvar" icon="fa fa-floppy-o"
+								action="#{controleInternoBean.save}"
+								update="grid-cadastro :frm:table-controleInterno"
+								rendered="#{controleInternoBean.controleInterno.id == null}" />
+
+							<p:commandButton value="Atualizar" icon="fa fa-floppy-o"
+								action="#{controleInternoBean.update}"
+								rendered="#{controleInternoBean.controleInterno.id != null}" />
+
+							<p:spacer width="20" height="0" />
+						</h:panelGrid>
+					</div>
+				</p:dialog>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

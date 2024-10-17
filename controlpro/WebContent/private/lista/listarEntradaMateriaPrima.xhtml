@@ -1,0 +1,165 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="avaliacao.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>Lista de Entrada de Materia Prima</h1>
+				<h3>Listagem de entrada materia prima cadastradas no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:link id="cadastrar" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/cadastro/cadastrarEntradaMateriaPrima.xhtml">
+						<i class="material-icons md-32">add_to_photos</i>
+						<br />
+					</p:link>
+					<p:tooltip for="cadastrar" position="top"
+						value="Cadastrar Entrada de Materia Prima" />
+
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{entradaMateriaPrimaBean.entradaMateriaPrima}" />
+			<t:saveState
+				value="#{entradaMateriaPrimaBean.itemEntradaMateriaPrimaList}" />
+			<t:saveState value="#{entradaMateriaPrimaBean.entradaMateriaPrimas}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel styleClass="panel-pesquisa" style="margin-top: 15px">
+					<div class="lupa">
+						<p:graphicImage library="imagens" name="SearchLupa.png" />
+					</div>
+					<h:panelGrid columns="15">
+						<p:outputLabel value="Fornecedor: " styleClass="my-label" />
+						<p:autoComplete
+							value="#{entradaMateriaPrimaBean.entradaMateriaPrimaFilter.fornecedor}"
+							autocomplete="true" size="36" id="fornecedor"
+							completeMethod="#{clienteBean.getClienteAutoComplete()}"
+							forceSelection="true" minQueryLength="2" maxResults="30"
+							dropdown="true"
+							converterMessage="Não foi possível selecionar o fornecedor (Erro ao converter o objeto)"
+							converter="clienteConverter" var="cli" itemLabel="#{cli.nome}"
+							itemValue="#{cli}" placeholder="Pesquise pelo nome">
+						</p:autoComplete>
+
+						<p:outputLabel value="Loja: " styleClass="my-label" />
+						<p:selectOneMenu id="loja"
+							value="#{entradaMateriaPrimaBean.entradaMateriaPrimaFilter.loja}">
+							<f:selectItem itemLabel="Todas" />
+							<f:selectItems value="#{entradaMateriaPrimaBean.lojas}" var="l"
+								itemLabel="#{l.descricao}" itemValue="#{l}" />
+						</p:selectOneMenu>
+						<p:outputLabel value="De: " styleClass="my-label" />
+						<p:calendar size="10" navigator="true"
+							value="#{entradaMateriaPrimaBean.entradaMateriaPrimaFilter.dataInicio}"
+							pattern="dd/MM/yyyy HH:mm" />
+						<p:outputLabel value="Até: " styleClass="my-label" />
+						<p:calendar size="10" navigator="true"
+							value="#{entradaMateriaPrimaBean.entradaMateriaPrimaFilter.dataFim}"
+							pattern="dd/MM/yyyy HH:mm" />
+
+						<p:commandButton icon="fa fa-search"
+							style="margin-left: 5px;"
+							update="table-entrada" action="#{entradaMateriaPrimaBean.list()}" />
+
+						<p:commandButton id="report"
+							actionListener="#{entradaMateriaPrimaBean.gerarPDF}"
+							icon="fa fa-download" onclick="this.form.target='_blank'"
+							ajax="false">
+						</p:commandButton>
+					</h:panelGrid>
+
+				</p:panel>
+
+				<p:dataTable id="table-entrada"
+					value="#{entradaMateriaPrimaBean.entradaMateriaPrimas}"
+					var="entity" paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10"
+					lazy="true">
+
+					<p:column headerText="Data de cadastro" styleClass="Center">
+						<p:outputLabel value="#{entity.dataCadastro}">
+							<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Nota">
+						<p:outputLabel value="#{entity.nota}" />
+					</p:column>
+
+					<p:column headerText="Loja">
+						<p:outputLabel value="#{entity.loja}" />
+					</p:column>
+
+					<p:column headerText="Fornecedor">
+						<p:outputLabel value="#{entity.fornecedor.nome}" />
+					</p:column>
+
+					<p:column headerText="Total" styleClass="Center">
+						<p:outputLabel value="#{entity.valorTotal}">
+							<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+								minFractionDigits="2" type="currency" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Quantidade Itens" styleClass="Center">
+						<p:outputLabel
+							value="#{entradaMateriaPrimaBean.quantidadeItensPorEntrada(entity)}" />
+					</p:column>
+
+					<p:column headerText="Observação">
+						<p:outputLabel value="#{entity.observacao}" />
+					</p:column>
+
+					<p:column headerText="Ações" style="width: 130px"
+						styleClass="Center">
+
+						<p:link ajax="false" id="lnkEditar" title="Editar"
+							rendered="#{entity.status}"
+							outcome="#{entradaMateriaPrimaBean.prepareUpdate()}"
+							style="text-decoration: none">
+							<i class="material-icons GrayDark">mode_edit</i>
+							<f:param name="id" value="#{entity.id}" />
+						</p:link>
+						<p:spacer />
+					</p:column>
+
+					<f:facet name="footer">
+						<div align="right">
+							<h1>
+								<p:outputLabel value="Total:" style="color:#fff" />
+								<p:outputLabel
+									value="#{entradaMateriaPrimaBean.acumuladorTotal}"
+									style="color:#fff">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</h1>
+						</div>
+					</f:facet>
+				</p:dataTable>
+
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

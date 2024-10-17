@@ -1,0 +1,294 @@
+
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:t="http://myfaces.apache.org/tomahawk"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="despesa-fixa.jpg"
+						width="60px" style="float: left" />
+				</div>
+
+				<h1>#{despesaFixaBean.despesaFixa.id == null ? 'Cadastrar
+					Despesa Fixa' : 'Atualizar Despesa Fixa'}</h1>
+				<h3>#{despesaFixaBean.despesaFixa.id == null ? 'Preencha o
+					formulário abaixo para cadastrar uma nova Despesa Fixa.' :
+					'Preencha o formulário abaixo para atualizar a Despesa Fixa.'}</h3>
+
+				<div class="links-funcionais">
+					<p:link id="lista" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/lista/listarDespesaFixa.xhtml">
+						<i class="material-icons md-32">list</i>
+						<br />
+					</p:link>
+					<p:tooltip for="lista" position="top" value="Listar Despesas Fixas" />
+
+					<p:link styleClass="link-funcional" outcome="/private/index.xhtml"
+						id="inicio">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+			<p:panel style="margin-top: 15px" styleClass="my-panel">
+				<p:outputLabel value="(" />
+				<p:outputLabel value="*" styleClass="campoObrigatorio" />
+				<p:outputLabel value=") Campos obrigatórios." />
+			</p:panel>
+
+			<h:form id="frm">
+				<div class="ui-fluid">
+					<p:messages showDetail="true" autoUpdate="false" closable="true" />
+					<h:panelGrid columns="3" style="margin-top: 20px">
+						<h:panelGroup>
+							<p:outputLabel value="Loja: " styleClass="my-label"
+								style="vertical-align: text-top;" for="loja" />
+							<br />
+							<br />
+							<p:selectOneMenu id="loja" label="Loja"
+								value="#{despesaFixaBean.despesaFixa.loja}" required="true"
+								requiredMessage="Loja obrigatório">
+								<f:selectItem itemLabel="-- Selecione --" />
+								<f:selectItems value="#{despesaFixaBean.lojas}" var="loja"
+									itemLabel="#{loja.descricao}" itemValue="#{loja}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+
+						<h:panelGroup>
+							<p:outputLabel value="Quantidade de Produção:"
+								styleClass="my-label" style="vertical-align: text-top;" />
+							<h:outputText value=" * " styleClass="campoObrigatorio" />
+							<br />
+							<br />
+							<p:inputText required="true" size="40"
+								requiredMessage="Campo 'Quantidade de produção' é obrigatório!"
+								value="#{despesaFixaBean.despesaFixa.quantidadeProducao}">
+								<p:ajax event="keyup" update="group-meta"
+									listener="#{despesaFixaBean.getRefreshValores}" />
+							</p:inputText>
+						</h:panelGroup>
+						<h:panelGroup id="group-meta">
+							<p:outputLabel value="Média por Produtos: " styleClass="my-label"
+								style="vertical-align: text-top;" />
+							<br />
+							<br />
+							<p:outputLabel value="#{despesaFixaBean.meta}"
+								styleClass="label-laranja" style="font-size: 18px">
+								<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+									minFractionDigits="2" type="currency" />
+							</p:outputLabel>
+						</h:panelGroup>
+					</h:panelGrid>
+					<h:panelGrid>
+						<br />
+						<p:commandButton value="Adicionar item na despesa fixa"
+							oncomplete="PF('dados').show()" styleClass="button-add"
+							action="#{despesaFixaBean.clearItemDespesaFixa()}"
+							process="@this" update=":form-cadastro:dados" icon="fa fa-plus">
+						</p:commandButton>
+						<br />
+
+						<p:dataTable id="tableItemDespesaFixa" var="item"
+							value="#{despesaFixaBean.itemDespesaFixaList}"
+							emptyMessage="Nenhuma atividade foi adicionada">
+
+							<p:column headerText="Situação" styleClass="Center">
+								<p:outputLabel value="#{item.statusDespesaFixa}"
+									styleClass="negrito Blue"
+									rendered="#{item.statusDespesaFixa eq 'ATIVO'}" />
+								<p:outputLabel value="#{item.statusDespesaFixa}"
+									styleClass="negrito Green"
+									rendered="#{item.statusDespesaFixa eq 'FINALIZADO'}" />
+							</p:column>
+
+							<p:column headerText="Descrição">
+								<p:outputLabel value="#{item.descricao}" />
+							</p:column>
+
+							<p:column headerText="Dia de Pagamento" width="90">
+								<p:outputLabel value="#{item.diaPagamento}" />
+							</p:column>
+							<p:column headerText="Valor" width="90">
+								<p:outputLabel value="#{item.valor}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+
+							<p:column headerText="Data de finalização" styleClass="Center">
+								<p:outputLabel value="#{item.dataConfirmacao}"
+									rendered="#{item.dataConfirmacao != null}">
+									<f:convertDateTime pattern="dd/MM/yyyy - HH:mm" />
+								</p:outputLabel>
+								<p:outputLabel value="Não finalizado!"
+									rendered="#{item.dataConfirmacao == null}" />
+							</p:column>
+
+
+							<p:column headerText="Ações" width="90">
+								<div align="center">
+									<h:panelGroup>
+										<p:commandLink oncomplete="PF('dados').show()"
+											id="edititemdespesafixa" update=":form-cadastro:dados"
+											process="@this">
+											<i class="material-icons GrayDark">mode_edit</i>
+											<f:setPropertyActionListener
+												target="#{despesaFixaBean.itemDespesaFixa}" value="#{item}" />
+										</p:commandLink>
+										<p:tooltip for="edititemdespesafixa"
+											value="Clique para editar o item na despesa fixa" />
+									</h:panelGroup>
+									<h:panelGroup>
+										<p:commandLink id="removeitem"
+											action="#{despesaFixaBean.removerItemDespesaFixa()}"
+											update="tableItemDespesaFixa" process="@this">
+											<i class="material-icons GrayDark">delete_forever</i>
+											<f:setPropertyActionListener
+												target="#{despesaFixaBean.itemDespesaFixa}" value="#{item}"></f:setPropertyActionListener>
+										</p:commandLink>
+										<p:tooltip for="removeitem"
+											value="Clique para excluir o item da despesa fixa" />
+									</h:panelGroup>
+									<h:panelGroup rendered="#{item.statusDespesaFixa eq 'ATIVO'}" >
+										<p:commandLink action="#{despesaFixaBean.finalizarDespesa()}"
+											immediate="true" image="icon-add" id="finalizar"
+											update=":frm:tableItemDespesaFixa :frm:group-meta"
+											process="@this" title="Finalizar despesa">
+											<i class="material-icons GrayDark md-20">done_outline</i>
+											<f:setPropertyActionListener value="#{item}"
+												target="#{despesaFixaBean.itemDespesaFixa}" />
+										</p:commandLink>
+										<p:tooltip showEffect="clip" position="bottom" for="finalizar" />
+									</h:panelGroup>
+								</div>
+							</p:column>
+							<f:facet name="footer">
+								<div align="right">
+									<h1>
+										<p:outputLabel value="Total:" style="color:#fff" />
+										<p:outputLabel value="#{despesaFixaBean.acumulador}"
+											style="color:#fff">
+											<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+												minFractionDigits="2" type="currency" />
+										</p:outputLabel>
+									</h1>
+								</div>
+							</f:facet>
+						</p:dataTable>
+					</h:panelGrid>
+
+					<br /> <br />
+					<p:separator />
+					<h:panelGrid columns="3">
+						<p:commandButton value="Salvar" icon="fa fa-floppy-o"
+							action="#{despesaFixaBean.save}" update="frm"
+							rendered="#{despesaFixaBean.despesaFixa.id == null}" />
+
+						<p:commandButton value="Atualizar" icon="fa fa-floppy-o"
+							action="#{despesaFixaBean.update}"
+							rendered="#{despesaFixaBean.despesaFixa.id != null}" />
+
+						<p:spacer width="20" height="0" />
+
+						<p:commandButton value="Cancelar" action="/private/index.xhtml"
+							immediate="true"
+							rendered="#{despesaFixaBean.despesaFixa.id == null}"
+							icon="fa fa-ban" ajax="false" />
+
+						<p:commandButton value="Cancelar"
+							action="#{despesaFixaBean.goToList()}" immediate="true"
+							rendered="#{despesaFixaBean.despesaFixa.id != null}"
+							icon="fa fa-ban" ajax="false" />
+					</h:panelGrid>
+				</div>
+			</h:form>
+
+			<h:form id="form-cadastro">
+				<p:dialog modal="true" id="dados" widgetVar="dados"
+					resizable="false" width="60%">
+
+					<f:facet name="header">
+						#{despesaFixaBean.itemDespesaFixa.descricao == null ? 'Adicionar item' :
+						'Atualizar item'}
+						</f:facet>
+
+					<div class="scroll-dialog">
+						<p:messages showDetail="true" autoUpdate="true" closable="true" />
+
+						<h:panelGrid columns="2" style="margin-top: 20px; width:100%;"
+							id="grid-cadastro" cellpadding="05px">
+
+							<h:panelGrid columns="3" cellpadding="02px">
+								<h:panelGroup>
+									<p:outputLabel value="Descrição:" styleClass="my-label"
+										style="vertical-align: text-top;" />
+									<h:outputText value=" * " styleClass="campoObrigatorio" />
+									<br />
+									<br />
+									<p:inputText required="true" 
+										requiredMessage="Campo 'Descrição' é obrigatório!"
+										value="#{despesaFixaBean.itemDespesaFixa.descricao}">
+									</p:inputText>
+								</h:panelGroup>
+								<h:panelGroup>
+									<p:outputLabel value="Valor(R$):" styleClass="my-label"
+										style="vertical-align: text-top;" />
+									<h:outputText value=" * " styleClass="campoObrigatorio" />
+									<br />
+									<br />
+									<p:inputText required="true" id="valor"
+										requiredMessage="Campo 'Valor' é obrigatório!"
+										styleClass="moeda" maxlength="10"
+										value="#{despesaFixaBean.itemDespesaFixa.valor}">
+										<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+											minFractionDigits="2" type="number" />
+									</p:inputText>
+								</h:panelGroup>
+								<h:panelGroup>
+									<p:outputLabel value="Dia do Pagamento:" styleClass="my-label"
+										style="vertical-align: text-top;" />
+									<h:outputText value=" * " styleClass="campoObrigatorio" />
+									<br />
+									<br />
+									<p:inputText required="true"
+										requiredMessage="Campo 'Dia Pagamento' é obrigatório!"
+										value="#{despesaFixaBean.itemDespesaFixa.diaPagamento}">
+									</p:inputText>
+								</h:panelGroup>
+							</h:panelGrid>
+						</h:panelGrid>
+						<p:separator />
+						<h:panelGrid columns="3">
+							<p:commandButton value="Adicionar"
+								update=":frm:tableItemDespesaFixa :frm:group-meta grid-cadastro"
+								action="#{despesaFixaBean.addItemDespesaFixa()}"
+								icon="fa fa-plus"
+								rendered="#{despesaFixaBean.itemDespesaFixa.descricao == null}" />
+
+							<p:commandButton value="Atualizar" styleClass="btn-green"
+								oncomplete="PF('dados').hide()" icon="fa fa-refresh"
+								update=":frm:tableItemDespesaFixa :frm:group-meta"
+								action="#{despesaFixaBean.updateItemDespesaFixa()}"
+								rendered="#{despesaFixaBean.itemDespesaFixa.descricao != null}" />
+
+							<p:commandButton value="Cancelar" styleClass="btn-orange"
+								icon="fa fa-close" process="@this"
+								oncomplete="PF('dados').hide()" immediate="true" />
+
+							<p:spacer width="20" height="0" />
+						</h:panelGrid>
+					</div>
+				</p:dialog>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,451 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="ocorrencia.png"
+						style="float: left" styleClass="image-title" dataURI="true" />
+				</div>
+				<h1 style="font-size: 32px !important;">Sistema de Controle e
+					Gerenciamento</h1>
+			</p:panel>
+
+			<!-- TAB VIEW FABRICA -->
+			<p:tabView
+				rendered="#{escopoSessaoBean.usuarioLogado.loja eq 'FABRICA'}">
+				<p:tab title="Dashboard">
+					<p:panelGrid columns="2" style="margin-top: 20px" layout="grid"
+						styleClass="ui-panelgrid-blank">
+
+						<p:panel>
+
+							<f:facet name="header">
+								<div align="center">
+									<p:outputLabel value="Ordem de Corte"
+										styleClass="my-label-dashboard" />
+								</div>
+							</f:facet>
+							<div align="left">
+								<p:commandButton id="infop" type="button" icon="fa fa-info" />
+								<p:overlayPanel showCloseIcon="true" showEffect="fade"
+									id="imagePanelp" for="infop" hideEffect="explode" modal="true"
+									style="width: 40%;">
+
+									<p:panelGrid columns="2">
+										<p:outputLabel value="Cortadas:" style="color: #ec9454" />
+										<p:outputLabel value="Somatório de cortes recebidos." />
+										<p:outputLabel value="Aguardando:" style="color: #4CAF50" />
+										<p:outputLabel
+											value="Quantidade de peças cortadas menos a quantidades de enviados para produção." />
+										<p:outputLabel value="Produção x Corte:"
+											style="color: #3f51b5" />
+										<p:outputLabel
+											value="Percentual de peças produzidas em relação as cortadas." />
+
+									</p:panelGrid>
+								</p:overlayPanel>
+								<p:tooltip value="Informações" for="info" position="top" />
+							</div>
+							<p:panelGrid columns="2" style="margin-top: 20px" layout="grid"
+								styleClass="ui-panelgrid-blank"
+								columnClasses="ui-grid-col-8,ui-grid-col-6">
+
+								<h:panelGrid style="width: 100% !important">
+									<h:panelGroup>
+										<div class="panel-total-projeto shadow-effect">
+											<div class="panel-infor" style="background-color: #ec9454;">
+												<div class="marginTop10"></div>
+												<div style="font-size: 12px" class="Fs16">Cortadas</div>
+												<div style="font-size: 22px" class="animated pulse infinite">
+													<p:outputLabel value="#{dashboardBean.cortadas}"
+														id="cortadas" />
+												</div>
+											</div>
+										</div>
+									</h:panelGroup>
+									<h:panelGroup>
+										<div class="panel-total-projeto shadow-effect">
+											<div class="panel-infor" style="background-color: #4CAF50;">
+												<div class="marginTop10"></div>
+												<div style="font-size: 12px" class="Fs16">Aguardando</div>
+												<div style="font-size: 22px" class="animated pulse infinite">
+													<p:outputLabel value="#{dashboardBean.aguardando}" />
+												</div>
+											</div>
+										</div>
+									</h:panelGroup>
+								</h:panelGrid>
+								<!-- 								<h:panelGrid style="width: 100% !important"> -->
+								<!-- 									<p:outputLabel value="Percentual de Cortes" -->
+								<!-- 										styleClass="my-label" /> -->
+								<!-- 									<br /> -->
+								<!-- 									<p:knob labelTemplate="{value}%" -->
+								<!-- 										value="#{dashboardBean.cortePercentualPronto}" disabled="true" -->
+								<!-- 										width="150" -->
+								<!-- 										foregroundColor="#{dashboardBean.cortePercentualPronto gt 50 ? 'green' : 'red'}" /> -->
+								<!-- 								</h:panelGrid> -->
+								<h:panelGrid style="width: 100% !important">
+									<p:outputLabel value="Produção x Corte" styleClass="my-label" />
+									<br />
+									<p:knob labelTemplate="{value}%"
+										value="#{dashboardBean.percentualCorteProducao}"
+										disabled="true" width="150"
+										foregroundColor="#{dashboardBean.percentualCorteProducao gt 50 ? 'green' : 'red'}" />
+
+								</h:panelGrid>
+							</p:panelGrid>
+						</p:panel>
+						<p:panel>
+
+							<f:facet name="header" styleClass="panel-title">
+								<div align="center">
+									<p:outputLabel value="Ordem de Produção"
+										styleClass="my-label-dashboard" />
+								</div>
+							</f:facet>
+							<div align="left">
+								<p:commandButton id="info" type="button" icon="fa fa-info" />
+								<p:overlayPanel showCloseIcon="true" showEffect="fade"
+									id="imagePanel" for="info" hideEffect="explode" modal="true"
+									style="width: 40%;">
+
+									<p:panelGrid columns="2">
+										<p:outputLabel value="Enviadas:" style="color: #3f51b5" />
+										<p:outputLabel
+											value="Somatório de peças enviadas para produção.." />
+										<p:outputLabel value="Produzido:" style="color: #ec9454" />
+										<p:outputLabel value="Quantidade de peças já produzidas.." />
+										<p:outputLabel value="Aguardando Retorno:"
+											style="color: #4CAF50" />
+										<p:outputLabel value="Aguarando finalizar produção." />
+										<p:outputLabel value="Percentual de Produção:"
+											style="color: #000" />
+										<p:outputLabel value="Percentual de peças produzidas." />
+
+									</p:panelGrid>
+								</p:overlayPanel>
+								<p:tooltip value="Informações" for="info" position="top" />
+							</div>
+							<p:panelGrid columns="2" style="margin-top: 20px" layout="grid"
+								styleClass="ui-panelgrid-blank"
+								columnClasses="ui-grid-col-8,ui-grid-col-6">
+
+								<h:panelGrid style="width: 100% !important">
+									<h:panelGroup style="width: 100% !important">
+										<div class="panel-total-projeto shadow-effect">
+											<div class="panel-infor" style="background-color: #3f51b5;">
+												<div class="marginTop10"></div>
+												<div style="font-size: 12px" class="Fs16">Enviadas</div>
+												<div style="font-size: 22px" class="animated pulse infinite">
+													<p:outputLabel value="#{dashboardBean.producaoEnviado}" />
+												</div>
+											</div>
+										</div>
+									</h:panelGroup>
+									<h:panelGroup>
+										<div class="panel-total-projeto shadow-effect">
+											<div class="panel-infor" style="background-color: #ec9454;">
+												<div class="marginTop10"></div>
+												<div style="font-size: 12px" class="Fs16">Produzido</div>
+												<div style="font-size: 22px" class="animated pulse infinite">
+													<p:outputLabel value="#{dashboardBean.producaoPronto}" />
+												</div>
+											</div>
+										</div>
+									</h:panelGroup>
+									<h:panelGroup>
+										<div class="panel-total-projeto shadow-effect">
+											<div class="panel-infor" style="background-color: #4CAF50;">
+												<div class="marginTop10"></div>
+												<div style="font-size: 12px" class="Fs16">Aguardando
+													Retorno</div>
+												<div style="font-size: 22px" class="animated pulse infinite">
+													<p:outputLabel value="#{dashboardBean.producaoSaldo}" />
+												</div>
+											</div>
+										</div>
+									</h:panelGroup>
+								</h:panelGrid>
+								<h:panelGrid style="width: 100% !important">
+									<p:outputLabel value="Percentual de Produção"
+										styleClass="my-label" />
+									<br />
+									<p:knob labelTemplate="{value}%"
+										value="#{dashboardBean.producaoPercentualPronto}"
+										disabled="true" width="150"
+										foregroundColor="#{dashboardBean.producaoPercentualPronto gt 50 ? 'green' : 'red'}" />
+								</h:panelGrid>
+							</p:panelGrid>
+						</p:panel>
+
+					</p:panelGrid>
+
+				</p:tab>
+				<p:tab title="Links Rápidos">
+					<div class="padding">
+						<h:form id="frm">
+							<center>
+								<p:spacer height="30px;" />
+								<div class="ui-grid ui-grid-responsive">
+									<div class="ui-grid-row">
+										<h:panelGroup styleClass="ui-grid-col-12">
+											<h1>
+												<p:outputLabel value="Atalhos a Menus" />
+											</h1>
+
+										</h:panelGroup>
+									</div>
+								</div>
+								<div class="ui-grid ui-grid-responsive">
+									<div class="ui-grid-row">
+										<h:panelGroup styleClass="ui-grid-col-8"
+											rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' or escopoSessaoBean.usuarioLogado.perfilUser eq 'PRODUCAO'}">
+											<div class="wrapper">
+												<p:graphicImage styleClass="myImg" library="imagens"
+													name="producao.png" />
+
+												<br />
+												<p:outputLabel value="Ordem de Produção"
+													styleClass="myLabel2" />
+												<div class="tooltip">
+													<p:link styleClass="myLabel3" value="Cadastrar"
+														outcome="/private/cadastro/cadastrarOrdemProducao.xhtml" />
+													<br />
+													<p:link styleClass="myLabel3" value="Listar"
+														outcome="/private/lista/listarOrdemProducao.xhtml" />
+													<br />
+												</div>
+											</div>
+										</h:panelGroup>
+										<h:panelGroup styleClass="ui-grid-col-8"
+											rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' or escopoSessaoBean.usuarioLogado.perfilUser eq 'CORTADOR'}">
+											<div class="wrapper">
+												<p:graphicImage styleClass="myImg" library="imagens"
+													name="avaliacao.png" />
+
+												<br />
+												<p:outputLabel value="Ordem de Corte" styleClass="myLabel2" />
+												<div class="tooltip">
+													<p:link styleClass="myLabel3" value="Cadastrar"
+														outcome="/private/cadastro/cadastrarOrdemCorte.xhtml" />
+													<br />
+													<p:link styleClass="myLabel3" value="Listar"
+														outcome="/private/lista/listarOrdemCorte.xhtml" />
+													<br />
+												</div>
+											</div>
+										</h:panelGroup>
+										<h:panelGroup styleClass="ui-grid-col-8">
+											<div class="wrapper">
+												<p:graphicImage styleClass="myImg" library="imagens"
+													name="faccao.jpg" />
+
+												<br />
+												<p:outputLabel value="Consultar Facção"
+													styleClass="myLabel2" />
+												<div class="tooltip">
+													<p:link styleClass="myLabel3" value="Consultar Facção"
+														outcome="/private/lista/listarFaccao.xhtml" />
+													<br />
+													<!-- 													<p:link styleClass="myLabel3" value="Listar" -->
+													<!-- 														outcome="/private/lista/listarOrdemCorte.xhtml" /> -->
+													<br />
+												</div>
+											</div>
+										</h:panelGroup>
+									</div>
+								</div>
+
+								<!-- 						********************** -->
+
+								<div class="ui-grid ui-grid-responsive">
+									<div class="ui-grid-row">
+										<h:panelGroup styleClass="ui-grid-col-8">
+											<div class="wrapper">
+												<p:graphicImage styleClass="myImg" library="imagens"
+													name="ajuste.png" />
+
+												<br />
+												<p:outputLabel value="Controle de Ajustes"
+													styleClass="myLabel2" />
+												<div class="tooltip">
+													<p:link styleClass="myLabel3" value="Cadastrar/Consultar"
+														outcome="/private/lista/listarControleAjuste.xhtml" />
+													<br />
+
+												</div>
+											</div>
+										</h:panelGroup>
+										<h:panelGroup styleClass="ui-grid-col-8">
+											<div class="wrapper">
+												<p:graphicImage styleClass="myImg" library="imagens"
+													name="resgate.png" />
+
+												<br />
+												<p:outputLabel value="Consultar Resgate"
+													styleClass="myLabel2" />
+												<div class="tooltip">
+													<p:link styleClass="myLabel3" value="Resgatar Pontos"
+														outcome="/private/control/controlResgate.xhtml" />
+													<br />
+													<!-- 											<p:link styleClass="myLabel3" value="Listar" -->
+													<!-- 												outcome="/private/control/controlResgate.xhtml" /> -->
+													<!-- 											<br /> -->
+												</div>
+											</div>
+										</h:panelGroup>
+
+										<h:panelGroup styleClass="ui-grid-col-8">
+											<div class="wrapper">
+												<p:graphicImage styleClass="myImg" library="imagens"
+													name="cliente.png" />
+
+												<br />
+												<p:outputLabel value="Consultar Cliente"
+													styleClass="myLabel2" />
+												<div class="tooltip">
+													<p:link styleClass="myLabel3" value="Consultar Cliente"
+														outcome="/private/lista/listarClientes.xhtml" />
+													<br />
+												</div>
+											</div>
+										</h:panelGroup>
+									</div>
+								</div>
+							</center>
+						</h:form>
+					</div>
+				</p:tab>
+			</p:tabView>
+
+			<!-- 	TAB VIEW GLAMIX -->
+			<p:tabView
+				rendered="#{escopoSessaoBean.usuarioLogado.loja eq 'GLAMIX'}">
+
+				<p:tab title="Banner">
+					<div align="center">
+
+						<p:galleria panelWidth="1100" panelHeight="313" showCaption="true"
+							autoPlay="true">
+							<!-- 							<h:graphicImage library="imagens" name="Banner lolabel.jpg" -->
+							<!-- 							width="1100" -->
+							<!-- 								alt="Descrição da loja Lollabel - aqui vc altera e colcoca o que acha melhor" title="Lollabel" /> -->
+							<h:graphicImage library="imagens" name="GlamixLogo.jpg"
+								alt="GLAMIX a melhor da Cidade!" title="Lolli" width="1100" />
+							<!-- 							<h:graphicImage library="imagens" name="logo.jpg" -->
+							<!-- 								alt="Descrição da loja 03" title="Loja 03" /> -->
+							<!-- 							<h:graphicImage library="imagens" name="logo1.jpg" -->
+							<!-- 								alt="Descrição da loja 04" title="Loja 04" /> -->
+						</p:galleria>
+					</div>
+				</p:tab>
+
+
+				<p:tab title="Links Rápidos">
+					<div class="padding">
+						<h:form id="frm">
+							<center>
+								<p:spacer height="30px;" />
+								<div class="ui-grid ui-grid-responsive">
+									<div class="ui-grid-row">
+										<h:panelGroup styleClass="ui-grid-col-12">
+											<h1>
+												<p:outputLabel value="Atalhos a Menus" />
+											</h1>
+
+										</h:panelGroup>
+									</div>
+								</div>
+								<div class="ui-grid ui-grid-responsive">
+									<div class="ui-grid-row">
+										<h:panelGroup styleClass="ui-grid-col-8">
+											<div class="wrapper">
+												<p:graphicImage styleClass="myImg" library="imagens"
+													name="produto.png" />
+
+												<br />
+												<p:outputLabel value="Consultar Produtos"
+													styleClass="myLabel2" />
+												<div class="tooltip">
+													<p:link styleClass="myLabel3" value="Consultar Produtoss"
+														outcome="/private/lista/listarProdutos.xhtml" />
+													<br />
+
+												</div>
+											</div>
+										</h:panelGroup>
+										<h:panelGroup styleClass="ui-grid-col-8">
+											<div class="wrapper">
+												<p:graphicImage styleClass="myImg" library="imagens"
+													name="resgate.png" />
+
+												<br />
+												<p:outputLabel value="Consultar Resgate"
+													styleClass="myLabel2" />
+												<div class="tooltip">
+													<p:link styleClass="myLabel3" value="Resgatar Pontos"
+														outcome="/private/control/controlResgate.xhtml" />
+													<br />
+													<!-- 											<p:link styleClass="myLabel3" value="Listar" -->
+													<!-- 												outcome="/private/control/controlResgate.xhtml" /> -->
+													<!-- 											<br /> -->
+												</div>
+											</div>
+										</h:panelGroup>
+									</div>
+								</div>
+
+								<!-- 						********************** -->
+
+								<div class="ui-grid ui-grid-responsive">
+									<div class="ui-grid-row">
+										<h:panelGroup styleClass="ui-grid-col-8">
+											<div class="wrapper">
+												<p:graphicImage styleClass="myImg" library="imagens"
+													name="produto.png" />
+
+												<br />
+												<p:outputLabel value="Consultar Estoque"
+													styleClass="myLabel2" />
+												<div class="tooltip">
+													<p:link styleClass="myLabel3" value="Consultar Estoque"
+														outcome="/private/lista/listarEstoque.xhtml" />
+													<br />
+
+												</div>
+											</div>
+										</h:panelGroup>
+										<h:panelGroup styleClass="ui-grid-col-8">
+											<div class="wrapper">
+												<p:graphicImage styleClass="myImg" library="imagens"
+													name="cliente.png" />
+
+												<br />
+												<p:outputLabel value="Consultar Cliente"
+													styleClass="myLabel2" />
+												<div class="tooltip">
+													<p:link styleClass="myLabel3" value="Consultar Cliente"
+														outcome="/private/lista/listarClientes.xhtml" />
+													<br />
+												</div>
+											</div>
+										</h:panelGroup>
+									</div>
+								</div>
+							</center>
+						</h:form>
+					</div>
+				</p:tab>
+			</p:tabView>
+
+
+
+		</div>
+	</ui:define>
+</ui:composition>

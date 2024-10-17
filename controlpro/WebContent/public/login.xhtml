@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/template/layout.xhtml">
+
+
+	<ui:define name="titulo">Login</ui:define>
+
+	<ui:define name="conteudo">
+		<div class="marginTopContainerLogin" />
+
+		<div class="Card ContainerIndent ShadowEffect ContainerLogin">
+			<div class="marginTop20" />
+
+			<h:form id="formInicio">
+				<div align="center">
+					<h:panelGrid columns="1">
+						<h:panelGroup>
+							<center>
+								<p:graphicImage library="imagens" name="logo.jpg"
+									style="width: 150px; border-radius:200px;" />
+								<br />
+								<br />
+								<p:outputLabel
+									value="Informe seu usuário e sua senha para acessar o sistema"
+									styleClass="my-label" />
+							</center>
+						</h:panelGroup>
+					</h:panelGrid>
+					<p:separator />
+					<h:panelGrid columns="1" width="100%">
+
+						<p:messages closable="true" showSummary="true" showDetail="true" />
+						<p:focus for="textoLogin" />
+						<p:outputLabel value="Usuário:  " styleClass="my-label" />
+						<p:inputText value="#{loginBean.login}" style="width:100%"
+							id="textoLogin" required="true"
+							requiredMessage="Digite seu usuário" />
+						<p:outputLabel value="Senha: " styleClass="my-label" />
+						<p:password maxlength="25" id="senha" style="width:100%"
+							value="#{loginBean.senha}" required="true"
+							requiredMessage="Digite sua senha"
+							validatorMessage="Sua senha deve ser composta por no mínimo 6 caracteres!">
+						</p:password>
+						<p:watermark value="Ex:. usuario" for="textoLogin"></p:watermark>
+						<p:watermark value="Senha" for="senha"></p:watermark>
+						<br />
+						<p:commandButton id="btnLogin" value="ACESSAR" iconPos="fa fa-key"
+							icon="fa fa-unlock-alt" action="#{loginBean.loginSistema()}"
+							 style="width:100%" />
+						<p:spacer height="5" />
+					</h:panelGrid>
+				</div>
+			</h:form>
+		</div>
+
+
+	</ui:define>
+
+</ui:composition>

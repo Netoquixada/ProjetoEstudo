@@ -1,0 +1,72 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:t="http://myfaces.apache.org/tomahawk"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+	<br />
+	<p:outputLabel value="Lista de itens no acabamento"
+		styleClass="my-label-titulo" />
+	<br />
+	<br />
+	<center>
+		<p:dataTable id="tableItemAcabamento" var="item"
+			value="#{acabamentoBean.itemAcabamentoList}"
+			emptyMessage="Nenhuma atividade foi adicionada">
+
+			<p:ajax event="rowEdit" listener="#{ordemProducaoBean.onRowEdit}"
+				update=":frm:group tableItemAcabamento :frm:msg-update" />
+
+			<p:column headerText="Produto" style="color: #000000 !important">
+				<p:outputLabel value="#{item.produto.nome}" />
+			</p:column>
+
+			<p:column headerText="Unidade" width="60"
+				style="color: #000000 !important">
+				<p:outputLabel value="#{item.produto.unidadeVenda}" />
+			</p:column>
+
+			<p:column headerText="Referência" width="110"
+				style="color: #000000 !important">
+				<p:outputLabel value="#{item.produto.id}" />
+			</p:column>
+
+			<p:column headerText="Valor unitário"
+				style="color: #000000 !important">
+				<p:outputLabel value="#{item.valor}">
+					<f:convertNumber minFractionDigits="2" type="currency"
+						maxFractionDigits="2" />
+				</p:outputLabel>
+			</p:column>
+			<p:column headerText="Quantidade" width="90" styleClass="Center"
+				style="color: #000000 !important">
+				<p:outputLabel value="#{item.quantidade}" />
+			</p:column>
+			<p:column headerText="Valor total" style="color: #000000 !important">
+				<p:outputLabel value="#{item.valorTotal}">
+					<f:convertNumber minFractionDigits="2" type="currency"
+						maxFractionDigits="2" />
+				</p:outputLabel>
+			</p:column>
+			<p:column headerText="Recebidas" style="color: #000000 !important"
+				styleClass="Center" width="90">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{item.prontas}"
+							styleClass="Green tam-14 negrito" />
+					</f:facet>
+					<f:facet name="input">
+								#{item.prontas}	+
+										<p:inputText value="#{item.prontasAux}" style="width:50%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="Atualizar Rebebimento" width="90" styleClass="Center"
+				rendered="#{acabamentoBean.acabamento.situacao eq 'ANDAMENTO'}"
+				style="width:32px; color: #000000 !important">
+				<p:rowEditor />
+			</p:column>
+		</p:dataTable>
+	</center>
+</ui:composition>

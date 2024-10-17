@@ -1,0 +1,440 @@
+
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:t="http://myfaces.apache.org/tomahawk"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="acabamento.jpg"
+						width="60px" style="float: left" />
+				</div>
+
+				<h1>#{acabamentoBean.acabamento.id == null ? 'Cadastrar
+					Acabamento' : 'Atualizar Acabamento'}</h1>
+				<h3>#{acabamentoBean.acabamento.id == null ? 'Preencha o
+					formulário abaixo para cadastrar um acabamento.' : 'Preencha o
+					formulário abaixo para atualizar o acabamento.'}</h3>
+
+				<div class="links-funcionais">
+					<p:link id="lista" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/lista/listarAcabamento.xhtml">
+						<i class="material-icons md-32">list</i>
+						<br />
+					</p:link>
+					<p:tooltip for="lista" position="top" value="Listar Acabamentos" />
+
+					<p:link styleClass="link-funcional" outcome="/private/index.xhtml"
+						id="inicio">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+			<p:panel style="margin-top: 15px" styleClass="my-panel">
+				<p:outputLabel value="(" />
+				<p:outputLabel value="*" styleClass="campoObrigatorio" />
+				<p:outputLabel value=") Campos obrigatórios." />
+			</p:panel>
+
+			<h:form id="frm">
+				<div class="ui-fluid">
+					<p:messages showDetail="true" autoUpdate="false" closable="true" />
+					<p:panelGrid columns="2" style="margin-top: 20px" layout="grid"
+						columnClasses="ui-grid-col-2" styleClass="ui-panelgrid-blank">
+
+						<h:panelGroup>
+							<p:outputLabel value="Oficina: " styleClass="my-label"
+								style="vertical-align: text-top;" for="faccao" />
+						</h:panelGroup>
+						<p:autoComplete value="#{acabamentoBean.acabamento.faccao}"
+							autocomplete="true" id="faccao"
+							completeMethod="#{faccaoBean.getFaccaoAutoComplete}"
+							forceSelection="true" minQueryLength="1" maxResults="30"
+							dropdown="true" required="true"
+							requiredMessage="Campo 'Facção' é obrigatório!"
+							converterMessage="Não foi possível selecionar a facção(Erro ao converter o objeto)"
+							converter="genericConverter" var="faccao"
+							itemLabel="#{faccao.nome}" itemValue="#{faccao}"
+							placeholder="Pesquise pelo nome da facção">
+						</p:autoComplete>
+						
+						<h:panelGroup>
+							<p:outputLabel value="Loja: " styleClass="my-label"
+								style="vertical-align: text-top;" for="loja" />
+						</h:panelGroup>
+						<p:selectOneMenu required="true"
+							requiredMessage="Selecione a loja" id="loja"
+							value="#{acabamentoBean.acabamento.loja}">
+							<f:selectItem itemLabel="Selecione" />
+							<f:selectItems value="#{acabamentoBean.lojas}"
+								var="loja" itemLabel="#{loja.descricao}" itemValue="#{loja}" />
+						</p:selectOneMenu>
+						
+						<h:panelGroup>
+							<p:outputLabel value="Origem: " styleClass="my-label"
+								style="vertical-align: text-top;" for="origem" />
+						</h:panelGroup>
+						
+										
+										
+						<p:selectOneMenu required="true"
+							requiredMessage="Selecione a origem" id="origem"
+							value="#{acabamentoBean.acabamento.origem}">
+							<f:selectItem itemLabel="Selecione" />
+							<f:selectItems value="#{acabamentoBean.origens}"
+								var="o" itemLabel="#{o.descricao}" itemValue="#{o}" />
+						</p:selectOneMenu>
+						
+						<h:panelGroup>
+							<p:outputLabel value="Tipo de Serviço: " styleClass="my-label"
+								style="vertical-align: text-top;" for="tipoCostura" />
+						</h:panelGroup>
+						<p:selectOneMenu required="true"
+							requiredMessage="Selecione o tipo de costura" id="tipoCostura"
+							value="#{acabamentoBean.acabamento.tipoCostura}">
+							<f:selectItem itemLabel="Selecione" />
+							<f:selectItems value="#{acabamentoBean.tiposCostura}"
+								var="tipo" itemLabel="#{tipo.descricao}" itemValue="#{tipo}" />
+						</p:selectOneMenu>
+					
+						
+						<h:panelGroup>
+							<p:outputLabel value="Prévisão de término: "
+								styleClass="my-label" for="previsao" />
+						</h:panelGroup>
+						<p:inputMask mask="99/99/9999" id="previsao" required="true"
+							label="Prévisão"
+							requiredMessage="Prévisão de término obrigatório"
+							value="#{acabamentoBean.acabamento.previsaoTermino}">
+
+							<p:ajax update="dias" event="blur"
+								listener="#{acabamentoBean.atualizarQtdDias()}" />
+						</p:inputMask>
+
+						<h:panelGroup>
+							<p:outputLabel value="Duração(Dias): " styleClass="my-label" />
+						</h:panelGroup>
+						<p:outputLabel id="dias"
+							value="#{acabamentoBean.acabamento.qtdDias}"
+							styleClass="negrito tam-18" />
+
+						<h:panelGroup>
+							<p:outputLabel value="Observação: " styleClass="my-label"
+								for="observacao" />
+						</h:panelGroup>
+						<p:inputTextarea id="observacao" rows="6" cols="60"
+							label="Observação"
+							value="#{acabamentoBean.acabamento.observacao}" />
+					</p:panelGrid>
+					<h:panelGrid>
+						<br />
+						<p:commandButton value="Adicionar item no acabamento"
+							oncomplete="PF('dados').show()" styleClass="button-add"
+							action="#{acabamentoBean.clearItemAcabamento()}" process="@this"
+							update=":form-cadastro:dados" icon="fa fa-plus">
+						</p:commandButton>
+						<br />
+
+						<p:dataTable id="tableItemAcabamento" var="item"
+							value="#{acabamentoBean.itemAcabamentoList}"
+							emptyMessage="Nenhuma atividade foi adicionada">
+
+
+							<p:column headerText="Produto">
+								<p:outputLabel value="#{item.produto.nome}" />
+							</p:column>
+							<p:column headerText="Referência" width="90">
+								<p:outputLabel value="#{item.produto.id}" />
+							</p:column>
+							<p:column headerText="Quantidade" width="90">
+								<p:outputLabel value="#{item.quantidade}" />
+							</p:column>
+							<p:column headerText="Valor" width="90">
+								<p:outputLabel value="#{item.valor}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Total" width="90">
+								<p:outputLabel value="#{item.valorTotal}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+
+							<p:column headerText="Ações" width="80">
+								<div align="center">
+									<h:panelGroup>
+										<p:commandLink oncomplete="PF('dados').show()"
+											id="edititemprod" update=":form-cadastro:dados"
+											process="@this">
+											<i class="material-icons GrayDark">mode_edit</i>
+											<f:setPropertyActionListener
+												target="#{acabamentoBean.itemAcabamento}" value="#{item}" />
+										</p:commandLink>
+										<p:tooltip for="edititemprod"
+											value="Clique para editar o item no acabamento" />
+									</h:panelGroup>
+									<h:panelGroup>
+										<p:commandLink id="removeitem"
+											action="#{acabamentoBean.removerItemAcabamento()}"
+											update="tableItemAcabamento" process="@this">
+											<i class="material-icons GrayDark">delete_forever</i>
+											<f:setPropertyActionListener
+												target="#{acabamentoBean.itemAcabamento}" value="#{item}"></f:setPropertyActionListener>
+										</p:commandLink>
+										<p:tooltip for="removeitem"
+											value="Clique para excluir o item do acabamento" />
+									</h:panelGroup>
+								</div>
+							</p:column>
+
+							<f:facet name="footer">
+								<div align="right">
+									<h1>
+										<p:outputLabel value="Total:" style="color:#fff" />
+										<p:outputLabel value="#{acabamentoBean.total}" style="color:#fff">
+											<f:convertNumber minFractionDigits="2" type="currency"
+												maxFractionDigits="2" />
+										</p:outputLabel>
+									</h1>
+								</div>
+							</f:facet>
+
+						</p:dataTable>
+					</h:panelGrid>
+
+					<br /> <br />
+					<h:panelGrid>
+						<br />
+						<p:commandButton value="Adicionar item envolvido no acabamento"
+							oncomplete="PF('dados-envolvido').show()" styleClass="button-add"
+							action="#{acabamentoBean.clearItemAcabamento()}" process="@this"
+							update=":form-cadastro-envolvido:dados-envolvido" icon="fa fa-plus">
+						</p:commandButton>
+						<br />
+
+						<p:dataTable id="tableItemEnvolvidoAcabamento" var="item"
+							value="#{acabamentoBean.itemEnvolvidoAcabamentoList}"
+							emptyMessage="Nenhuma atividade foi adicionada">
+
+
+							<p:column headerText="Produto">
+								<p:outputLabel value="#{item.produto.nome}" />
+							</p:column>
+							<p:column headerText="Referência" width="90">
+								<p:outputLabel value="#{item.produto.id}" />
+							</p:column>
+							<p:column headerText="Quantidade" width="90">
+								<p:outputLabel value="#{item.quantidade}" />
+							</p:column>
+
+							<p:column headerText="Ações" width="80">
+								<div align="center">
+									<h:panelGroup>
+										<p:commandLink oncomplete="PF('dados-envolvido').show()"
+											id="edititemprod-envolvido" update=":form-cadastro-envolvido:dados-envolvido"
+											process="@this">
+											<i class="material-icons GrayDark">mode_edit</i>
+											<f:setPropertyActionListener
+												target="#{acabamentoBean.itemEnvolvidoAcabamento}" value="#{item}" />
+										</p:commandLink>
+										<p:tooltip for="edititemprod-envolvido"
+											value="Clique para editar o item no acabamento" />
+									</h:panelGroup>
+									<h:panelGroup>
+										<p:commandLink id="removeitem-envolvido"
+											action="#{acabamentoBean.removerItemEnvolvidoAcabamento()}"
+											update="tableItemEnvolvidoAcabamento" process="@this">
+											<i class="material-icons GrayDark">delete_forever</i>
+											<f:setPropertyActionListener
+												target="#{acabamentoBean.itemEnvolvidoAcabamento}" value="#{item}"></f:setPropertyActionListener>
+										</p:commandLink>
+										<p:tooltip for="removeitem-envolvido"
+											value="Clique para excluir o item do acabamento" />
+									</h:panelGroup>
+								</div>
+							</p:column>
+						</p:dataTable>
+					</h:panelGrid>
+
+					<br /> <br />
+					<p:separator />
+					<h:panelGrid columns="3">
+						<p:commandButton value="Salvar" icon="fa fa-floppy-o"
+							action="#{acabamentoBean.save}" update="frm"
+							rendered="#{acabamentoBean.acabamento.id == null}" />
+
+						<p:commandButton value="Atualizar" icon="fa fa-floppy-o"
+							action="#{acabamentoBean.update}"
+							rendered="#{acabamentoBean.acabamento.id != null}" />
+
+						<p:spacer width="20" height="0" />
+
+						<p:commandButton value="Cancelar" action="/private/index.xhtml"
+							immediate="true"
+							rendered="#{acabamentoBean.acabamento.id == null}"
+							icon="fa fa-ban" ajax="false" />
+
+						<p:commandButton value="Cancelar"
+							action="#{acabamentoBean.goToList()}" immediate="true"
+							rendered="#{acabamentoBean.acabamento.id != null}"
+							icon="fa fa-ban" ajax="false" />
+					</h:panelGrid>
+				</div>
+			</h:form>
+
+			<h:form id="form-cadastro">
+				<p:dialog modal="true" id="dados" widgetVar="dados"
+					resizable="false" width="60%">
+
+					<f:facet name="header">
+						#{acabamentoBean.itemAcabamento.produto.nome == null ? 'Adicionar item' :
+						'Atualizar item'}
+						</f:facet>
+
+					<p:messages showDetail="true" autoUpdate="true" closable="true" />
+
+					<h:panelGrid columns="31" style="margin-top: 20px; width:100%;"
+						id="grid-cadastro" cellpadding="05px">
+						<h:panelGroup>
+							<p:outputLabel value="Produto: " styleClass="my-label"
+								style="vertical-align: text-top;" for="produto" />
+							<br />
+							<p:autoComplete value="#{acabamentoBean.itemAcabamento.produto}"
+								autocomplete="true" size="36" id="produto"
+								completeMethod="#{produtoBean.getProdutoAutoCompletePorProduto}"
+								forceSelection="true" minQueryLength="1" maxResults="30"
+								dropdown="true"
+								converterMessage="Não foi possível selecionar o produto (Erro ao converter o objeto)"
+								converter="produtoConverter" var="prod" itemLabel="#{prod.nome}"
+								itemValue="#{prod}" placeholder="Pesquise pelo código">
+							</p:autoComplete>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Quantidade: " styleClass="my-label"
+								style="vertical-align: text-top;" for="qtd" />
+							<br />
+							<p:inputText id="qtd"
+								value="#{acabamentoBean.itemAcabamento.quantidade}"
+								required="true"
+								requiredMessage="Campo 'quantidade' é obrigatório!"
+								validatorMessage="O campo 'quantidade' deve receber apenas números">
+							</p:inputText>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Valor unitário: " styleClass="my-label"
+								style="vertical-align: text-top;" for="valor" />
+							<br />
+							<p:inputText id="valor"
+								value="#{acabamentoBean.itemAcabamento.valor}"
+								styleClass="moeda" maxlength="10">
+								<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+									minFractionDigits="2" type="number" />
+							</p:inputText>
+						</h:panelGroup>
+					</h:panelGrid>
+					<br />
+					<br />
+					<br />
+					<p:separator />
+					<br />
+					<br />
+					<br />
+					<h:panelGrid columns="3">
+						<p:commandButton value="Adicionar"
+							update=":frm:tableItemAcabamento grid-cadastro"
+							action="#{acabamentoBean.addItemAcabamento()}" icon="fa fa-plus"
+							rendered="#{acabamentoBean.itemAcabamento.produto.nome == null}" />
+
+						<p:commandButton value="Atualizar" styleClass="btn-green"
+							oncomplete="PF('dados').hide()" icon="fa fa-refresh"
+							update=":frm:tableItemAcabamento"
+							action="#{acabamentoBean.updateItemAcabamento()}"
+							rendered="#{acabamentoBean.itemAcabamento.produto.nome != null}" />
+
+						<p:commandButton value="Cancelar" styleClass="btn-orange"
+							icon="fa fa-close" process="@this"
+							oncomplete="PF('dados').hide()" immediate="true" />
+
+						<p:spacer width="20" height="0" />
+					</h:panelGrid>
+				</p:dialog>
+			</h:form>
+			<h:form id="form-cadastro-envolvido">
+				<p:dialog modal="true" id="dados-envolvido" widgetVar="dados-envolvido"
+					resizable="false" width="60%">
+
+					<f:facet name="header">
+						#{acabamentoBean.itemEnvolvidoAcabamento.produto.nome == null ? 'Adicionar item' :
+						'Atualizar item'}
+						</f:facet>
+
+					<p:messages showDetail="true" autoUpdate="true" closable="true" />
+
+					<h:panelGrid columns="31" style="margin-top: 20px; width:100%;"
+						id="grid-cadastro-envolvido" cellpadding="05px">
+						<h:panelGroup>
+							<p:outputLabel value="Produto: " styleClass="my-label"
+								style="vertical-align: text-top;" for="produto" />
+							<br />
+							<p:autoComplete value="#{acabamentoBean.itemEnvolvidoAcabamento.produto}"
+								autocomplete="true" size="36" id="produto"
+								completeMethod="#{produtoBean.getProdutoAutoCompletePorProduto}"
+								forceSelection="true" minQueryLength="1" maxResults="30"
+								dropdown="true"
+								converterMessage="Não foi possível selecionar o produto (Erro ao converter o objeto)"
+								converter="produtoConverter" var="prod" itemLabel="#{prod.nome}"
+								itemValue="#{prod}" placeholder="Pesquise pelo código">
+							</p:autoComplete>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Quantidade: " styleClass="my-label"
+								style="vertical-align: text-top;" for="qtd" />
+							<br />
+							<p:inputText id="qtd"
+								value="#{acabamentoBean.itemEnvolvidoAcabamento.quantidade}"
+								required="true"
+								requiredMessage="Campo 'quantidade' é obrigatório!"
+								validatorMessage="O campo 'quantidade' deve receber apenas números">
+							</p:inputText>
+						</h:panelGroup>
+					</h:panelGrid>
+					<br />
+					<br />
+					<p:separator />
+					<br />
+					<br />
+					<h:panelGrid columns="3">
+						<p:commandButton value="Adicionar"
+							update=":frm:tableItemEnvolvidoAcabamento grid-cadastro-envolvido"
+							action="#{acabamentoBean.addItemEnvolvidoAcabamento()}" icon="fa fa-plus"
+							rendered="#{acabamentoBean.itemEnvolvidoAcabamento.produto.nome == null}" />
+
+						<p:commandButton value="Atualizar" styleClass="btn-green"
+							oncomplete="PF('dados-envolvido').hide()" icon="fa fa-refresh"
+							update=":frm:tableItemEnvolvidoAcabamento"
+							action="#{acabamentoBean.updateItemEnvolvidoAcabamento()}"
+							rendered="#{acabamentoBean.itemEnvolvidoAcabamento.produto.nome != null}" />
+
+						<p:commandButton value="Cancelar" styleClass="btn-orange"
+							icon="fa fa-close" process="@this"
+							oncomplete="PF('dados-envolvido').hide()" immediate="true" />
+
+						<p:spacer width="20" height="0" />
+					</h:panelGrid>
+				</p:dialog>
+			</h:form>
+
+		</div>
+	</ui:define>
+</ui:composition>

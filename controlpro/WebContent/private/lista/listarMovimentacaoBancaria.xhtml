@@ -1,0 +1,172 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="mov_bancaria.png"
+						width="60px" style="float: left" />
+				</div>
+
+				<h1>Lista de Movimentações bancarias</h1>
+				<h3>Listagem de movimentações bancarias realizadas no sistema.</h3>
+
+				<div class="links-funcionais">
+
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+				<br />
+				<p:commandButton id="infop" type="button" icon="fa fa-info"
+					value="Informação" />
+				<p:overlayPanel showCloseIcon="true" showEffect="fade"
+					id="imagePanelp" for="infop" hideEffect="explode" modal="true"
+					style="width: 40%;">
+
+					<h:panelGrid cellpadding="15">
+						<p:outputLabel
+							value="...! "
+							styleClass="Red my-label" />
+					</h:panelGrid>
+				</p:overlayPanel>
+				<br />
+				<br />
+				<p:panel>
+
+					<h:panelGrid columns="8">
+						<h:panelGroup>
+							<p:outputLabel value="De: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{movimentacaoBancariaBean.movimentacaoBancaria.dataInicioFilter}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Até: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{movimentacaoBancariaBean.movimentacaoBancaria.dataFimFilter}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Tipo documento: " styleClass="my-label" />
+							<br />
+							<p:inputText
+								value="#{movimentacaoBancariaBean.movimentacaoBancaria.docTipo}" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Origem: " styleClass="my-label" />
+							<br />
+							<p:inputText
+								value="#{movimentacaoBancariaBean.movimentacaoBancaria.origem}" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Filtro: " styleClass="my-label" />
+							<br />
+							<p:inputText size="5" id="gerou-conta"								value="#{movimentacaoBancariaBean.movimentacaoBancaria.gerouConta}" />
+								
+								<p:tooltip for="gerou-conta" value="Digite (N) pra Entradas ou (R) pra saidas"
+								position="top"/>
+						</h:panelGroup>
+
+						<p:commandButton value="Pesquisar" icon="fa fa-search"
+							style="margin-left: 5px; width: 100px !important"
+							update="table-mov" action="#{movimentacaoBancariaBean.list()}" />
+
+						<p:commandButton id="report"
+							actionListener="#{movimentacaoBancariaBean.gerarPDF}"
+							icon="fa fa-download" value="Gerar PDF"
+							onclick="this.form.target='_blank'" ajax="false">
+						</p:commandButton>
+					</h:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-mov"
+					value="#{movimentacaoBancariaBean.movimentacaoBancariaList}"
+					var="entity" paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10"
+					lazy="true">
+
+					<p:column headerText="Data" style="width: 110px">
+						<p:outputLabel value="#{entity.data}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Descrição" styleClass="Center">
+						<p:outputLabel value="#{entity.descricao}" />
+					</p:column>
+
+					<p:column headerText="Tipo Documento" style="width: 110px">
+						<p:outputLabel value="#{entity.docTipo}" />
+					</p:column>
+
+					<p:column headerText="Origem" style="width: 110px">
+						<p:outputLabel value="#{entity.origem}" />
+					</p:column>
+					<p:column headerText="Gerou Conta" style="width: 110px"
+						styleClass="Center">
+						<p:outputLabel value="#{entity.gerouConta}" />
+					</p:column>
+
+					<p:column headerText="Crédito" styleClass="Center"
+						style="width: 100px">
+						<p:outputLabel value="#{entity.credito}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Débito" styleClass="Center"
+						style="width: 100px">
+						<p:outputLabel value="#{entity.debito}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:columnGroup type="footer">
+						<p:row>
+							<p:column colspan="5" style="text-align:right"
+								footerText="Total:" styleClass="negrito" />
+							<p:column>
+								<f:facet name="footer">
+									<p:outputLabel styleClass="negrito"
+										value="#{movimentacaoBancariaBean.credito}">
+										<f:convertNumber minFractionDigits="2" type="currency"
+											maxFractionDigits="2" />
+									</p:outputLabel>
+								</f:facet>
+							</p:column>
+							<p:column>
+								<f:facet name="footer">
+									<p:outputLabel styleClass="negrito"
+										value="#{movimentacaoBancariaBean.debito}">
+										<f:convertNumber minFractionDigits="2" type="currency"
+											maxFractionDigits="2" />
+									</p:outputLabel>
+								</f:facet>
+							</p:column>
+						</p:row>
+					</p:columnGroup>
+
+				</p:dataTable>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

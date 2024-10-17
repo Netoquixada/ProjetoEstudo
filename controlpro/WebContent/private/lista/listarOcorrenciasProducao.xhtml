@@ -1,0 +1,111 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="ocorrencia.png"
+						width="60px" style="float: left" />
+				</div>
+
+				<h1>Lista de Ocorrências de Ordem de Produção</h1>
+				<h3>Listagem de ocorrências de produção cadastradas no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel header="Filtros" style="margin-top: 15px" toggleable="true"
+					toggleOrientation="vertical">
+
+					<p:panelGrid columns="10"
+						styleClass="ui-panelgrid-blank">
+
+						<h:panelGroup>
+							<p:outputLabel value="Protocolo: " styleClass="my-label" />
+							<br />
+							<p:inputText
+								value="#{ocorrenciaOrdemProducaoBean.ocorrenciaOrdemProducaoFilter.ordemProducao.protocolo}" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Situação ocorrência"
+								styleClass="my-label" />
+							<br />
+							<p:selectOneMenu
+								value="#{ocorrenciaOrdemProducaoBean.ocorrenciaOrdemProducaoFilter.statusOcorrenciaFilter}">
+								<f:selectItem itemLabel="Todos" itemValue="0" />
+								<f:selectItem itemLabel="Aberta" itemValue="1" />
+								<f:selectItem itemLabel="Finalizada" itemValue="2" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<br />
+						<h:panelGroup>
+							<p:commandButton value="Pesquisar" icon="fa fa-search"
+								style="margin-left: 5px; width: 100px !important"
+								update="table-historico"
+								action="#{ocorrenciaOrdemProducaoBean.list}" />
+						</h:panelGroup>
+					</p:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-historico"
+					value="#{ocorrenciaOrdemProducaoBean.ocorrenciaOrdemProducaoList}"
+					var="ocorrencia" paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10">
+
+
+					<p:column headerText="Situação Ocorrência" width="90"
+						style="color: #000000 !important">
+						<p:outputLabel rendered="#{ocorrencia.ordemProducao.statusOcorrencia == 2}" value="Finalizada" styleClass="label-verde" />
+						<p:outputLabel rendered="#{ocorrencia.ordemProducao.statusOcorrencia == 1}" value="Aberta" styleClass="label-vermelho" />
+					</p:column>
+
+					<p:column headerText="Protocolo" width="90"
+						style="color: #000000 !important">
+						<p:outputLabel value="#{ocorrencia.ordemProducao.protocolo}" />
+					</p:column>
+
+					<p:column headerText="Origem" width="90"
+						style="color: #000000 !important">
+						<p:outputLabel value="#{ocorrencia.origemOcorrencia.descricao}" />
+					</p:column>
+
+					<p:column headerText="Data cadastro" width="110"
+						style="color: #000000 !important">
+						<p:outputLabel value="#{ocorrencia.dataCadastro}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Data ocorrência" width="110"
+						style="color: #000000 !important">
+						<p:outputLabel value="#{ocorrencia.dataOcorrencia}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+					<p:column headerText="Relato" 
+						style="color: #000000 !important">
+						<p:outputLabel value="#{ocorrencia.descricao}" />
+					</p:column>
+				</p:dataTable>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

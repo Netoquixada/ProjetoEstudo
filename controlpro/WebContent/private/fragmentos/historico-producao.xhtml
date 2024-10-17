@@ -1,0 +1,300 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:t="http://myfaces.apache.org/tomahawk"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+	<!-- 	<br /> -->
+	<!-- 	<p:outputLabel value="Histórico de recebimento de produto" -->
+	<!-- 		styleClass="my-label-titulo" /> -->
+	<!-- 	<br /> -->
+	<br />
+	<p:tabView>
+		<p:tab title="Enviado">
+			<p:dataTable id="tableHistorico" var="historico"
+				value="#{ordemProducaoBean.historicoProducaoList}"
+				emptyMessage="Nenhuma produto recebido até o momento">
+
+				<f:facet name="header">
+					<p:outputLabel value="Historico de Recebimento de Itens enviados"
+						styleClass="my-label-titulo" style="color: #fff !important" />
+				</f:facet>
+
+				<p:column headerText="Recebido por"
+					style="color: #000000 !important">
+					<p:outputLabel value="#{historico.usuario.nome}" />
+				</p:column>
+
+				<p:column headerText="Data recebimento"
+					style="color: #000000 !important">
+					<p:outputLabel value="#{historico.dataRecebimento}">
+						<f:convertDateTime pattern="dd/MM/yyyy - HH:mm" />
+					</p:outputLabel>
+				</p:column>
+
+				<p:column headerText="Facção" style="color: #000000 !important">
+					<p:outputLabel value="#{historico.faccao.nome}" />
+				</p:column>
+				
+				<p:column headerText="Situação" style="color: #000000 !important"
+					styleClass="Center" width="90">
+					<h:panelGroup rendered="#{!historico.itemReenviado}">
+						<p:outputLabel value="Recebido" styleClass="my-label-blue" />
+					</h:panelGroup>
+					<h:panelGroup rendered="#{historico.itemReenviado}">
+						<p:outputLabel value="Reenviado" styleClass="my-label-orange" />
+					</h:panelGroup>
+				</p:column>
+
+				<p:column headerText="Produto" style="color: #000000 !important">
+					<p:outputLabel value="#{historico.produto.nome}" />
+				</p:column>
+
+				<p:column headerText="Unidade" width="60"
+					style="color: #000000 !important">
+					<p:outputLabel value="#{historico.produto.unidadeVenda}" />
+				</p:column>
+
+				<p:column headerText="Quantidade recebida" width="90"
+					styleClass="Center" style="color: #000000 !important">
+					<p:outputLabel value="#{historico.qtdRecebido}" />
+				</p:column>
+
+				<p:column headerText="Quantidade defeito" width="90"
+					styleClass="Center" style="color: #000000 !important">
+					<p:outputLabel value="#{historico.qtdDefeito}" />
+				</p:column>
+
+				<p:column headerText="Valor Bônus" width="90" styleClass="Center"
+					style="color: #000000 !important">
+					<p:outputLabel value="#{historico.valorBonus}">
+						<f:convertNumber minFractionDigits="2" type="currency"
+							maxFractionDigits="2" />
+					</p:outputLabel>
+				</p:column>
+			</p:dataTable>
+
+			<br />
+			<p:dataTable id="tableItemProducao" var="item"
+				value="#{ordemProducaoBean.itemProducaoList}"
+				emptyMessage="Nenhuma atividade foi adicionada">
+
+				<f:facet name="header">
+					<p:outputLabel value="Lista de Itens enviados"
+						styleClass="my-label-titulo" style="color: #fff !important" />
+				</f:facet>
+
+				<p:column headerText="Tipo" style="color: #000000 !important">
+					<h:panelGroup rendered="#{!item.itemReenviado}">
+						<p:outputLabel value="Enviado" styleClass="my-label-blue" />
+					</h:panelGroup>
+					<h:panelGroup rendered="#{item.itemReenviado}">
+						<p:outputLabel value="Reenviado" styleClass="my-label-orange" />
+					</h:panelGroup>
+				</p:column>
+
+				<p:column headerText="Produto" style="color: #000000 !important">
+					<p:outputLabel value="#{item.produto.nome}" />
+				</p:column>
+				
+				<p:column headerText="Parte" styleClass="Center" style="color: #000000 !important">
+					<p:outputLabel value="#{item.tipoItemProducao}" />
+				</p:column>
+
+				<!-- 					<p:column headerText="Unidade" width="50" -->
+				<!-- 						style="color: #000000 !important"> -->
+				<!-- 						<p:outputLabel value="#{item.produto.unidadeVenda}" /> -->
+				<!-- 					</p:column> -->
+
+				<p:column headerText="Ref." width="50"
+					style="color: #000000 !important">
+					<p:outputLabel value="#{item.produto.id}" />
+				</p:column>
+
+				<p:column headerText="Valor unitário"
+				    styleClass="Center"
+					style="color: #000000 !important">
+					<p:outputLabel value="#{item.valor}">
+						<f:convertNumber minFractionDigits="2" type="currency"
+							maxFractionDigits="2" />
+					</p:outputLabel>
+				</p:column>
+
+				<p:column headerText="Valor total" style="color: #000000 !important">
+					<p:outputLabel value="#{item.valorTotal}">
+						<f:convertNumber minFractionDigits="2" type="currency"
+							maxFractionDigits="2" />
+					</p:outputLabel>
+				</p:column>
+
+				<p:column headerText="Quantidade" width="75" styleClass="Center"
+					style="color: #000000 !important">
+					<p:outputLabel value="#{item.quantidade}" />
+				</p:column>
+				<p:column headerText="Prontas" width="75" styleClass="Center"
+					style="color: #000000 !important">
+					<p:outputLabel value="#{item.prontas}" />
+				</p:column>
+				<p:column headerText="Defeito" width="75" styleClass="Center"
+					style="color: #000000 !important">
+					<p:outputLabel value="#{item.defeito}" />
+				</p:column>
+				<p:column headerText="Falta" width="75" styleClass="Center"
+					style="color: #000000 !important">
+					<p:outputLabel value="#{item.faltaAux}" />
+				</p:column>
+
+				<p:column headerText="Comprovante" width="80" styleClass="Center"
+					style="color: #000000 !important">
+					<p:commandLink id="pdf" ajax="false"
+						action="#{ordemProducaoBean.gerarPDFComprovanteOrdemProducao()}"
+						title="Download" style="text-decoration: none">
+						<i class="material-icons GrayDark">get_app</i>
+						<f:setPropertyActionListener value="#{item}"
+							target="#{ordemProducaoBean.itemProducao}" />
+					</p:commandLink>
+				</p:column>
+
+			</p:dataTable>
+		</p:tab>
+		<p:tab title="Reenviado">
+			<p:dataTable id="tableHistoricoReenviado" var="historico"
+				value="#{ordemProducaoBean.historicoReenviarProducaoList}"
+				emptyMessage="Nenhuma produto recebido até o momento">
+
+				<f:facet name="header">
+					<p:outputLabel value="Historico de Recebimento de Itens Reenviados"
+						styleClass="my-label-titulo" style="color: #fff !important" />
+				</f:facet>
+
+				<p:column headerText="Recebido por"
+					style="color: #000000 !important">
+					<p:outputLabel value="#{historico.usuario.nome}" />
+				</p:column>
+
+				<p:column headerText="Data recebimento"
+					style="color: #000000 !important">
+					<p:outputLabel value="#{historico.dataRecebimento}">
+						<f:convertDateTime pattern="dd/MM/yyyy - HH:mm" />
+					</p:outputLabel>
+				</p:column>
+
+				<p:column headerText="Facção" style="color: #000000 !important">
+					<p:outputLabel value="#{historico.faccao.nome}" />
+				</p:column>
+
+				<p:column headerText="Status" style="color: #000000 !important"
+					styleClass="Center" width="90">
+					<h:panelGroup rendered="#{!historico.itemReenviado}">
+<!-- 						<p:outputLabel value="Recebido" styleClass="my-label-blue" /> -->
+						<p:outputLabel rendered="#{!historico.itemReenviado == T}" value="Finalizada" styleClass="label-verde" />
+					</h:panelGroup>
+					<h:panelGroup rendered="#{historico.itemReenviado}">
+						<p:outputLabel value="Recebido" styleClass="label-verde" />
+					</h:panelGroup>
+				</p:column>
+
+				<p:column headerText="Produto" style="color: #000000 !important">
+					<p:outputLabel value="#{historico.produto.nome}" />
+				</p:column>
+
+				<p:column headerText="Unidade" width="60"
+					style="color: #000000 !important">
+					<p:outputLabel value="#{historico.produto.unidadeVenda}" />
+				</p:column>
+
+				<p:column headerText="Quantidade recebida" width="90"
+					styleClass="Center" style="color: #000000 !important">
+					<p:outputLabel value="#{historico.qtdRecebido}" />
+				</p:column>
+
+				<p:column headerText="Quantidade defeito" width="90"
+					styleClass="Center" style="color: #000000 !important">
+					<p:outputLabel value="#{historico.qtdDefeito}" />
+				</p:column>
+
+				<p:column headerText="Valor Bônus" width="90" styleClass="Center"
+					style="color: #000000 !important">
+					<p:outputLabel value="#{historico.valorBonus}">
+						<f:convertNumber minFractionDigits="2" type="currency"
+							maxFractionDigits="2" />
+					</p:outputLabel>
+				</p:column>
+			</p:dataTable>
+
+			<br />
+			<p:dataTable var="item"
+				value="#{ordemProducaoBean.itemReenviarProducaoList}"
+				emptyMessage="Nenhuma atividade foi adicionada">
+
+				<f:facet name="header">
+					<p:outputLabel value="Lista de Itens Reenviados"
+						styleClass="my-label-titulo" style="color: #fff !important" />
+				</f:facet>
+
+				<p:column headerText="Status" style="color: #000000 !important">
+					<h:panelGroup rendered="#{!item.itemReenviado}">
+						<p:outputLabel value="Enviado" styleClass="my-label-blue" />
+					</h:panelGroup>
+					<h:panelGroup rendered="#{item.itemReenviado}">
+						<p:outputLabel value="Reenviado" styleClass="my-label-orange" />
+					</h:panelGroup>
+				</p:column>
+				<p:column headerText="Produto" style="color: #000000 !important">
+					<p:outputLabel value="#{item.produto.nome}" />
+				</p:column>
+				<!-- 					<p:column headerText="Unidade" width="50" -->
+				<!-- 						style="color: #000000 !important"> -->
+				<!-- 						<p:outputLabel value="#{item.produto.unidadeVenda}" /> -->
+				<!-- 					</p:column> -->
+				<p:column headerText="Ref." width="50"
+					style="color: #000000 !important">
+					<p:outputLabel value="#{item.produto.id}" />
+				</p:column>
+				<p:column headerText="Valor unitário"
+					style="color: #000000 !important">
+					<p:outputLabel value="#{item.valor}">
+						<f:convertNumber minFractionDigits="2" type="currency"
+							maxFractionDigits="2" />
+					</p:outputLabel>
+				</p:column>
+				<p:column headerText="Valor total" style="color: #000000 !important">
+					<p:outputLabel value="#{item.valorTotal}">
+						<f:convertNumber minFractionDigits="2" type="currency"
+							maxFractionDigits="2" />
+					</p:outputLabel>
+				</p:column>
+				<p:column headerText="Qtd Reenviado" width="75" styleClass="Center"
+					style="color: #000000 !important">
+					<p:outputLabel value="#{item.quantidade}" />
+				</p:column>
+				<p:column headerText="Prontas" width="75" styleClass="Center"
+					style="color: #000000 !important">
+					<p:outputLabel value="#{item.prontas}" />
+				</p:column>
+				<p:column headerText="Defeito" width="75" styleClass="Center"
+					style="color: #000000 !important">
+					<p:outputLabel value="#{item.defeito}" />
+				</p:column>
+				<p:column headerText="Falta" width="75" styleClass="Center"
+					style="color: #000000 !important">
+					<p:outputLabel value="#{item.faltaAux}" />
+				</p:column>
+				<p:column headerText="Justificativa" width="80"
+					style="color: #000000 !important" styleClass="Center">
+					<p:commandButton id="infop" type="button" icon="fa fa-info" />
+					<p:overlayPanel showCloseIcon="true" showEffect="fade"
+						id="imagePanelp" for="infop" hideEffect="explode" modal="true"
+						style="width: 40%;">
+
+						<h:panelGrid cellpadding="15">
+							<p:outputLabel value="#{item.justificativaAux}"
+								styleClass="Red my-label" />
+						</h:panelGrid>
+					</p:overlayPanel>
+				</p:column>
+			</p:dataTable>
+		</p:tab>
+	</p:tabView>
+</ui:composition>

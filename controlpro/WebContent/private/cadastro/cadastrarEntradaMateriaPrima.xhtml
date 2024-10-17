@@ -1,0 +1,314 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:t="http://myfaces.apache.org/tomahawk"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="avaliacao.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>#{entradaMateriaPrimaBean.entradaMateriaPrima.id == null ?
+					'Cadastrar Entrada de Matéria Prima' : 'Atualizar Entrada de
+					Matéria Prima'}</h1>
+				<h3>#{entradaMateriaPrima.entradaMateriaPrima.id == null ?
+					'Preencha o formulário abaixo para cadastrar uma nova entrada de
+					matéria prima.' : 'Preencha o formulário abaixo para atualizar a
+					entrada de matéria prima.'}</h3>
+
+				<div class="links-funcionais">
+					<p:link id="lista" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/lista/listarEntradaMateriaPrima.xhtml">
+						<i class="material-icons md-32">list</i>
+						<br />
+					</p:link>
+					<p:tooltip for="lista" position="top"
+						value="Listar Entrada Materia Prima" />
+
+					<p:link styleClass="link-funcional" outcome="/private/index.xhtml"
+						id="inicio">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+			<p:panel style="margin-top: 15px" styleClass="my-panel">
+				<p:outputLabel value="(" />
+				<p:outputLabel value="*" styleClass="campoObrigatorio" />
+				<p:outputLabel value=") Campos obrigatórios." />
+			</p:panel>
+
+			<h:form id="frm">
+				<div class="ui-fluid">
+					<p:messages showDetail="true" autoUpdate="false" closable="true" />
+
+					<p:panelGrid columns="2" style="margin-top: 20px" layout="grid"
+						columnClasses="ui-grid-col-2" styleClass="ui-panelgrid-blank">
+						<h:panelGroup>
+							<p:outputLabel value="Fornecedor: " styleClass="my-label"
+								for="fornecedor" />
+						</h:panelGroup>
+
+						<!-- 						<p:autoComplete -->
+						<!-- 							value="#{entradaMateriaPrimaBean.entradaMateriaPrima.fornecedor}" -->
+						<!-- 							autocomplete="true" id="fornecedor" -->
+						<!-- 							completeMethod="#{clienteBean.getFornecedorAutoComplete}" -->
+						<!-- 							forceSelection="true" minQueryLength="2" maxResults="30" -->
+						<!-- 							dropdown="true" required="true" -->
+						<!-- 							requiredMessage="Fornecedor é obrigatório" -->
+						<!-- 							converterMessage="Não foi possível selecionar o fornecedor (Erro ao converter o objeto)" -->
+						<!-- 							converter="clienteConverter" var="cli" itemLabel="#{cli.nome}" -->
+						<!-- 							itemValue="#{cli}" placeholder="Pesquise pelo nome"> -->
+						<!-- 							<f:attribute name="collectionType" value="java.util.ArrayList" /> -->
+						<!-- 						</p:autoComplete> -->
+
+						<p:selectOneMenu showCheckbox="true" id="fornecedor" filter="true"
+							filterMatchMode="startsWith"
+							value="#{entradaMateriaPrimaBean.entradaMateriaPrima.fornecedor}"
+							validatorMessage="erro ao validar" converter="clienteConverter"
+							converterMessage="Erro ao converter!">
+							<f:selectItem itemLabel="Selecione" />
+							<f:selectItems value="#{clienteBean.fornecedores}" var="f"
+								itemLabel="#{f.nome}" itemValue="#{f}" />
+						</p:selectOneMenu>
+
+						<h:panelGroup>
+							<p:outputLabel value="Nota: " styleClass="my-label"
+								for="observacao" />
+						</h:panelGroup>
+						<p:inputText id="nota" label="Nota"
+							value="#{entradaMateriaPrimaBean.entradaMateriaPrima.nota}" />
+
+						<h:panelGroup>
+							<p:outputLabel value="Loja: " styleClass="my-label" for="loja" />
+						</h:panelGroup>
+						<p:selectOneMenu id="loja"
+							value="#{entradaMateriaPrimaBean.entradaMateriaPrima.loja}"
+							required="true" requiredMessage="Selecione a loja">
+							<f:selectItem itemLabel="Selecione" />
+							<f:selectItems value="#{entradaMateriaPrimaBean.lojas}" var="l"
+								itemLabel="#{l.descricao}" itemValue="#{l}" />
+						</p:selectOneMenu>
+
+						<h:panelGroup>
+							<p:outputLabel value="Observação: " styleClass="my-label"
+								for="observacao" />
+						</h:panelGroup>
+						<p:inputTextarea id="observacao" rows="6" cols="60"
+							label="Observação"
+							value="#{entradaMateriaPrimaBean.entradaMateriaPrima.observacao}" />
+					</p:panelGrid>
+					<h:panelGrid>
+						<br />
+						<p:commandButton value="Adicionar item"
+							rendered="#{entradaMateriaPrimaBean.entradaMateriaPrima.id == null}"
+							oncomplete="PF('dados').show()" styleClass="button-add"
+							action="#{entradaMateriaPrimaBean.clearItemEntradaMateriaPrima()}"
+							process="@this" update=":form-cadastro:dados" icon="fa fa-plus">
+						</p:commandButton>
+						<br />
+
+						<p:dataTable id="tableItemEntradaMateriaPrima" var="entity"
+							value="#{entradaMateriaPrimaBean.itemEntradaMateriaPrimaList}"
+							emptyMessage="Nenhum item foi adicionada">
+
+							<p:column headerText="Matéria Prima">
+								<p:outputLabel value="#{entity.materiaPrima.nome}" />
+							</p:column>
+
+							<p:column headerText="Unidade Medida">
+								<p:outputLabel
+									value="#{entity.materiaPrima.unidadeMedida} - #{entity.materiaPrima.unidadeMedida.descricao}" />
+							</p:column>
+
+							<p:column headerText="Saldo da Matéria Prima">
+								<p:outputLabel value="#{entity.materiaPrima.saldo}" />
+							</p:column>
+
+							<p:column styleClass="Center" headerText="Valor (R$)">
+								<p:outputLabel value="#{entity.valor}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+
+							<p:column headerText="Quantidade Entrada" width="110">
+								<p:outputLabel value="#{entity.quantidade}" />
+							</p:column>
+
+							<p:column headerText="Total" width="110">
+								<p:outputLabel value="#{entity.total}" styleClass="label-azul">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+
+							<p:column headerText="Ações" width="80">
+								<div align="center">
+									<h:panelGroup
+										rendered="#{entradaMateriaPrimaBean.entradaMateriaPrima.id == null}">
+										<p:commandLink oncomplete="PF('dados').show()"
+											id="editItemEntradaMateriaPrima"
+											update=":form-cadastro:dados" process="@this">
+											<i class="material-icons GrayDark">mode_edit</i>
+											<f:setPropertyActionListener
+												target="#{entradaMateriaPrimaBean.itemEntradaMateriaPrima}"
+												value="#{entity}" />
+										</p:commandLink>
+										<p:tooltip for="editItemEntradaMateriaPrima"
+											value="Clique para editar o item " />
+									</h:panelGroup>
+									<h:panelGroup>
+										<p:commandLink id="removeItemEntradaMateriaPrima"
+											action="#{entradaMateriaPrimaBean.removerItemEntradaMateriaPrima()}"
+											update="tableItemEntradaMateriaPrima" process="@this">
+											<i class="material-icons GrayDark">delete_forever</i>
+											<f:setPropertyActionListener
+												target="#{entradaMateriaPrimaBean.itemEntradaMateriaPrima}"
+												value="#{entity}"></f:setPropertyActionListener>
+										</p:commandLink>
+										<p:tooltip for="removeItemEntradaMateriaPrima"
+											value="Clique para excluir o item" />
+									</h:panelGroup>
+								</div>
+							</p:column>
+
+							<f:facet name="footer">
+								<div align="right">
+									<h1>
+										<p:outputLabel value="Total:" style="color:#fff" />
+										<p:outputLabel value="#{entradaMateriaPrimaBean.total}"
+											style="color:#fff">
+											<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+												minFractionDigits="2" type="currency" />
+										</p:outputLabel>
+									</h1>
+								</div>
+							</f:facet>
+
+						</p:dataTable>
+					</h:panelGrid>
+
+					<br /> <br />
+					<p:separator />
+					<h:panelGrid columns="3">
+						<p:commandButton value="Salvar" icon="fa fa-floppy-o"
+							action="#{entradaMateriaPrimaBean.save}" update="frm"
+							rendered="#{entradaMateriaPrimaBean.entradaMateriaPrima.id == null}" />
+
+						<p:commandButton value="Atualizar" icon="fa fa-floppy-o"
+							action="#{entradaMateriaPrimaBean.update}"
+							rendered="#{entradaMateriaPrimaBean.entradaMateriaPrima.id != null}" />
+
+						<p:spacer width="20" height="0" />
+
+						<p:commandButton value="Cancelar" action="/private/index.xhtml"
+							immediate="true"
+							rendered="#{entradaMateriaPrimaBean.entradaMateriaPrima.id == null}"
+							icon="fa fa-ban" ajax="false" />
+
+						<p:commandButton value="Cancelar"
+							action="#{entradaMateriaPrimaBean.goToList()}" immediate="true"
+							rendered="#{entradaMateriaPrimaBean.entradaMateriaPrima.id != null}"
+							icon="fa fa-ban" ajax="false" />
+					</h:panelGrid>
+				</div>
+			</h:form>
+
+			<h:form id="form-cadastro">
+				<p:dialog modal="true" id="dados" widgetVar="dados"
+					resizable="false">
+
+					<f:facet name="header">
+					#{entradaMateriaPrima.itemEntradaMateriaPrima.materiaPrima.nome == null ? 'Adicionar item' :
+					'Atualizar item'}
+					</f:facet>
+
+					<div class="ui-fluid">
+						<p:messages showDetail="true" autoUpdate="true" closable="true" />
+
+						<h:panelGrid columns="2" style="margin-top: 20px"
+							id="grid-cadastro" cellpadding="05px">
+
+							<h:panelGroup>
+								<p:outputLabel value="Materia Prima: " styleClass="my-label"
+									style="vertical-align: text-top;" for="materia" />
+							</h:panelGroup>
+							<!-- 							<p:selectOneMenu id="materia" -->
+							<!-- 								value="#{entradaMateriaPrimaBean.itemEntradaMateriaPrima.materiaPrima}" -->
+							<!-- 								required="true" requiredMessage="Materia Prima é obrigatório." -->
+							<!-- 								converter="genericConverter"> -->
+							<!-- 								<f:selectItem itemLabel="Selecione" /> -->
+							<!-- 								<f:selectItems value="#{materiaPrimaBean.materias}" var="mat" -->
+							<!-- 									itemLabel="#{mat.nome}" itemValue="#{mat}" /> -->
+							<!-- 							</p:selectOneMenu> -->
+
+							<p:autoComplete
+								value="#{entradaMateriaPrimaBean.itemEntradaMateriaPrima.materiaPrima}"
+								autocomplete="true" id="materia"
+								completeMethod="#{materiaPrimaBean.getMateriaPrimaAutoComplete}"
+								forceSelection="true" minQueryLength="1" maxResults="30"
+								dropdown="true" required="true"
+								requiredMessage="Campo 'Materia Prima' é obrigatório!"
+								converterMessage="Não foi possível selecionar a materia prima(Erro ao converter o objeto)"
+								converter="genericConverter" var="materia"
+								itemLabel="#{materia.nome}" itemValue="#{materia}"
+								placeholder="Pesquise pelo nome da materia prima">
+							</p:autoComplete>
+
+							<h:panelGroup>
+								<p:outputLabel value="Quantidade: " styleClass="my-label"
+									style="vertical-align: text-top;" />
+							</h:panelGroup>
+							<p:inputText id="qtd" validatorMessage="Apenas números"
+								value="#{entradaMateriaPrimaBean.itemEntradaMateriaPrima.quantidade}"
+								required="true"
+								requiredMessage="Campo 'quantidade' obrigatório!" />
+
+							<h:panelGroup>
+								<p:outputLabel value="Valor: " styleClass="my-label"
+									style="vertical-align: text-top;" />
+							</h:panelGroup>
+							<p:inputText required="true" id="valor"
+								requiredMessage="Campo 'Valor' é obrigatório!"
+								styleClass="moeda" maxlength="10"
+								value="#{entradaMateriaPrimaBean.itemEntradaMateriaPrima.valor}">
+								<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+									minFractionDigits="2" type="number" />
+							</p:inputText>
+						</h:panelGrid>
+						<p:separator />
+						<h:panelGrid columns="3">
+							<p:commandButton value="Adicionar"
+								update=":frm:tableItemEntradaMateriaPrima grid-cadastro"
+								action="#{entradaMateriaPrimaBean.addItemEntradaMateriaPrima()}"
+								icon="fa fa-plus"
+								rendered="#{entradaMateriaPrimaBean.itemEntradaMateriaPrima.materiaPrima.nome == null}" />
+
+							<p:commandButton value="Atualizar"
+								oncomplete="PF('dados').hide()" icon="fa fa-refresh"
+								update=":frm:tableItemEntradaMateriaPrima"
+								action="#{entradaMateriaPrimaBean.updateItemEntradaMateriaPrima()}"
+								rendered="#{entradaMateriaPrimaBean.itemEntradaMateriaPrima.materiaPrima.nome != null}" />
+
+							<p:commandButton value="Cancelar" styleClass="btn-orange"
+								icon="fa fa-close" process="@this"
+								oncomplete="PF('dados').hide()" immediate="true" />
+
+							<p:spacer width="20" height="0" />
+						</h:panelGrid>
+					</div>
+				</p:dialog>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

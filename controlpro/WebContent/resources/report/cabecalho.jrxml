@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="cabecalho" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c9b3a11e-5ec3-47ed-8d65-4b3d2455b6b2">
+	<property name="ireport.zoom" value="1.5026296018031553"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="logo" class="java.lang.String"/>
+	<parameter name="filtro" class="java.lang.String"/>
+	<parameter name="rodape" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<field name="protocolo" class="java.lang.String"/>
+	<field name="dataCadastro" class="java.util.Date"/>
+	<field name="previsaoTermino" class="java.util.Date"/>
+	<field name="observacao" class="java.lang.String"/>
+	<field name="faccao.nome" class="java.lang.String"/>
+	<field name="situacao.descricao" class="java.lang.String"/>
+	<field name="tipoCostura.descricao" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="80" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="107" height="75" uuid="81b3d175-0fcf-4287-9947-53db6be13884"/>
+			</rectangle>
+			<image hAlign="Center" vAlign="Middle">
+				<reportElement x="7" y="9" width="92" height="56" uuid="507ca833-b407-4d24-9e55-1bd225b8c118"/>
+				<imageExpression><![CDATA[$P{logo}]]></imageExpression>
+			</image>
+			<rectangle>
+				<reportElement x="107" y="0" width="448" height="75" uuid="4f8f0f58-8759-4346-8cf2-314641417453"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="111" y="3" width="109" height="20" uuid="b8508aa7-3a05-4bae-b26e-0e2e59539e48"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[NOME EMPRESARIAL:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="110" y="23" width="110" height="20" uuid="67ef90b4-05b3-4709-9c8e-34e104177721"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[CNPJ:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="110" y="44" width="110" height="20" uuid="c0ef3fc2-1598-4c25-80db-fbc9b6050bd6"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[ENDEREÇO:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="221" y="3" width="264" height="20" uuid="a42db397-b801-48fb-b9e3-7a6b721e15b3"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<text><![CDATA[FERNANDA LIMA OLIVEIRA LTDA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="221" y="23" width="264" height="20" uuid="3392191b-e847-4727-9e37-21bad6faae14"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<text><![CDATA[20.297.332/0001-97]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="221" y="44" width="264" height="20" uuid="600686ea-87ae-423d-9258-a3523b19f53a"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<text><![CDATA[R. BASÍLIO EMILIANO PINTO. 461 - CENTRO - QUIXADÁ]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+</jasperReport>

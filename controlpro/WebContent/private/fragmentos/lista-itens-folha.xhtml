@@ -1,0 +1,84 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:t="http://myfaces.apache.org/tomahawk"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+	<br />
+	<p:outputLabel value="Lista de itens na ordem de corte"
+		styleClass="my-label-titulo" />
+	<br />
+	<br />
+	<center>
+		<p:dataTable id="tableItensFolha" var="item"
+			value="#{folhaPagamentoBean.itemFolhaPagamentoList}"
+			emptyMessage="Nenhum registro encontrado">
+			
+			<p:column headerText="Tipo" style="color: #000000 !important">
+				<p:outputLabel value="#{item.folhaPagamento.tipoFolhaPagamento.descricao}" />
+			</p:column>
+			
+			<p:column headerText="Funcionario" style="color: #000000 !important">
+				<p:outputLabel value="#{item.funcionario.nome}" />
+			</p:column>
+
+			<p:column headerText="Valor" style="color: #000000 !important"
+				styleClass="Center">
+				<p:outputLabel
+					value="#{item.valor}"
+					styleClass="negrito">
+					<f:convertNumber minFractionDigits="2" type="currency"
+						maxFractionDigits="2" />
+				</p:outputLabel>
+			</p:column>
+			<p:column headerText="Hora Extra" style="color: #000000 !important"
+				styleClass="Center">
+				<p:outputLabel
+					value="#{item.horaExtra}"
+					styleClass="negrito">
+					<f:convertNumber minFractionDigits="2" type="currency"
+						maxFractionDigits="2" />
+				</p:outputLabel>
+			</p:column>
+			<p:column headerText="Inss" style="color: #000000 !important"
+				styleClass="Center">
+				<p:outputLabel
+					value="#{item.inss}"
+					styleClass="negrito">
+					<f:convertNumber minFractionDigits="2" type="currency"
+						maxFractionDigits="2" />
+				</p:outputLabel>
+			</p:column>
+			<p:column headerText="Outros Descontos" style="color: #000000 !important"
+				styleClass="Center">
+				<p:outputLabel
+					value="#{item.outrosDescontos}"
+					styleClass="negrito">
+					<f:convertNumber minFractionDigits="2" type="currency"
+						maxFractionDigits="2" />
+				</p:outputLabel>
+			</p:column>
+			<p:column headerText="Salário Receber" style="color: #000000 !important"
+				styleClass="Center">
+				<p:outputLabel
+					value="#{item.salarioReceber}"
+					styleClass="negrito">
+					<f:convertNumber minFractionDigits="2" type="currency"
+						maxFractionDigits="2" />
+				</p:outputLabel>
+			</p:column>
+
+
+			<!-- 			<f:facet name="footer"> -->
+			<!-- 				<h1 style="color: #fff !important"> -->
+			<!-- 					<p:outputLabel value="Total enviados: " /> -->
+			<!-- 					<p:outputLabel value="#{ordemCorteBean.total}" /> -->
+			<!-- 				</h1> -->
+			<!-- 			</f:facet> -->
+
+
+
+		</p:dataTable>
+	</center>
+</ui:composition>

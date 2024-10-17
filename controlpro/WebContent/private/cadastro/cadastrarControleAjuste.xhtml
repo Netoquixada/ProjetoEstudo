@@ -1,0 +1,375 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:t="http://myfaces.apache.org/tomahawk"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="ajuste.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>#{controleAjusteBean.controleAjuste.id == null ? 'Cadastrar
+					Controle de Ajuste' : 'Atualizar Controle de Ajuste'}</h1>
+				<h3>#{controleAjusteBean.controleAjuste.id == null ? 'Preencha
+					o formulário abaixo para cadastrar um novo controle de ajuste.' :
+					'Preencha o formulário abaixo para atualizar o controle de
+					ajuste.'}</h3>
+
+				<div class="links-funcionais">
+					<p:link id="lista" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/lista/listarControleAjuste.xhtml">
+						<i class="material-icons md-32">list</i>
+						<br />
+					</p:link>
+					<p:tooltip for="lista" position="top"
+						value="Listar Controles de Ajustes" />
+
+					<p:link styleClass="link-funcional" outcome="/private/index.xhtml"
+						id="inicio">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+			<p:panel style="margin-top: 15px" styleClass="my-panel">
+				<p:outputLabel value="(" />
+				<p:outputLabel value="*" styleClass="campoObrigatorio" />
+				<p:outputLabel value=") Campos obrigatórios." />
+			</p:panel>
+
+			<t:saveState value="#{controleAjusteBean.controleAjuste}" />
+			<t:saveState value="#{controleAjusteBean.controleAjustes}" />
+
+			<h:form id="frm">
+				<div class="ui-fluid">
+					<p:messages showDetail="true" autoUpdate="true" closable="true" />
+
+					<p:tabView style="margin-top: 15px" prependId="false">
+						<p:tab title="Sequência e Movimentação">
+							<p:panelGrid columns="2" style="margin-top: 20px" layout="grid"
+								styleClass="ui-panelgrid-blank"
+								columnClasses="ui-grid-col-6,ui-grid-col-6">
+								<h:panelGrid columns="3">
+									<p:outputLabel value="Sequência da Venda: "
+										styleClass="my-label" style="vertical-align: text-top;"
+										for="sequencia" />
+									<p:inputText id="sequencia"
+										value="#{controleAjusteBean.controleAjuste.sequenciaVenda}"
+										required="true" requiredMessage="Digite a sequencia da venda" />
+									<p:commandButton icon="fa fa-search"
+										process="@this sequencia grid-cliente"
+										style="margin-left: 5px; width: 100px !important"
+										update="table-controle grid-cliente"
+										action="#{controleAjusteBean.movimentacoesProduto()}" />
+
+									<h:panelGrid columns="2" id="grid-cliente">
+
+										<p:outputLabel value="Data: " styleClass="my-label"
+											style="vertical-align: text-top;" />
+										<p:outputLabel value="#{controleAjusteBean.venda.data}">
+											<f:convertDateTime pattern="dd/MM/yyyy" />
+										</p:outputLabel>
+
+										<p:outputLabel value="Cliente: " styleClass="my-label"
+											style="vertical-align: text-top;" />
+
+										<p:outputLabel
+											value="#{controleAjusteBean.venda.cliente.nome}" />
+
+										<p:outputLabel value="Telefone: " styleClass="my-label"
+											style="vertical-align: text-top;" />
+
+										<p:outputLabel
+											value="#{controleAjusteBean.venda.cliente.fone}" />
+
+										<p:outputLabel value="Total da Venda: " styleClass="my-label"
+											style="vertical-align: text-top;" />
+
+										<p:outputLabel value="#{controleAjusteBean.venda.totalVenda}">
+											<f:convertNumber minFractionDigits="2" type="currency"
+												maxFractionDigits="2" />
+										</p:outputLabel>
+									</h:panelGrid>
+								</h:panelGrid>
+
+								<h:panelGroup>
+									<p:dataTable id="table-controle"
+										value="#{controleAjusteBean.movimentacoes}" var="entity"
+										paginator="true" style="margin-top: 15px"
+										emptyMessage="Nenhum registro encontrado!"
+										paginatorPosition="bottom" paginatorAlwaysVisible="false"
+										rows="10" lazy="true">
+
+										<f:facet name="header">
+											<p:outputLabel value="Movimentação da Saída" />
+										</f:facet>
+
+<!-- 										<p:column headerText="Data" style="color: #000 !important"> -->
+<!-- 											<p:outputLabel value="#{entity.data}"> -->
+<!-- 												<f:convertDateTime pattern="dd/MM/yyyy" /> -->
+<!-- 											</p:outputLabel> -->
+<!-- 										</p:column> -->
+
+										<p:column headerText="Sequencia"
+											style="color: #000 !important">
+											<p:outputLabel value="#{entity.sequencia}" />
+										</p:column>
+
+										<p:column headerText="Linha"
+											style="color: #000 !important">
+											<p:outputLabel value="#{entity.linha}" />
+										</p:column>
+
+										<p:column headerText="Refência Produto"
+											style="color: #000 !important">
+											<p:outputLabel value="#{entity.produto.id}" />
+										</p:column>
+
+										<p:column headerText="Nome" style="color: #000 !important">
+											<p:outputLabel value="#{entity.produto.nome}" />
+										</p:column>
+
+										<f:facet name="footer">
+											<p:outputLabel value="Quantidade de Itens: " />
+											<p:outputLabel
+												value="#{controleAjusteBean.movimentacoes.size()}" />
+										</f:facet>
+
+									</p:dataTable>
+								</h:panelGroup>
+							</p:panelGrid>
+							<br />
+							<p:separator />
+							<h:panelGrid>
+								<br />
+								<p:commandButton value="Adicionar item de ajuste"
+									oncomplete="PF('dados').show()" styleClass="button-add"
+									action="#{controleAjusteBean.clearItemControleAjuste()}"
+									process="@this" update=":form-cadastro:dados" icon="fa fa-plus">
+								</p:commandButton>
+								<br />
+
+								<p:dataTable id="tableItemControleAjuste" var="entity"
+									value="#{controleAjusteBean.itemControleAjusteList}"
+									emptyMessage="Nenhum item foi adicionada">
+
+									<p:column headerText="Referência"
+										style="color: #000 !important">
+										<p:outputLabel value="#{entity.sequencia}" />
+									</p:column>
+									
+									<p:column headerText="Linha"
+										style="color: #000 !important">
+										<p:outputLabel value="#{entity.linha}" />
+									</p:column>
+
+									<p:column headerText="Observação"
+										style="color: #000 !important">
+										<p:outputLabel value="#{entity.observacao}" />
+									</p:column>
+
+									<p:column headerText="Ações" width="80"
+										style="color: #000 !important">
+										<div align="center">
+											<h:panelGroup>
+												<p:commandLink oncomplete="PF('dados').show()"
+													id="editItemControleAjuste" update=":form-cadastro:dados"
+													process="@this">
+													<i class="material-icons GrayDark">mode_edit</i>
+													<f:setPropertyActionListener
+														target="#{controleAjusteBean.itemControleAjuste}"
+														value="#{entity}" />
+												</p:commandLink>
+												<p:tooltip for="editItemControleAjuste"
+													value="Clique para editar o item " />
+											</h:panelGroup>
+											<h:panelGroup>
+												<p:commandLink id="removeItemControleAjuste"
+													action="#{controleAjusteBean.removerItemControleAjuste()}"
+													update="tableItemControleAjuste" process="@this">
+													<i class="material-icons GrayDark">delete_forever</i>
+													<f:setPropertyActionListener
+														target="#{controleAjusteBean.itemControleAjuste}"
+														value="#{entity}"></f:setPropertyActionListener>
+												</p:commandLink>
+												<p:tooltip for="removeItemControleAjuste"
+													value="Clique para excluir o item" />
+											</h:panelGroup>
+										</div>
+									</p:column>
+								</p:dataTable>
+							</h:panelGrid>
+
+							<br />
+							<br />
+
+						</p:tab>
+						<p:tab title="Informações">
+							<h:panelGrid cellpadding="20" columns="5"
+								style="margin-top: 10px" id="grid">
+								<h:panelGrid id="l-data-entrega">
+									<h:panelGroup>
+										<p:outputLabel value="Loja: " styleClass="my-label"
+											style="vertical-align: text-top;" for="loja" />
+										<br />
+										<p:selectOneMenu
+											value="#{controleAjusteBean.controleAjuste.loja}"
+											required="true" id="loja">
+											<f:selectItem itemLabel="Selecione" />
+											<f:selectItems value="#{controleAjusteBean.lojas}" var="l"
+												itemLabel="#{l.descricao}" itemValue="#{l}" />
+										</p:selectOneMenu>
+									</h:panelGroup>
+									<h:panelGroup>
+										<p:outputLabel value="Facção: " styleClass="my-label"
+											style="vertical-align: text-top;" for="faccao" />
+										<br />
+										<p:autoComplete
+											value="#{controleAjusteBean.controleAjuste.faccao}"
+											autocomplete="true" size="36" id="faccao"
+											completeMethod="#{faccaoBean.getFaccaoAutoComplete}"
+											forceSelection="true" minQueryLength="1" maxResults="30"
+											dropdown="true" required="true"
+											requiredMessage="Campo 'Facção' é obrigatório!"
+											converterMessage="Não foi possível selecionar a facção(Erro ao converter o objeto)"
+											converter="genericConverter" var="faccao"
+											itemLabel="#{faccao.nome}" itemValue="#{faccao}"
+											placeholder="Pesquise pelo nome da facção">
+										</p:autoComplete>
+									</h:panelGroup>
+									<h:panelGroup>
+										<p:outputLabel value="Protocolo de Controle: "
+											styleClass="my-label" style="vertical-align: text-top;"
+											for="p-controle" />
+										<br />
+										<p:inputText required="true" id="p-controle"
+											value="#{controleAjusteBean.controleAjuste.protocoloControle}" />
+									</h:panelGroup>
+									<h:panelGroup>
+										<p:outputLabel value="Pronto em: " styleClass="my-label"
+											style="vertical-align: text-top;" for="data-pronto" />
+										<br />
+										<p:calendar size="10" navigator="true" id="data-pronto"
+											value="#{controleAjusteBean.controleAjuste.dataPronto}"
+											pattern="dd/MM/yyyy" />
+									</h:panelGroup>
+									<h:panelGroup>
+										<p:outputLabel value="Data da Entrega: " styleClass="my-label"
+											style="vertical-align: text-top;" for="data-entrega" />
+										<br />
+										<p:calendar size="10" navigator="true" id="data-entrega"
+											value="#{controleAjusteBean.controleAjuste.dataEntrega}"
+											pattern="dd/MM/yyyy" />
+									</h:panelGroup>
+								</h:panelGrid>
+								<h:panelGroup>
+									<p:outputLabel value="Descrição:" styleClass="my-label"
+										style="vertical-align: text-top;" />
+									<br />
+									<p:inputTextarea id="descricao"
+										placeholder="Descreva uma observação sobre o controle de ajuste(opcional)!"
+										value="#{controleAjusteBean.controleAjuste.observacao}"
+										label="Descrição" rows="4" cols="60" />
+								</h:panelGroup>
+							</h:panelGrid>
+						</p:tab>
+					</p:tabView>
+					<br /> <br />
+					<p:separator />
+					<h:panelGrid columns="3">
+						<p:commandButton value="Salvar" icon="fa fa-floppy-o"
+							action="#{controleAjusteBean.save}" update="frm"
+							rendered="#{controleAjusteBean.controleAjuste.id == null}" />
+
+						<p:commandButton value="Atualizar" icon="fa fa-floppy-o"
+							action="#{controleAjusteBean.update}"
+							rendered="#{controleAjusteBean.controleAjuste.id != null}" />
+
+						<p:spacer width="20" height="0" />
+
+						<p:commandButton value="Cancelar" action="/private/index.xhtml"
+							immediate="true"
+							rendered="#{controleAjusteBean.controleAjuste.id == null}"
+							icon="fa fa-ban" ajax="false" />
+
+						<p:commandButton value="Cancelar"
+							action="#{controleAjusteBean.goToList()}" immediate="true"
+							rendered="#{controleAjusteBean.controleAjuste.id != null}"
+							icon="fa fa-ban" ajax="false" />
+					</h:panelGrid>
+				</div>
+			</h:form>
+
+			<h:form id="form-cadastro">
+				<p:dialog modal="true" id="dados" widgetVar="dados"
+					resizable="false">
+
+					<f:facet name="header">
+					#{controleAjusteBean.itemControleAjuste.sequencia == null ? 'Adicionar item' :
+					'Atualizar item'}
+					</f:facet>
+
+					<div class="ui-fluid">
+						<p:messages showDetail="true" autoUpdate="true" closable="true" />
+
+						<h:panelGrid columns="2" style="margin-top: 20px"
+							id="grid-cadastro" cellpadding="05px">
+
+							<h:panelGroup>
+								<p:outputLabel value="Referência: " styleClass="my-label"
+									style="vertical-align: text-top;" />
+							</h:panelGroup>
+							<p:inputText id="qtd"
+								value="#{controleAjusteBean.itemControleAjuste.sequencia}"
+								required="true" requiredMessage="Campo 'sequencia' obrigatório!" />
+								
+								<h:panelGroup>
+								<p:outputLabel value="Linha: " styleClass="my-label"
+									style="vertical-align: text-top;" />
+							</h:panelGroup>
+							<p:inputText id="qtd1"
+								value="#{controleAjusteBean.itemControleAjuste.linha}"
+								required="true" requiredMessage="Campo 'sequencia' obrigatório!" />
+
+							<h:panelGroup>
+								<p:outputLabel value="Observação: " styleClass="my-label"
+									style="vertical-align: text-top;" />
+							</h:panelGroup>
+							<p:inputTextarea rows="6" cols="50" required="true"
+								requiredMessage="Campo obrigatório!"
+								value="#{controleAjusteBean.itemControleAjuste.observacao}" />
+						</h:panelGrid>
+						<p:separator />
+						<h:panelGrid columns="3">
+							<p:commandButton value="Adicionar"
+								update=":frm:tableItemControleAjuste grid-cadastro"
+								action="#{controleAjusteBean.addItemControleAjuste()}"
+								icon="fa fa-plus"
+								rendered="#{controleAjusteBean.itemControleAjuste.sequencia == null}" />
+
+							<p:commandButton value="Atualizar"
+								oncomplete="PF('dados').hide()" icon="fa fa-refresh"
+								update=":frm:tableItemControleAjuste"
+								action="#{controleAjusteBean.updateItemControleAjuste()}"
+								rendered="#{controleAjusteBean.itemControleAjuste.sequencia != null}" />
+
+							<p:commandButton value="Cancelar" styleClass="btn-orange"
+								icon="fa fa-close" process="@this"
+								oncomplete="PF('dados').hide()" immediate="true" />
+
+							<p:spacer width="20" height="0" />
+						</h:panelGrid>
+					</div>
+				</p:dialog>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

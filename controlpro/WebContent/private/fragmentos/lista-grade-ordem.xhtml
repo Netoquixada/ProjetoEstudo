@@ -1,0 +1,66 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:t="http://myfaces.apache.org/tomahawk"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+	<br />
+	<p:outputLabel value="Lista de itens na ordem de corte"
+		styleClass="my-label-titulo" />
+	<br />
+	<br />
+	<center>
+		<p:dataTable id="tableGradeOrdem" var="gradeOrdem"
+			value="#{ordemCorteBean.gradeOrdemList}"
+			emptyMessage="Nenhuma atividade foi adicionada">
+			<p:column headerText="Cortador" style="color: #000000 !important">
+				<p:outputLabel value="#{gradeOrdem.cortador.nome}" />
+			</p:column>
+
+			<p:column headerText="Produto" style="color: #000000 !important">
+				<p:outputLabel value="#{gradeOrdem.produto.nome}" />
+			</p:column>
+
+			<p:column headerText="Unidade" width="60"
+				style="color: #000000 !important">
+				<p:outputLabel value="#{gradeOrdem.produto.unidadeVenda}" />
+			</p:column>
+
+			<p:column headerText="Referência" width="110"
+				style="color: #000000 !important">
+				<p:outputLabel value="#{gradeOrdem.produto.id}" />
+			</p:column>
+
+			<p:column headerText="Grade" width="50"
+				style="color: #000000 !important">
+				<p:outputLabel value="#{gradeOrdem.grade.nome}" />
+			</p:column>
+
+			<p:column headerText="Quantidade" width="90" styleClass="Center"
+				style="color: #000000 !important">
+				<p:outputLabel value="#{gradeOrdem.quantidade}" />
+			</p:column>
+			<p:column headerText="Cortadas" width="90" styleClass="Center"
+				style="color: #000000 !important">
+				<p:outputLabel value="#{gradeOrdem.prontas}"
+					styleClass="negrito Green tam-24" />
+			</p:column>
+			<p:column headerText="Falta" width="90"
+				style="color: #000000 !important" styleClass="Center">
+				<p:outputLabel value="#{gradeOrdem.faltaAux}"
+					styleClass="negrito Red tam-24" />
+			</p:column>
+
+			<f:facet name="footer">
+				<h1 style="color: #fff !important">
+					<p:outputLabel value="Total enviados: " />
+					<p:outputLabel value="#{ordemCorteBean.total}" />
+				</h1>
+			</f:facet>
+
+
+
+		</p:dataTable>
+	</center>
+</ui:composition>

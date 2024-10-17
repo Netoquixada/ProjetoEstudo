@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<f:facet name="first">
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+	</f:facet>
+	<link rel="shortcut icon" type="image/x-icon"
+		href="#{facesContext.externalContext.requestContextPath}/resources/imagens/logo1.jpg" />
+	<h:outputStylesheet library="css" name="estilo.css" />
+	<h:outputStylesheet library="css" name="tooltip.css" />
+	<h:outputStylesheet library="font_icons"
+		name="MaterialIcons-Regular.css" />
+	<h:outputScript library="js" name="locale.js" />
+	<title><ui:insert name="titulo">ControlPro_V76</ui:insert></title>
+	<style type="text/css">
+@font-face {
+	font-family: 'RobotoCondensed-Regular';
+	src:
+		url('#{facesContext.externalContext.requestContextPath}/resources/fonts/RobotoCondensed-Regular.ttf')
+		format('truetype');
+	font-weight: normal;
+	font-style: normal;
+}
+</style>
+</h:head>
+
+<h:body>
+	<p:ajaxStatus onstart="PF('statusDialog').show();"
+		oncomplete="PF('statusDialog').hide()" />
+
+	<p:dialog modal="true" widgetVar="statusDialog" resizable="false"
+		header="Carregando..." draggable="false" closable="false">
+		<p:graphicImage library="imagens" name="ajax-loader.gif" />
+	</p:dialog>
+
+	<header>
+
+		<p:ajaxStatus oncomplete="configurarMoeda()" />
+
+		<p:link rendered="#{escopoSessaoBean.usuarioLogado.id != null}"
+			outcome="/private/index.xhtml">
+			<h:graphicImage library="imagens" name="201.jpeg" styleClass="logo" />
+		</p:link>
+
+		<h:panelGroup rendered="#{escopoSessaoBean.usuarioLogado.id != null}">
+			<div style="float: right; margin-right: 8%">
+				<span class="saudacao"> Bem-vindo,
+					#{escopoSessaoBean.usuarioLogado.nome}!
+					(#{escopoSessaoBean.usuarioLogado.loja.descricao}) </span>
+
+				<h:form style="display: inline-block; margin-top: 2px">
+
+
+					<!--      MENU FABRICA -->
+					<p:menubar styleClass="menu-sistema" autoDisplay="false"
+						style="background: #000 !important"
+						rendered="#{escopoSessaoBean.usuarioLogado.loja eq 'FABRICA'}">
+
+						<p:submenu label="Produção" icon="pi pi-file">
+
+
+							<!-- 								ACESSO AO SETOR DE PRODUÇÃO -->
+
+							<!-- 								MENU DE CADASTRO -->
+
+							<p:menuitem value="Facções" icon="fa fa-plus"
+								outcome="/private/lista/listarFaccao.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'PRODUCAO'
+							  or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+							<p:menuitem value="Coleção" icon="fa fa-shirtsinbulk"
+								outcome="/private/control/controlColecao.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'PRODUCAO'
+							  or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+							<p:menuitem value="Grade" icon="fa fa-sitemap"
+								outcome="/private/control/controlGrade.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'PRODUCAO'
+							  or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+							<p:menuitem value="SubGrupos Insumos"
+								outcome="/private/control/controlSubGrupo.xhtml"
+								icon="fa fa-tasks"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+
+							<p:separator />
+
+							<p:menuitem value="Ordem de corte" icon="fa fa-cut"
+								outcome="/private/lista/listarOrdemCorte.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'CORTADOR'
+							  or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+
+							<p:menuitem value="Ordem de Produção" icon="fa fa-plus"
+								outcome="/private/lista/listarOrdemProducao.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'PRODUCAO'
+							  or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+
+
+							<p:menuitem value="Acabamento" icon="fa fa-cog"
+								outcome="/private/lista/listarAcabamento.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'PRODUCAO'
+							  or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+							<p:menuitem value="Adiantamento Fac"
+								outcome="/private/control/controlAdiantamento.xhtml"
+								icon="fa fa-dollar"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'PRODUCAO'
+							  or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+
+
+							<p:separator />
+
+							<!-- 								ACESSO A LISTAGEMS DE GERENCIAMENTOS -->
+
+							<p:menuitem value="Relação Pro.Resumida" icon="fa fa-file-text-o"
+								outcome="/private/lista/listarOrdemProducaoResumida.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'PRODUCAO'
+							  or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+							<p:menuitem value="Produção Analistica" icon="fa fa-sitemap"
+								outcome="/private/lista/listarProducaoAnalistica.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'PRODUCAO'
+							  or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+							<p:menuitem value="Ocorrências de Produção" icon="fa fa-plus"
+								outcome="/private/lista/listarOcorrenciasProducao.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+							  or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+							<p:separator />
+
+							<!-- 								ACESSO AO SETOR DE PRECIFICAÇÃO E MATERIA PRIMA -->
+
+							<p:menuitem value="Materia Prima"
+								outcome="/private/lista/listarMateriaPrima.xhtml"
+								icon="fa fa-tasks"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+
+							<p:menuitem value="Entrada"
+								outcome="/private/lista/listarEntradaMateriaPrima.xhtml"
+								icon="fa fa-cny"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+							<p:menuitem value="Produto/Consumo"
+								outcome="/private/lista/listarProdutoConsumo.xhtml"
+								icon="fa fa-cny"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' or escopoSessaoBean.usuarioLogado.perfilUser eq 'PRODUCAO'}" />
+
+
+
+						</p:submenu>
+
+
+						<!--  **********************************  -->
+
+						<p:submenu label="Controle">
+
+							<p:menuitem value="Despesa Fixa" icon="fa fa-money"
+								outcome="/private/lista/listarDespesaFixa.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+							<p:menuitem value="Imobilizado"
+								outcome="/private/control/controlImobilizado.xhtml"
+								icon="fa fa-sitemap"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+							<p:menuitem value="Meta" icon="fa fa-exchange"
+								outcome="/private/lista/listarMeta.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+							<p:menuitem value="Logistica" icon="fa fa-exchange"
+								outcome="/private/lista/listarLogistica.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR'}" />
+
+
+							<p:separator />
+
+
+							<p:menuitem value="Funcionário"
+								outcome="/private/lista/listarFuncionarioControlPro.xhtml"
+								icon="fa fa-sitemap"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+							<p:menuitem value="Folha de Pagamento"
+								outcome="/private/lista/listarFolhaPagamento.xhtml"
+								icon="fa fa-usd"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+
+							<p:menuitem value="Cargo"
+								outcome="/private/control/controlCargo.xhtml"
+								icon="fa fa-sitemap"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+
+							<p:menuitem value="Vale"
+								outcome="/private/control/controlVale.xhtml"
+								icon="fa fa-sitemap"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+
+							<p:menuitem value="Vale - Pagamentos"
+								outcome="/private/control/controlValePagamentos.xhtml"
+								icon="fa fa-sitemap"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR'}" />
+
+							<p:separator />
+
+
+							<!-- 								Menus de interesses do escritório geral e LOLLABEL -->
+
+							<p:separator />
+
+							<p:menuitem value="Contas á pagar" icon="fa fa-usd"
+								outcome="/private/lista/listarContaPagar.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR'}" />
+
+							<p:menuitem value="Histórico Contas á pagar" icon="fa fa-usd"
+								outcome="/private/lista/listarHistoricoContaPagar.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'PRODUCAO'
+							  or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+							<p:separator />
+
+							<p:menuitem value="Gestão de Corte" icon="fa fa-table"
+								outcome="/private/lista/listarHistoricoCorte.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' or escopoSessaoBean.usuarioLogado.perfilUser eq 'PRODUCAO' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'CORTADOR'
+							  or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+							<p:menuitem value="Gestão de Pro(Recebidos)"
+								icon="fa fa-sort-amount-desc"
+								outcome="/private/lista/listarHistoricoProducao.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'PRODUCAO'
+							  or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+							<p:menuitem value="Gestão Pro(Analitico)"
+								icon="fa fa-rotate-left"
+								outcome="/private/lista/listarItensProducao.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'PRODUCAO'
+							  or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+
+						</p:submenu>
+
+						<p:submenu label="Consultas">
+
+
+							<p:menuitem value="Clientes" icon="fa fa-user"
+								outcome="/private/lista/listarClientes.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'OPERADOR'
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'VENDAS'
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+							<p:separator />
+
+							<p:menuitem value="Produtos" icon="fa fa-reorder"
+								outcome="/private/lista/listarProdutos.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'OPERADOR'
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'VENDAS'
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+							<p:menuitem value="Estoque" icon="fa fa-trello"
+								outcome="/private/lista/listarEstoque.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'OPERADOR'
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'VENDAS'
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+							<p:separator />
+
+							<p:menuitem value="Funcionários" icon="fa fa-child"
+								outcome="/private/lista/listarFuncionarios.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+
+							<p:menuitem value="Produtos Movimentados"
+								outcome="/private/lista/listarProdutosMovimentados.xhtml"
+								icon="fa fa-bookmark"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'OPERADOR'
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+
+						</p:submenu>
+
+						<p:submenu label="Auditoria">
+							<p:menuitem value="Item de Produção" icon="fa fa-key"
+								outcome="/private/lista/listarItensAudProducao.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR'
+							  or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+						</p:submenu>
+
+						<p:submenu label="Sistema">
+							<p:menuitem value="Meu perfil" icon="fa fa-street-view	" />
+							<p:menuitem value="Usuários" icon="fa fa-key"
+								outcome="/private/lista/listarUsuarios.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR'
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+						</p:submenu>
+						<p:menuitem value="Sair" action="#{loginBean.logout()}"
+							style="margin-right: 8px" />
+
+					</p:menubar>
+
+
+					<!--      MENU GLAMIX -->
+					<p:menubar styleClass="menu-sistema" autoDisplay="false"
+						style="background: #000 !important"
+						rendered="#{escopoSessaoBean.usuarioLogado.loja eq 'GLAMIX'}">
+
+						<p:submenu label="Cadastros" icon="pi pi-file">
+
+
+							<!-- 								ACESSO AO SETOR DE PRODUÇÃO -->
+
+							<p:menuitem value="Motoboy" icon="fa fa-shirtsinbulk"
+								outcome="/private/control/controlMotoboy.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR'  
+						 							 		or escopoSessaoBean.usuarioLogado.perfilUser eq 'PRODUCAO'}" />
+
+							<p:menuitem value="Clientes Glamix" icon="fa fa-shirtsinbulk"
+								outcome="/private/lista/listarClienteGlamix.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR'  
+						 							 		or escopoSessaoBean.usuarioLogado.perfilUser eq 'PRODUCAO'}" />
+
+							<p:menuitem value="Controle de Pedido Glamix"
+								outcome="/private/lista/listarControlePedidoGlamix.xhtml"
+								icon="fa-cart-arrow-down"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+									or escopoSessaoBean.usuarioLogado.perfilUser eq 'VENDAS'
+									or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+
+
+
+
+
+						</p:submenu>
+
+
+						<!--  **********************************  -->
+
+						<p:submenu label="Controle">
+							<p:menuitem value="Despesa Fixa" icon="fa fa-money"
+								outcome="/private/lista/listarDespesaFixa.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR'}" />
+
+							<p:menuitem value="Imobilizado"
+								outcome="/private/control/controlImobilizado.xhtml"
+								icon="fa fa-sitemap"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+							<p:menuitem value="Meta" icon="fa fa-exchange"
+								outcome="/private/lista/listarMeta.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR'}" />
+
+							<!-- 								Menus de interesses do escritório geral e LOLLABEL -->
+
+							<p:separator />
+
+							<p:menuitem value="Relacionamento Cliente"
+								icon="fa fa-shirtsinbulk"
+								outcome="/private/control/relacionamentoCliente.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'OPERADOR'
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+							<p:menuitem value="Vale"
+								outcome="/private/control/controlVale.xhtml"
+								icon="fa fa-sitemap"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+
+							<p:menuitem value="Vale - Pagamentos"
+								outcome="/private/control/controlValePagamentos.xhtml"
+								icon="fa fa-sitemap"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR'}" />
+
+							<p:separator />
+
+							<!-- 							<p:menuitem value="Controle de Reservas" -->
+							<!-- 								outcome="/private/control/controlReserva.xhtml" -->
+							<!-- 								icon="fa fa-money" -->
+							<!-- 								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR'  -->
+							<!-- 								or escopoSessaoBean.usuarioLogado.perfilUser eq 'OPERADOR' -->
+							<!-- 								or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" /> -->
+
+							<p:menuitem value="Controle de Cofres"
+								outcome="/private/control/controlCofre.xhtml" icon="fa fa-money"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+							<!-- 								Menus de interesses do escritório geral e LOLLABEL -->
+
+							<p:separator />
+
+
+						</p:submenu>
+
+						<p:submenu label="Consultas">
+
+													      <p:menuitem value="Resgate"
+															outcome="/private/control/controlResgate.xhtml"
+															icon="fa fa-bookmark"
+															rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+ 															or escopoSessaoBean.usuarioLogado.perfilUser eq 'OPERADOR'
+ 															or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+							<p:menuitem value="Clientes" icon="fa fa-user"
+								outcome="/private/lista/listarClientes.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'OPERADOR'
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'VENDAS'
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+
+
+							<p:separator />
+
+							<p:menuitem value="Produtos" icon="fa fa-trello"
+								outcome="/private/lista/listarProdutos.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'OPERADOR'
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'VENDAS'
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+							<p:menuitem value="Estoque" icon="fa fa-trello"
+								outcome="/private/lista/listarEstoque.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'OPERADOR'
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'VENDAS'
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+
+
+							<p:separator />
+
+							<p:menuitem value="Funcionários" icon="fa fa-child"
+								outcome="/private/lista/listarFuncionarios.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'OPERADOR'
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+
+							<p:menuitem value="Vendas Gerias" icon="fa fa-usd"
+								outcome="/private/lista/listarVendas.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'OPERADOR'
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+							<p:menuitem value="Vendas Dashboard" icon="fa fa-usd"
+								outcome="/private/lista/listarVendasDashboard.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'OPERADOR'
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+							<p:menuitem value="Caixa Geral" icon="fa fa-usd"
+								outcome="/private/lista/listarCaixa.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'OPERADOR'
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+							<p:menuitem value="Caixa Movimento" icon="fa fa-usd"
+								outcome="/private/lista/listarCaixaDetalhada.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'OPERADOR'
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+							<p:menuitem value="Movimentação bancaria"
+								outcome="/private/lista/listarMovimentacaoBancaria.xhtml"
+								icon="fa fa-bookmark"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'OPERADOR'
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+
+
+							<p:separator />
+
+
+							<p:menuitem value="Controle de Pedido"
+								outcome="/private/lista/listarControlePedido.xhtml"
+								icon="fa-cart-arrow-down"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+									or escopoSessaoBean.usuarioLogado.perfilUser eq 'VENDAS'
+									or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+							<!-- 							<p:menuitem value="Controle de Ajuste" -->
+							<!-- 								outcome="/private/lista/listarControleAjuste.xhtml" -->
+							<!-- 								icon="fa-cart-arrow-down" -->
+							<!-- 								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR'  -->
+							<!-- 									or escopoSessaoBean.usuarioLogado.perfilUser eq 'VENDAS' -->
+							<!-- 									or escopoSessaoBean.usuarioLogado.perfilUser eq 'OPERADOR' -->
+							<!-- 									or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" /> -->
+
+							<!-- 							<p:menuitem value="Resumo Cartão" -->
+							<!-- 								outcome="/private/control/resumoCartao.xhtml" icon="fa fa-usd" -->
+							<!-- 								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR'  -->
+							<!-- 								or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" /> -->
+
+							<p:separator />
+
+							<p:menuitem value="Produtos Movimentados"
+								outcome="/private/lista/listarProdutosMovimentados.xhtml"
+								icon="fa fa-bookmark"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' 
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'OPERADOR'
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+
+
+
+						</p:submenu>
+						<p:submenu label="Sistema">
+							<p:menuitem value="Meu perfil" icon="fa fa-street-view	" />
+							<p:menuitem value="Usuários" icon="fa fa-key"
+								outcome="/private/lista/listarUsuarios.xhtml"
+								rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR'
+								or escopoSessaoBean.usuarioLogado.perfilUser eq 'GERENCIA'}" />
+						</p:submenu>
+						<p:menuitem value="Sair" action="#{loginBean.logout()}"
+							style="margin-right: 8px" />
+
+					</p:menubar>
+				</h:form>
+			</div>
+		</h:panelGroup>
+
+		<div style="clear: both"></div>
+	</header>
+
+	<div class="content">
+		<ui:insert name="conteudo">
+
+		</ui:insert>
+	</div>
+
+	<footer>
+		<p:outputLabel
+			value="Sistema de controlador e gerenciamento - © GKSYSTEM - Todos os direitos reservados." />
+	</footer>
+
+	<h:outputScript library="js" name="jquery.maskMoney.js" />
+	<script>
+		function configurarMoeda() {
+			$(".moeda").maskMoney({
+				decimal : ",",
+				thousands : ".",
+				allowZero : true
+			});
+		}
+
+		$(document).ready(function() {
+			configurarMoeda();
+		});
+	</script>
+</h:body>
+</html>

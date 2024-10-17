@@ -1,0 +1,201 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:t="http://myfaces.apache.org/tomahawk"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="funcionario.jpg"
+						width="60px" style="float: left" />
+				</div>
+
+				<h1>#{funcionarioControlProBean.funcionarioControlPro.id ==
+					null ? 'Cadastrar Funcionario' : 'Atualizar Funcionario'}</h1>
+				<h3>#{funcionarioControlProBean.funcionarioControlPro.id ==
+					null ? 'Preencha o formulário abaixo para cadastrar uma nova
+					funcionario.' : 'Preencha o formulário abaixo para atualizar a
+					funcionario.'}</h3>
+
+				<div class="links-funcionais">
+					<p:link id="lista" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/lista/listarFuncionarioControlPro.xhtml">
+						<i class="material-icons md-32">list</i>
+						<br />
+					</p:link>
+					<p:tooltip for="lista" position="top" value="Listar Funcionários" />
+
+					<p:link styleClass="link-funcional" outcome="/private/index.xhtml"
+						id="inicio">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+			<p:panel style="margin-top: 15px" styleClass="my-panel">
+				<p:outputLabel value="(" />
+				<p:outputLabel value="*" styleClass="campoObrigatorio" />
+				<p:outputLabel value=") Campos obrigatórios." />
+			</p:panel>
+
+			<t:saveState
+				value="#{funcionarioControlProBean.funcionarioControlPro}" />
+			<t:saveState
+				value="#{funcionarioControlProBean.funcionarioControlPros}" />
+
+			<h:form id="frm">
+				<div class="ui-fluid">
+					<p:messages showDetail="true" autoUpdate="true" closable="true" />
+
+
+
+					<p:panelGrid columns="2" style="margin-top: 20px" layout="grid"
+						columnClasses="ui-grid-col-4 ui-grid-col-4"
+						styleClass="ui-panelgrid-blank">
+						<p:commandButton id="infop" type="button" icon="fa fa-info"
+							value="Informações" />
+						<p:overlayPanel showCloseIcon="true" showEffect="fade"
+							id="imagePanelp" for="infop" hideEffect="explode" modal="true"
+							style="width: 40%;">
+
+							<h:panelGrid cellpadding="15">
+								<p:outputLabel
+									value="Preencha todos os campos direito e o mais completo possivel! "
+									styleClass="Red my-label" />
+							</h:panelGrid>
+						</p:overlayPanel>
+
+						<h:panelGroup>
+							<p:outputLabel value="Nome: " styleClass="my-label"
+								style="vertical-align: text-top;" for="nome" />
+							<br />
+							<p:inputText id="nome"
+								value="#{funcionarioControlProBean.funcionarioControlPro.nome}"
+								required="true" label="Nome"
+								requiredMessage="Nome é obrigatório." />
+						</h:panelGroup>
+
+						<h:panelGroup>
+							<p:outputLabel value="Cargo " styleClass="my-label" for="cargo" />
+							<br />
+							<p:selectOneMenu id="cargo" required="true"
+								requiredMessage="Selecione o cargo"
+								value="#{funcionarioControlProBean.funcionarioControlPro.cargo}"
+								converter="genericConverter">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{cargoBean.cargos}" var="c"
+									itemLabel="#{c.nome}" itemValue="#{c}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+
+						<h:panelGroup>
+							<p:outputLabel value="Loja" styleClass="my-label"
+								style="vertical-align: text-top;" for="loja" />
+							<br />
+							<p:selectOneMenu id="loja" required="true"
+								requiredMessage="Selecione o cargo"
+								value="#{funcionarioControlProBean.funcionarioControlPro.loja}">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{funcionarioControlProBean.lojas}"
+									var="c" itemLabel="#{c.descricao}" itemValue="#{c}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+
+						<h:panelGroup>
+							<p:outputLabel value="Salário Carteira(R$):"
+								styleClass="my-label" style="vertical-align: text-top;"
+								for="salario-ct" />
+							<br />
+							<p:inputText required="true" id="salario-ct"
+								requiredMessage="Campo 'Salário Carteira' é obrigatório!"
+								styleClass="moeda" maxlength="10"
+								value="#{funcionarioControlProBean.funcionarioControlPro.salarioCt}">
+								<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+									minFractionDigits="2" type="number" />
+							</p:inputText>
+						</h:panelGroup>
+
+						<h:panelGroup>
+							<p:outputLabel value="Salário Por Fora(R$):"
+								styleClass="my-label" style="vertical-align: text-top;"
+								for="salario-pf" />
+							<br />
+							<p:inputText required="true" id="salario-pf"
+								requiredMessage="Campo 'Salário Por Fora' é obrigatório!"
+								styleClass="moeda" maxlength="10"
+								value="#{funcionarioControlProBean.funcionarioControlPro.salarioPf}">
+								<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+									minFractionDigits="2" type="number" />
+							</p:inputText>
+						</h:panelGroup>
+						
+						<h:panelGroup>
+							<p:outputLabel value="Salário Familia(R$):"
+								styleClass="my-label" style="vertical-align: text-top;"
+								for="salario-familia" />
+							<br />
+							<p:inputText required="true" id="salario-familia"
+								requiredMessage="Campo 'Salário Familia' é obrigatório!"
+								styleClass="moeda" maxlength="10"
+								value="#{funcionarioControlProBean.funcionarioControlPro.salarioFamilia}">
+								<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+									minFractionDigits="2" type="number" />
+							</p:inputText>
+						</h:panelGroup>
+
+						<h:panelGroup>
+							<p:outputLabel value="INSS(R$):" styleClass="my-label"
+								style="vertical-align: text-top;" for="inss" />
+							<br />
+							<p:inputText required="true" id="inss"
+								requiredMessage="Campo 'INSS' é obrigatório!" styleClass="moeda"
+								maxlength="10"
+								value="#{funcionarioControlProBean.funcionarioControlPro.inss}">
+								<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+									minFractionDigits="2" type="number" />
+							</p:inputText>
+						</h:panelGroup>
+
+
+					</p:panelGrid>
+					<h:panelGroup>
+						<p:outputLabel value="Observação: " styleClass="my-label"
+							style="vertical-align: text-top;" for="obs" />
+					</h:panelGroup>
+					<p:inputTextarea id="obs"
+						value="#{funcionarioControlProBean.funcionarioControlPro.observacao}"
+						rows="6" cols="40" label="OBS" />
+					<br /> <br />
+					<p:separator />
+					<h:panelGrid columns="3">
+						<p:commandButton value="Salvar" icon="fa fa-floppy-o"
+							action="#{funcionarioControlProBean.save}" update="frm"
+							rendered="#{funcionarioControlProBean.funcionarioControlPro.id == null}" />
+
+						<p:commandButton value="Atualizar" icon="fa fa-floppy-o"
+							action="#{funcionarioControlProBean.update}"
+							rendered="#{funcionarioControlProBean.funcionarioControlPro.id != null}" />
+
+						<p:spacer width="20" height="0" />
+
+						<p:commandButton value="Cancelar" action="/private/index.xhtml"
+							immediate="true"
+							rendered="#{funcionarioControlProBean.funcionarioControlPro.id == null}"
+							icon="fa fa-ban" ajax="false" />
+
+						<p:commandButton value="Cancelar"
+							action="#{funcionarioControlProBean.goToList()}" immediate="true"
+							rendered="#{funcionarioControlProBean.funcionarioControlPro.id != null}"
+							icon="fa fa-ban" ajax="false" />
+					</h:panelGrid>
+				</div>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

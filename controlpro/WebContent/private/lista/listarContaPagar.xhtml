@@ -1,0 +1,840 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="conta-pagar.png"
+						width="60px" style="float: left" />
+				</div>
+
+				<h1>Lista de Contas á pagar</h1>
+				<h3>Listagem de contas á pagar cadastradas no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{contaPagarBean.contaPagar}" />
+			<t:saveState value="#{contaPagarBean.contaPagars}" />
+			<t:saveState value="#{contaPagarBean.historicoConta}" />
+			<t:saveState value="#{contaPagarBean.contaPagarAcabamento}" />
+			<t:saveState value="#{contaPagarBean.contaPagarsAcabamento}" />
+			<t:saveState value="#{contaPagarBean.historicoContaAcabamento}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel style="margin-top: 15px">
+
+					<h:panelGrid columns="10">
+						<h:panelGroup>
+							<p:outputLabel value="Situação: " styleClass="my-label" />
+							<br />
+							<p:selectOneMenu
+								value="#{contaPagarBean.contaPagarFilter.situacao}">
+								<f:selectItem itemLabel="Todas" />
+								<f:selectItems value="#{contaPagarBean.situacoes}"
+									var="situacao" itemLabel="#{situacao.descricao}"
+									itemValue="#{situacao}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Facção: " styleClass="my-label"
+								style="vertical-align: text-top;" for="faccao" />
+							<br />
+							<p:autoComplete
+								value="#{contaPagarBean.contaPagarFilter.itemProducao.ordemProducao.faccao}"
+								autocomplete="true" size="36" id="faccao"
+								completeMethod="#{faccaoBean.getFaccaoAutoComplete}"
+								forceSelection="true" minQueryLength="1" maxResults="30"
+								dropdown="true"
+								converterMessage="Não foi possível selecionar a facção(Erro ao converter o objeto)"
+								converter="genericConverter" var="faccao"
+								itemLabel="#{faccao.nome}" itemValue="#{faccao}"
+								placeholder="Pesquise pelo nome da facção">
+							</p:autoComplete>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="De: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{contaPagarBean.contaPagarFilter.dataInicio}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Até: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{contaPagarBean.contaPagarFilter.dataFim}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<p:spacer />
+						<p:commandButton value="Pesquisar" icon="fa fa-search"
+							style="margin-left: 5px; width: 100px !important"
+							update="table-conta table-conta-acabamento"
+							action="#{contaPagarBean.list()}" />
+						<p:spacer />
+						<p:commandButton id="report"
+							actionListener="#{contaPagarBean.gerarPDF}" icon="fa fa-download"
+							value="Gerar PDF" onclick="this.form.target='_blank'"
+							ajax="false">
+						</p:commandButton>
+					</h:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-conta" value="#{contaPagarBean.contaPagars}"
+					var="entity" paginator="true" style="margin-top: 15px"
+					paginatorAlwaysVisible="false" rows="20" lazy="true"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					paginatorPosition="bottom">
+
+					<f:facet name="header">LISTA DE CONTAS A PAGAR</f:facet>
+					<p:columnGroup type="header">
+						<p:row>
+							<p:column rowspan="1" headerText="Situação" />
+							<p:column rowspan="1" headerText="Protocolo" width="110" />
+							<p:column rowspan="1" headerText="Loja" />
+							<p:column rowspan="1" headerText="Geração da conta" />
+							<!-- 							<p:column rowspan="2" headerText="Responsável" /> -->
+							<p:column rowspan="1" headerText="Produto" />
+							<p:column rowspan="1" headerText="Qtd. recebido" width="80" />
+							<p:column rowspan="1" headerText="Facção" />
+							<p:column rowspan="1" headerText="Conta" styleClass="Center"
+								width="75" />
+							<p:column rowspan="1" headerText="Bônus" styleClass="Center"
+								width="75" />
+							<p:column rowspan="1" headerText="Total" styleClass="Center"
+								width="75" />
+							<p:column rowspan="1" headerText="Pago" styleClass="Center"
+								width="75" />
+							<p:column rowspan="1" headerText="Devedor" styleClass="Center"
+								width="75" />
+							<p:column rowspan="1" headerText="Realizar pagamento"
+								styleClass="Center" width="80" />
+						</p:row>
+					</p:columnGroup>
+
+					<p:column>
+						<p:outputLabel value="#{entity.situacao.descricao}"
+							rendered="#{entity.situacao eq 'NAO_QUITADA'}"
+							styleClass="negrito Red" />
+						<p:outputLabel value="#{entity.situacao.descricao}"
+							rendered="#{entity.situacao eq 'QUITADA'}"
+							styleClass="negrito Blue" />
+					</p:column>
+					<p:column>
+						<p:outputLabel
+							value="#{entity.itemProducao.ordemProducao.protocolo}" />
+					</p:column>
+					<p:column>
+						<p:outputLabel
+							value="#{entity.itemProducao.ordemProducao.loja.descricao}" />
+					</p:column>
+					<p:column>
+						<p:outputLabel value="#{entity.dataRecebimento}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+					<!-- 					<p:column> -->
+					<!-- 						<p:outputLabel value="#{entity.usuario.nome}" /> -->
+					<!-- 					</p:column> -->
+					<p:column>
+						<p:outputLabel value="#{entity.itemProducao.produto.nome}" />
+					</p:column>
+					<p:column>
+						<p:outputLabel value="#{entity.qtdRecebido}" />
+					</p:column>
+					<p:column>
+						<p:outputLabel
+							value="#{entity.itemProducao.ordemProducao.faccao.nome}" />
+					</p:column>
+					<p:column styleClass="Center">
+						<p:outputLabel
+							value="#{entity.valor - (entity.valorBonus * entity.qtdRecebido)}"
+							styleClass="negrito">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+					<p:column styleClass="Center">
+						<p:outputLabel value="#{entity.valorBonus * entity.qtdRecebido}"
+							styleClass="negrito">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+					<p:column styleClass="Center">
+						<p:outputLabel value="#{entity.valor}" styleClass="negrito">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+					<p:column styleClass="Center">
+						<p:outputLabel value="#{entity.valorPago}"
+							styleClass="negrito Green">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+					<p:column styleClass="Center">
+						<p:outputLabel value="#{entity.valorDevedor}"
+							styleClass="negrito Red">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column styleClass="Center">
+						<p:commandLink id="lnkPagamento" rendered="#{entity.status}"
+							oncomplete="PF('pagamento').show()" style="text-decoration: none"
+							update=":form-pagamento:pagamento" title="Detalhes do pagamento"
+							action="#{contaPagarBean.clearCarregaHistoricoConta()}">
+							<i class="material-icons GrayDark">offline_pin</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{contaPagarBean.contaPagar}" />
+						</p:commandLink>
+						<p:commandLink id="lnkRecibo" rendered="#{entity.status}"
+							oncomplete="PF('recibo').show()" style="text-decoration: none"
+							update=":form-recibo:recibo" title="Gerar recibo"
+							action="#{contaPagarBean.clearCarregaHistoricoConta()}">
+							<i class="material-icons GrayDark">description</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{contaPagarBean.contaPagar}" />
+						</p:commandLink>
+					</p:column>
+
+				</p:dataTable>
+				<p:dataTable id="table-conta-acabamento"
+					value="#{contaPagarBean.contaPagarsAcabamento}" var="entity"
+					paginator="true" style="margin-top: 15px"
+					paginatorAlwaysVisible="false" rows="20" lazy="true"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					paginatorPosition="bottom">
+
+					<f:facet name="header">LISTA DE CONTAS DO ACABAMENTO</f:facet>
+					<p:columnGroup type="header">
+						<p:row>
+							<p:column rowspan="2" headerText="Situação" />
+							<p:column rowspan="2" headerText="Protocolo" width="110" />
+							<p:column rowspan="2" headerText="Geração da conta" />
+							<!-- 							<p:column rowspan="2" headerText="Responsável" /> -->
+							<p:column rowspan="2" headerText="Produto" />
+							<p:column rowspan="2" headerText="Qtd. recebido" width="80" />
+							<p:column colspan="2" headerText="Facção" />
+							<p:column rowspan="2" headerText="Conta" styleClass="Center"
+								width="75" />
+							<p:column rowspan="2" headerText="Pago" styleClass="Center"
+								width="75" />
+							<p:column rowspan="2" headerText="Devedor" styleClass="Center"
+								width="75" />
+							<p:column rowspan="2" headerText="Pagamento / Recibo"
+								styleClass="Center" width="80" />
+						</p:row>
+						<p:row>
+							<p:column colspan="1" headerText="Nome" />
+							<p:column colspan="1" headerText="Loja" />
+						</p:row>
+
+					</p:columnGroup>
+
+					<p:column>
+						<p:outputLabel value="#{entity.situacao.descricao}"
+							rendered="#{entity.situacao eq 'NAO_QUITADA'}"
+							styleClass="negrito Red" />
+						<p:outputLabel value="#{entity.situacao.descricao}"
+							rendered="#{entity.situacao eq 'QUITADA'}"
+							styleClass="negrito Blue" />
+					</p:column>
+					<p:column>
+						<p:outputLabel
+							value="#{entity.itemAcabamento.acabamento.protocolo}" />
+					</p:column>
+					<p:column>
+						<p:outputLabel value="#{entity.dataRecebimento}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+					<p:column>
+						<p:outputLabel value="#{entity.itemAcabamento.produto.nome}" />
+					</p:column>
+					<p:column>
+						<p:outputLabel value="#{entity.qtdRecebido}" />
+					</p:column>
+					<p:column>
+						<p:outputLabel
+							value="#{entity.itemAcabamento.acabamento.faccao.nome}" />
+					</p:column>
+					<p:column>
+						<p:outputLabel
+							value="#{entity.itemAcabamento.acabamento.loja.descricao}" />
+					</p:column>
+					<!-- 					<p:column> -->
+					<!-- 						<p:outputLabel -->
+					<!-- 							value="#{entity.acabamento.loja.descricao}" /> -->
+					<!-- 					</p:column> -->
+					<p:column styleClass="Center">
+						<p:outputLabel value="#{entity.valor}" styleClass="negrito">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+					<p:column styleClass="Center">
+						<p:outputLabel value="#{entity.valorPago}"
+							styleClass="negrito Green">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+					<p:column styleClass="Center">
+						<p:outputLabel value="#{entity.valorDevedor}"
+							styleClass="negrito Red">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column styleClass="Center">
+						<p:commandLink id="lnkPagamentoAcabamento"
+							rendered="#{entity.status}"
+							oncomplete="PF('pagamento-acabamento').show()"
+							style="text-decoration: none"
+							update=":form-pagamento-acabamento:pagamento-acabamento"
+							title="Detalhes do pagamento do Acabamento"
+							action="#{contaPagarBean.clearCarregaHistoricoContaAcabamento()}">
+							<i class="material-icons GrayDark">offline_pin</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{contaPagarBean.contaPagarAcabamento}" />
+						</p:commandLink>
+					</p:column>
+
+				</p:dataTable>
+			</h:form>
+			<h:form id="form-pagamento">
+				<p:dialog header="Realizar pagamento" modal="true" closable="true"
+					width="90%" closeOnEscape="true" draggable="false" id="pagamento"
+					widgetVar="pagamento" resizable="false">
+
+					<p:messages autoUpdate="true" closable="true" />
+
+					<div class="scroll-dialog">
+						<p:panelGrid columns="2" style="margin-top: 20px; padding: 5px;"
+							layout="grid" columnClasses="ui-grid-col-3"
+							rendered="#{contaPagarBean.contaPagar.situacao eq 'NAO_QUITADA'}"
+							styleClass="ui-panelgrid-blank" id="grid-cadastro">
+
+							<h:panelGroup>
+								<p:outputLabel value="Valor pendente de adiantamento: "
+									styleClass="my-label" />
+							</h:panelGroup>
+							<h:link style="font-color: #000; text-decoration:none; "
+								target="_blank"
+								outcome="/private/control/controlAdiantamento.xhtml">
+								<p:outputLabel
+									value="#{contaPagarBean.getAdiantamentosPendentes(contaPagarBean.contaPagar.itemProducao.ordemProducao.faccao)}"
+									styleClass="my-label-titulo label-vermelho">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+
+								</p:outputLabel>
+							</h:link>
+
+							<h:panelGroup>
+								<p:outputLabel value="Valor da Conta: " styleClass="my-label" />
+							</h:panelGroup>
+							<p:outputLabel
+								value="#{contaPagarBean.contaPagar.valor - (contaPagarBean.contaPagar.valorBonus * contaPagarBean.contaPagar.qtdRecebido)}"
+								styleClass="my-label-titulo">
+								<f:convertNumber minFractionDigits="2" type="currency"
+									maxFractionDigits="2" />
+							</p:outputLabel>
+							<h:panelGroup>
+								<p:outputLabel value="Valor da Bônus: " styleClass="my-label" />
+							</h:panelGroup>
+							<p:outputLabel
+								value="#{contaPagarBean.contaPagar.valorBonus * contaPagarBean.contaPagar.qtdRecebido}"
+								styleClass="my-label-titulo">
+								<f:convertNumber minFractionDigits="2" type="currency"
+									maxFractionDigits="2" />
+							</p:outputLabel>
+							<h:panelGroup>
+								<p:outputLabel value="Saldo devedor calculado: "
+									styleClass="my-label" />
+							</h:panelGroup>
+							<p:outputLabel value="#{contaPagarBean.contaPagar.valor}"
+								styleClass="my-label-titulo label-azul">
+								<f:convertNumber minFractionDigits="2" type="currency"
+									maxFractionDigits="2" />
+							</p:outputLabel>
+							<p:separator />
+							<p:separator />
+							<h:panelGroup>
+								<p:outputLabel value="Saldo devedor: " styleClass="my-label" />
+							</h:panelGroup>
+							<p:outputLabel value="#{contaPagarBean.contaPagar.valorDevedor}"
+								styleClass="my-label-titulo Red">
+								<f:convertNumber minFractionDigits="2" type="currency"
+									maxFractionDigits="2" />
+							</p:outputLabel>
+							<h:panelGroup>
+								<p:outputLabel value="Valor já pago: " styleClass="my-label" />
+							</h:panelGroup>
+							<p:outputLabel value="#{contaPagarBean.contaPagar.valorPago}"
+								styleClass="my-label-titulo Green">
+								<f:convertNumber minFractionDigits="2" type="currency"
+									maxFractionDigits="2" />
+							</p:outputLabel>
+
+							<h:panelGroup>
+								<p:outputLabel value="Bônus: " styleClass="my-label" />
+							</h:panelGroup>
+							<h:panelGroup>
+								<p:inputText styleClass="moeda"
+									value="#{contaPagarBean.historicoConta.valorJuros}">
+									<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+										minFractionDigits="2" type="number" />
+								</p:inputText>
+							</h:panelGroup>
+
+							<h:panelGroup>
+								<p:outputLabel value="Desconto: " styleClass="my-label" />
+							</h:panelGroup>
+							<h:panelGroup>
+								<p:inputText styleClass="moeda"
+									value="#{contaPagarBean.historicoConta.valorDesconto}">
+									<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+										minFractionDigits="2" type="number" />
+									<p:ajax event="blur"
+										update="grid-cadastro saldo-devedor-calculado" />
+								</p:inputText>
+							</h:panelGroup>
+							<h:panelGroup>
+								<p:outputLabel value="Saldo devedor calculado: "
+									styleClass="my-label" />
+							</h:panelGroup>
+							<p:outputLabel id="saldo-devedor-calculado"
+								value="#{contaPagarBean.saldoDevedorCalculado}"
+								styleClass="my-label-titulo label-azul">
+								<f:convertNumber minFractionDigits="2" type="currency"
+									maxFractionDigits="2" />
+							</p:outputLabel>
+							<h:panelGroup>
+								<p:outputLabel value="Valor pagar: " styleClass="my-label" />
+								<p:outputLabel value="*" styleClass="Red" />
+							</h:panelGroup>
+							<h:panelGroup>
+								<p:inputText id="pago"
+									value="#{contaPagarBean.historicoConta.valorPago}"
+									styleClass="moeda" required="true"
+									requiredMessage="Adicione um vaor a ser pago">
+									<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+										minFractionDigits="2" type="number" />
+								</p:inputText>
+							</h:panelGroup>
+							<h:panelGroup>
+								<p:outputLabel value="Data pagamento: " styleClass="my-label" />
+								<p:outputLabel value="*" styleClass="Red" />
+							</h:panelGroup>
+							<p:calendar id="cal"
+								value="#{contaPagarBean.historicoConta.dataPagamento}"
+								required="true" requiredMessage="Campo data é obrigatório!"
+								pattern="dd/MM/yyyy" />
+							<h:panelGroup>
+								<p:outputLabel value="Forma de pagamento: "
+									styleClass="my-label" />
+								<p:outputLabel value="*" styleClass="Red" />
+							</h:panelGroup>
+							<p:selectOneMenu id="pag"
+								value="#{contaPagarBean.historicoConta.opcaoPagamento}"
+								required="true"
+								requiredMessage="Forma de pagamento é obrigatório">
+								<f:selectItem itemLabel="-- Selecione --" />
+								<f:selectItems value="#{contaPagarBean.opcoesPagamento}"
+									var="pagamento" itemLabel="#{pagamento.descricao}"
+									itemValue="#{pagamento}" />
+								<p:ajax
+									update="grid numeroLabel numeroInput bancoLabel bancoInput" />
+							</p:selectOneMenu>
+						</p:panelGrid>
+						<p:panelGrid id="grid" layout="grid" columnClasses="ui-grid-col-3"
+							styleClass="ui-panelgrid-blank" columns="2">
+							<p:outputLabel value="Número: " styleClass="my-label"
+								id="numeroLabel"
+								rendered="#{contaPagarBean.historicoConta.opcaoPagamento eq 'CHEQUE'
+								or contaPagarBean.historicoConta.opcaoPagamento eq 'DEPOSITO'
+								or contaPagarBean.historicoConta.opcaoPagamento eq 'TRANSFERENCIA'}" />
+							<p:inputText id="numeroInput"
+								value="#{contaPagarBean.historicoConta.numeroCheque}"
+								rendered="#{contaPagarBean.historicoConta.opcaoPagamento eq 'CHEQUE'
+								or contaPagarBean.historicoConta.opcaoPagamento eq 'DEPOSITO'
+								or contaPagarBean.historicoConta.opcaoPagamento eq 'TRANSFERENCIA'}" />
+							<p:outputLabel value="Banco: " styleClass="my-label"
+								id="bancoLabel"
+								rendered="#{contaPagarBean.historicoConta.opcaoPagamento eq 'CHEQUE'
+								or contaPagarBean.historicoConta.opcaoPagamento eq 'DEPOSITO'
+								or contaPagarBean.historicoConta.opcaoPagamento eq 'TRANSFERENCIA'}" />
+							<p:inputText id="bancoInput"
+								value="#{contaPagarBean.historicoConta.bancoCheque}"
+								rendered="#{contaPagarBean.historicoConta.opcaoPagamento eq 'CHEQUE'
+								or contaPagarBean.historicoConta.opcaoPagamento eq 'DEPOSITO'
+								or contaPagarBean.historicoConta.opcaoPagamento eq 'TRANSFERENCIA'}" />
+						</p:panelGrid>
+
+						<br />
+						<p:separator />
+						<p:commandButton value="Salvar"
+							rendered="#{contaPagarBean.contaPagar.situacao eq 'NAO_QUITADA'}"
+							action="#{contaPagarBean.saveHistorico()}"
+							update=":form-pagamento:table-historico-conta :form-pagamento:grid-cadastro
+							:frm:table-conta" />
+						<br />
+
+						<p:dataTable id="table-historico-conta" var="entity"
+							paginator="true" style="margin-top: 15px"
+							value="#{contaPagarBean.historicoContaList}"
+							paginatorAlwaysVisible="false" rows="10" lazy="true"
+							paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+							paginatorPosition="bottom">
+
+							<p:column headerText="Responsável"
+								style="color: #000000 !important" styleClass="Center">
+								<p:outputLabel value="#{entity.usuario.nome}" />
+							</p:column>
+							<p:column headerText="Data pagamento"
+								style="color: #000000 !important" styleClass="Center">
+								<p:outputLabel value="#{entity.dataPagamento}">
+									<f:convertDateTime pattern="dd/MM/yyyy" />
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Bonus" style="color: #000000 !important"
+								styleClass="Center">
+								<p:outputLabel value="#{entity.valorJuros}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Desconto" style="color: #000000 !important"
+								styleClass="Center">
+								<p:outputLabel value="#{entity.valorDesconto}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Valor pago"
+								style="color: #000000 !important" styleClass="Center">
+								<p:outputLabel value="#{entity.valorPago}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Forma" style="color: #000000 !important"
+								styleClass="Center">
+								<p:outputLabel value="#{entity.opcaoPagamento.descricao}" />
+							</p:column>
+							<p:column headerText="Número" style="color: #000000 !important"
+								styleClass="Center">
+								<p:outputLabel value="#{entity.numeroCheque}" />
+							</p:column>
+							<p:column headerText="Banco" style="color: #000000 !important"
+								styleClass="Center">
+								<p:outputLabel value="#{entity.bancoCheque}" />
+							</p:column>
+						</p:dataTable>
+					</div>
+				</p:dialog>
+			</h:form>
+
+
+
+			<h:form id="form-pagamento-acabamento">
+				<p:dialog header="Realizar pagamento do acabamento" modal="true"
+					closable="true" width="90%" closeOnEscape="true" draggable="false"
+					id="pagamento-acabamento" widgetVar="pagamento-acabamento"
+					resizable="false">
+
+					<p:messages autoUpdate="true" closable="true" />
+
+					<div class="scroll-dialog">
+						<p:panelGrid columns="2" style="margin-top: 20px; padding: 5px;"
+							layout="grid" columnClasses="ui-grid-col-3"
+							rendered="#{contaPagarBean.contaPagarAcabamento.situacao eq 'NAO_QUITADA'}"
+							styleClass="ui-panelgrid-blank" id="grid-cadastro-acabamento">
+							<h:panelGroup>
+								<p:outputLabel value="Valor da Conta: " styleClass="my-label" />
+							</h:panelGroup>
+							<p:outputLabel
+								value="#{contaPagarBean.contaPagarAcabamento.valor}"
+								styleClass="my-label-titulo">
+								<f:convertNumber minFractionDigits="2" type="currency"
+									maxFractionDigits="2" />
+							</p:outputLabel>
+							<h:panelGroup>
+								<p:outputLabel value="Saldo devedor: " styleClass="my-label" />
+							</h:panelGroup>
+							<p:outputLabel
+								value="#{contaPagarBean.contaPagarAcabamento.valorDevedor}"
+								styleClass="my-label-titulo Red">
+								<f:convertNumber minFractionDigits="2" type="currency"
+									maxFractionDigits="2" />
+							</p:outputLabel>
+							<h:panelGroup>
+								<p:outputLabel value="Valor já pago: " styleClass="my-label" />
+							</h:panelGroup>
+							<p:outputLabel
+								value="#{contaPagarBean.contaPagarAcabamento.valorPago}"
+								styleClass="my-label-titulo Green">
+								<f:convertNumber minFractionDigits="2" type="currency"
+									maxFractionDigits="2" />
+							</p:outputLabel>
+
+							<h:panelGroup>
+								<p:outputLabel value="Desconto: " styleClass="my-label" />
+							</h:panelGroup>
+							<h:panelGroup>
+								<p:inputText styleClass="moeda"
+									value="#{contaPagarBean.historicoContaAcabamento.valorDesconto}">
+									<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+										minFractionDigits="2" type="number" />
+									<p:ajax event="blur"
+										update="grid-cadastro-acabamento saldo-devedor-calculado-acabamento" />
+								</p:inputText>
+							</h:panelGroup>
+							<h:panelGroup>
+								<p:outputLabel value="Bônus: " styleClass="my-label" />
+							</h:panelGroup>
+							<h:panelGroup>
+								<p:inputText
+									value="#{contaPagarBean.historicoContaAcabamento.valorJuros}"
+									styleClass="moeda">
+									<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+										minFractionDigits="2" type="number" />
+									<p:ajax event="blur"
+										update="grid-cadastro-acabamento saldo-devedor-calculado-acabamento" />
+								</p:inputText>
+							</h:panelGroup>
+							<h:panelGroup>
+								<p:outputLabel value="Saldo devedor calculado: "
+									styleClass="my-label" />
+							</h:panelGroup>
+							<p:outputLabel id="saldo-devedor-calculado-acabamento"
+								value="#{contaPagarBean.saldoDevedorCalculadoAcabamento}"
+								styleClass="my-label-titulo label-azul">
+								<f:convertNumber minFractionDigits="2" type="currency"
+									maxFractionDigits="2" />
+							</p:outputLabel>
+							<h:panelGroup>
+								<p:outputLabel value="Valor pagar: " styleClass="my-label" />
+								<p:outputLabel value="*" styleClass="Red" />
+							</h:panelGroup>
+							<h:panelGroup>
+								<p:inputText id="pago-acabamento"
+									value="#{contaPagarBean.historicoContaAcabamento.valorPago}"
+									styleClass="moeda" required="true"
+									requiredMessage="Adicione um valor a ser pago">
+									<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+										minFractionDigits="2" type="number" />
+								</p:inputText>
+							</h:panelGroup>
+							<h:panelGroup>
+								<p:outputLabel value="Data pagamento: " styleClass="my-label" />
+								<p:outputLabel value="*" styleClass="Red" />
+							</h:panelGroup>
+							<p:calendar id="cal-acabamento"
+								value="#{contaPagarBean.historicoContaAcabamento.dataPagamento}"
+								required="true" requiredMessage="Campo data é obrigatório!"
+								pattern="dd/MM/yyyy" />
+							<h:panelGroup>
+								<p:outputLabel value="Forma de pagamento: "
+									styleClass="my-label" />
+								<p:outputLabel value="*" styleClass="Red" />
+							</h:panelGroup>
+							<p:selectOneMenu id="pag-acabamento"
+								value="#{contaPagarBean.historicoContaAcabamento.opcaoPagamento}"
+								required="true"
+								requiredMessage="Forma de pagamento é obrigatório">
+								<f:selectItem itemLabel="-- Selecione --" />
+								<f:selectItems value="#{contaPagarBean.opcoesPagamento}"
+									var="pagamento" itemLabel="#{pagamento.descricao}"
+									itemValue="#{pagamento}" />
+								<p:ajax
+									update="grid-acabamento numeroLabel-acabamento numeroInput-acabamento 
+									bancoLabel-acabamento bancoInput-acabamento" />
+							</p:selectOneMenu>
+						</p:panelGrid>
+						<p:panelGrid id="grid-acabamento" layout="grid"
+							columnClasses="ui-grid-col-3" styleClass="ui-panelgrid-blank"
+							columns="2">
+							<p:outputLabel value="Número: " styleClass="my-label"
+								id="numeroLabel-acabamento"
+								rendered="#{contaPagarBean.historicoContaAcabamento.opcaoPagamento eq 'CHEQUE'
+								or contaPagarBean.historicoContaAcabamento.opcaoPagamento eq 'DEPOSITO'
+								or contaPagarBean.historicoContaAcabamento.opcaoPagamento eq 'TRANSFERENCIA'}" />
+							<p:inputText id="numeroInput-acabamento"
+								value="#{contaPagarBean.historicoContaAcabamento.numeroCheque}"
+								rendered="#{contaPagarBean.historicoContaAcabamento.opcaoPagamento eq 'CHEQUE'
+								or contaPagarBean.historicoContaAcabamento.opcaoPagamento eq 'DEPOSITO'
+								or contaPagarBean.historicoContaAcabamento.opcaoPagamento eq 'TRANSFERENCIA'}" />
+							<p:outputLabel value="Banco: " styleClass="my-label"
+								id="bancoLabel-acabamento"
+								rendered="#{contaPagarBean.historicoContaAcabamento.opcaoPagamento eq 'CHEQUE'
+								or contaPagarBean.historicoContaAcabamento.opcaoPagamento eq 'DEPOSITO'
+								or contaPagarBean.historicoContaAcabamento.opcaoPagamento eq 'TRANSFERENCIA'}" />
+							<p:inputText id="bancoInput-acabamento"
+								value="#{contaPagarBean.historicoContaAcabamento.bancoCheque}"
+								rendered="#{contaPagarBean.historicoContaAcabamento.opcaoPagamento eq 'CHEQUE'
+								or contaPagarBean.historicoContaAcabamento.opcaoPagamento eq 'DEPOSITO'
+								or contaPagarBean.historicoContaAcabamento.opcaoPagamento eq 'TRANSFERENCIA'}" />
+						</p:panelGrid>
+
+						<br />
+						<p:separator />
+						<p:commandButton value="Salvar"
+							rendered="#{contaPagarBean.contaPagarAcabamento.situacao eq 'NAO_QUITADA'}"
+							action="#{contaPagarBean.saveHistoricoAcabamento()}"
+							update=":form-pagamento-acabamento:table-historico-conta-acabamento 
+							:form-pagamento-acabamento:grid-cadastro-acabamento
+							:frm:table-conta-acabamento" />
+						<br />
+
+						<p:dataTable id="table-historico-conta-acabamento" var="entity"
+							paginator="true" style="margin-top: 15px"
+							value="#{contaPagarBean.historicoContaAcabamentoList}"
+							paginatorAlwaysVisible="false" rows="10" lazy="true"
+							paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+							paginatorPosition="bottom">
+
+							<p:column headerText="Responsável"
+								style="color: #000000 !important" styleClass="Center">
+								<p:outputLabel value="#{entity.usuario.nome}" />
+							</p:column>
+							<p:column headerText="Data pagamento"
+								style="color: #000000 !important" styleClass="Center">
+								<p:outputLabel value="#{entity.dataPagamento}">
+									<f:convertDateTime pattern="dd/MM/yyyy" />
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Bonus" style="color: #000000 !important"
+								styleClass="Center">
+								<p:outputLabel value="#{entity.valorJuros}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Desconto" style="color: #000000 !important"
+								styleClass="Center">
+								<p:outputLabel value="#{entity.valorDesconto}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Valor pago"
+								style="color: #000000 !important" styleClass="Center">
+								<p:outputLabel value="#{entity.valorPago}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Forma" style="color: #000000 !important"
+								styleClass="Center">
+								<p:outputLabel value="#{entity.opcaoPagamento.descricao}" />
+							</p:column>
+							<p:column headerText="Número" style="color: #000000 !important"
+								styleClass="Center">
+								<p:outputLabel value="#{entity.numeroCheque}" />
+							</p:column>
+							<p:column headerText="Banco" style="color: #000000 !important"
+								styleClass="Center">
+								<p:outputLabel value="#{entity.bancoCheque}" />
+							</p:column>
+						</p:dataTable>
+					</div>
+				</p:dialog>
+			</h:form>
+
+			<h:form id="form-recibo">
+				<p:dialog header="Gerar Recibo" modal="true" closable="true"
+					width="90%" closeOnEscape="true" draggable="false" id="recibo"
+					widgetVar="recibo" resizable="false">
+
+					<p:messages autoUpdate="true" closable="true" />
+
+					<div class="scroll-dialog">
+						<p:dataTable id="table-recibo" var="entity" paginator="true"
+							style="margin-top: 15px"
+							value="#{contaPagarBean.historicoContaList}"
+							paginatorAlwaysVisible="false" rows="10" lazy="true"
+							paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+							paginatorPosition="bottom">
+
+							<p:column headerText="Responsável"
+								style="color: #000000 !important" styleClass="Center">
+								<p:outputLabel value="#{entity.usuario.nome}" />
+							</p:column>
+							<p:column headerText="Data pagamento"
+								style="color: #000000 !important" styleClass="Center">
+								<p:outputLabel value="#{entity.dataPagamento}">
+									<f:convertDateTime pattern="dd/MM/yyyy" />
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Bonus" style="color: #000000 !important"
+								styleClass="Center">
+								<p:outputLabel value="#{entity.valorJuros}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Desconto" style="color: #000000 !important"
+								styleClass="Center">
+								<p:outputLabel value="#{entity.valorDesconto}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Valor pago"
+								style="color: #000000 !important" styleClass="Center">
+								<p:outputLabel value="#{entity.valorPago}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Forma" style="color: #000000 !important"
+								styleClass="Center">
+								<p:outputLabel value="#{entity.opcaoPagamento.descricao}" />
+							</p:column>
+							<p:column headerText="Número" style="color: #000000 !important"
+								styleClass="Center">
+								<p:outputLabel value="#{entity.numeroCheque}" />
+							</p:column>
+							<p:column headerText="Banco" style="color: #000000 !important"
+								styleClass="Center">
+								<p:outputLabel value="#{entity.bancoCheque}" />
+							</p:column>
+							<p:column headerText="Gerar Recibo"
+								style="color: #000000 !important" styleClass="Center">
+								<p:commandLink id="pdf" ajax="false" immediate="true"
+									action="#{contaPagarBean.gerarPDFRecibo()}"
+									title="Download" style="text-decoration: none">
+									<i class="material-icons GrayDark">get_app</i>
+									<f:setPropertyActionListener value="#{entity}"
+										target="#{contaPagarBean.historicoConta}" />
+								</p:commandLink>
+							</p:column>
+						</p:dataTable>
+					</div>
+				</p:dialog>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,241 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="sangria.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>Lista de Sangrias</h1>
+				<h3>Listagem de sangrias cadastradas no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:commandLink id="cadastrar" styleClass="link-funcional"
+						style="margin-top: 3px" update=":form-cadastro:dados"
+						oncomplete="PF('dados').show()">
+						<i class="material-icons md-32">add_to_photos</i>
+						<br />
+					</p:commandLink>
+					<p:tooltip for="cadastrar" position="top" value="Cadastrar sangria" />
+
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{sangriaBean.sangria}" />
+			<t:saveState value="#{sangriaBean.sangrias}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="false" closable="true" />
+
+				<p:panel header="Pesquisa" style="margin-top: 15px">
+
+					<h:panelGrid columns="10">
+						<h:panelGroup>
+							<p:outputLabel value="Descrição: " styleClass="my-label" />
+							<br />
+							<p:inputText value="#{sangriaBean.sangriaFilter.descricao}"
+								size="30" id="nome" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Favorecido:" styleClass="my-label" />
+							<br />
+							<p:selectOneMenu value="#{sangriaBean.sangriaFilter.favorecido}"
+								id="func" converter="funcionarioConverter">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{funcionarioBean.listaFuncionarios}"
+									var="func" itemLabel="#{func.nome}" itemValue="#{func}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="De: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{sangriaBean.sangriaFilter.dataPesquisaInicio}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Até: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{sangriaBean.sangriaFilter.dataPesquisaFim}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+
+						<h:panelGroup>
+							<br />
+							<p:commandButton value="Pesquisar" icon="fa fa-search"
+								style="margin-left: 5px; width: 100px !important"
+								update="table-sangria" action="#{sangriaBean.list()}" />
+							<p:commandButton id="report"
+								actionListener="#{sangriaBean.gerarPDF}" icon="fa fa-download"
+								value="Gerar PDF" onclick="this.form.target='_blank'"
+								ajax="false">
+							</p:commandButton>
+						</h:panelGroup>
+					</h:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-sangria" value="#{sangriaBean.sangrias}"
+					var="entity" paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10"
+					lazy="true">
+
+					<!-- 					<p:column headerText="Status" style="width: 50px" -->
+					<!-- 						styleClass="Center"> -->
+					<!-- 						<p:commandLink id="lnkAlterarStatus" -->
+					<!-- 							action="#{colecaoBean.updateStatus()}" update="table-colecao" -->
+					<!-- 							title="#{entity.status ? 'Desativar' : 'Ativar'}"> -->
+
+					<!-- 							<h:panelGroup rendered="#{!entity.status}"> -->
+					<!-- 								<i class="material-icons Red">remove_circle</i> -->
+					<!-- 							</h:panelGroup> -->
+
+					<!-- 							<h:panelGroup rendered="#{entity.status}"> -->
+					<!-- 								<i class="material-icons Green">check_circle</i> -->
+					<!-- 							</h:panelGroup> -->
+
+					<!-- 							<f:setPropertyActionListener target="#{colecaoBean.colecao}" -->
+					<!-- 								value="#{entity}" /> -->
+					<!-- 						</p:commandLink> -->
+					<!-- 					</p:column> -->
+
+					<p:column headerText="Protocolo">
+						<p:outputLabel value="#{entity.protocolo}" />
+					</p:column>
+					<p:column headerText="Data Sangria">
+						<p:outputLabel value="#{entity.dataSangria}" />
+					</p:column>
+					<p:column headerText="Favorecido">
+						<p:outputLabel value="#{entity.favorecido.nome}" />
+					</p:column>
+					<p:column headerText="Responsável">
+						<p:outputLabel value="#{entity.responsavel.nome}" />
+					</p:column>
+					<p:column headerText="Descrição">
+						<p:outputLabel value="#{entity.descricao}" />
+					</p:column>
+					<p:column headerText="Valor">
+						<p:outputLabel value="#{entity.valor}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+					<p:column headerText="Ações" style="width: 60px"
+						styleClass="Center">
+						<p:commandLink id="lnkEditar" rendered="#{entity.status}"
+							oncomplete="PF('dados').show()" style="text-decoration: none"
+							update=":form-cadastro:dados">
+							<i class="material-icons GrayDark">mode_edit</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{sangriaBean.sangria}" />
+						</p:commandLink>
+
+						<p:tooltip for="lnkEditar" value="Editar" position="top" />
+					</p:column>
+
+					<f:facet name="footer">
+					<div align="right">
+						<h1>
+							<p:outputLabel value="Total: " style="color: #fff !important" />
+							<p:outputLabel value="#{sangriaBean.total}"
+								style="color: #fff !important">
+								<f:convertNumber minFractionDigits="2" type="currency"
+									maxFractionDigits="2" />
+							</p:outputLabel>
+						</h1>
+						</div>
+					</f:facet>
+				</p:dataTable>
+			</h:form>
+
+			<h:form id="form-cadastro">
+				<p:dialog modal="true" id="dados" widgetVar="dados"
+					resizable="false" width="30%">
+
+					<f:facet name="header">
+					#{sangriaBean.sangria.id == null ? 'Cadastrar Sangria' :
+					'Atualizar Sangria'}
+					</f:facet>
+
+					<div class="ui-fluid" align="center">
+						<p:messages showDetail="true" autoUpdate="true" closable="true" />
+
+						<h:panelGrid columns="2" style="margin-top: 20px"
+							id="grid-cadastro" cellpadding="10">
+
+							<h:panelGroup>
+								<p:outputLabel value="Data: " styleClass="my-label"
+									style="vertical-align: text-top;" for="data" />
+							</h:panelGroup>
+
+							<p:calendar size="10" navigator="true" required="true"
+								requiredMessage="Digite a data da sangria" id="data"
+								value="#{sangriaBean.sangria.dataSangria}" pattern="dd/MM/yyyy" />
+
+							<h:panelGroup>
+								<p:outputLabel value="Descrição: " styleClass="my-label"
+									style="vertical-align: text-top;" for="desc" />
+							</h:panelGroup>
+							<p:inputText value="#{sangriaBean.sangria.descricao}" id="desc" />
+
+							<h:panelGroup>
+								<p:outputLabel value="Favorecido: " styleClass="my-label"
+									style="vertical-align: text-top;" for="func" />
+							</h:panelGroup>
+
+							<p:selectOneMenu value="#{sangriaBean.sangria.favorecido}"
+								id="func" required="true"
+								requiredMessage="Selecione o funcionário"
+								converter="funcionarioConverter">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{funcionarioBean.listaFuncionarios}"
+									var="func" itemLabel="#{func.nome}" itemValue="#{func}" />
+							</p:selectOneMenu>
+
+							<h:panelGroup>
+								<p:outputLabel value="Valor(R$):" styleClass="my-label"
+									style="vertical-align: text-top;" for="valor" />
+							</h:panelGroup>
+
+							<p:inputText required="true" id="valor"
+								requiredMessage="Campo 'Valor' é obrigatório!"
+								styleClass="moeda" maxlength="10"
+								value="#{sangriaBean.sangria.valor}">
+								<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+									minFractionDigits="2" type="number" />
+							</p:inputText>
+						</h:panelGrid>
+						<p:separator />
+						<h:panelGrid columns="3">
+							<p:commandButton value="Salvar" icon="fa fa-floppy-o"
+								action="#{sangriaBean.save}"
+								update="grid-cadastro :frm:table-sangria"
+								rendered="#{sangriaBean.sangria.id == null}" />
+
+							<p:commandButton value="Atualizar" icon="fa fa-floppy-o"
+								action="#{sangriaBean.update}"
+								rendered="#{sangriaBean.sangria.id != null}" />
+
+							<p:spacer width="20" height="0" />
+						</h:panelGrid>
+					</div>
+				</p:dialog>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

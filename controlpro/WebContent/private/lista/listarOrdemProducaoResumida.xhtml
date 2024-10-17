@@ -1,0 +1,206 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="producao.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>Lista de Ordens de Produção Resumida</h1>
+				<h3>Listagem de ordens de produção cadastradas no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:link id="cadastrar" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/cadastro/cadastrarOrdemProducao.xhtml">
+						<i class="material-icons md-32">add_to_photos</i>
+						<br />
+					</p:link>
+					<p:tooltip for="cadastrar" position="top"
+						value="Cadastrar Ordem de Produção" />
+
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{ordemProducaoBean.ordemProducao}" />
+			<t:saveState value="#{ordemProducaoBean.ordemProducaos}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel style="margin-top: 15px">
+					<h:panelGrid columns="5">
+						<h:panelGroup>
+							<p:outputLabel value="Protocolo: " styleClass="my-label" />
+							<br />
+							<p:inputText
+								value="#{ordemProducaoBean.ordemProducaoFilter.protocolo}"
+								size="10" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Tipo de Serviço: " styleClass="my-label" />
+							<br />
+							<p:selectOneMenu
+								value="#{ordemProducaoBean.ordemProducaoFilter.tipoCostura}">
+								<f:selectItem itemLabel="-- Selecione --" />
+								<f:selectItems value="#{ordemProducaoBean.tiposCostura}"
+									var="tip" itemLabel="#{tip.descricao}" itemValue="#{tip}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Situação: " styleClass="my-label" />
+							<br />
+							<p:selectOneMenu
+								value="#{ordemProducaoBean.ordemProducaoFilter.situacao}">
+								<f:selectItem itemLabel="-- Selecione --" />
+								<f:selectItems value="#{ordemProducaoBean.situacoes}" var="sit"
+									itemLabel="#{sit.descricao}" itemValue="#{sit}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Facção: " styleClass="my-label"
+								style="vertical-align: text-top;" for="faccao" />
+							<br />
+							<p:autoComplete
+								value="#{ordemProducaoBean.ordemProducaoFilter.faccao}"
+								autocomplete="true" id="faccao"
+								completeMethod="#{faccaoBean.getFaccaoAutoComplete}"
+								forceSelection="true" minQueryLength="1" maxResults="30"
+								dropdown="true"
+								converterMessage="Não foi possível selecionar a facção(Erro ao converter o objeto)"
+								converter="genericConverter" var="faccao"
+								itemLabel="#{faccao.nome}" itemValue="#{faccao}"
+								placeholder="Pesquise pelo nome da facção">
+							</p:autoComplete>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Coleção: " styleClass="my-label"
+								style="vertical-align: text-top;" for="colecao" />
+							<br />
+							<p:selectOneMenu converter="genericConverter"
+								value="#{ordemProducaoBean.ordemProducaoFilter.colecao}"
+								id="colecao">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{colecaoBean.colecaos}" var="c"
+									itemLabel="#{c.nome}" itemValue="#{c}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="De: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{ordemProducaoBean.ordemProducaoFilter.dataCadastroInicio}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Até: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{ordemProducaoBean.ordemProducaoFilter.dataCadastroFim}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<h:panelGroup
+							rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR'}">
+							<p:outputLabel value="Ocorrencia finalizada? "
+								styleClass="my-label" />
+							<br />
+							<p:selectOneMenu
+								value="#{ordemProducaoBean.ordemProducaoFilter.statusOcorrencia}">
+								<f:selectItem itemLabel="Todos" itemValue="0" />
+								<f:selectItem itemLabel="Sim" itemValue="2" />
+								<f:selectItem itemLabel="Não" itemValue="1" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup>
+							<br />
+							<p:commandButton icon="fa fa-search" id="pesquisar"
+								style="margin-left: 5px;" update="table-producao"
+								action="#{ordemProducaoBean.list()}" value="Pesquisar" />
+							<p:tooltip for="pesquisar" value="Pesquisar" position="top" />
+							<p:commandButton id="report" value="Gerar PDF"
+								actionListener="#{ordemProducaoBean.gerarPDFResumido}"
+								icon="fa fa-download" onclick="this.form.target='_blank'"
+								ajax="false">
+							</p:commandButton>
+							<p:tooltip for="report" value="Gerar PDF" position="top" />
+						</h:panelGroup>
+					</h:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-producao"
+					value="#{ordemProducaoBean.ordemProducaos}" var="entity"
+					paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10"
+					lazy="true">
+
+					<p:column headerText="Protocolo" styleClass="Center"
+						style="width: 110px">
+						<p:outputLabel id="lb" value="#{entity.protocolo}"
+							styleClass="label-vermelho"
+							rendered="#{ordemProducaoBean.isAtrasado(entity)}" />
+						<p:tooltip value="Atrasada" for="lb" position="top" />
+						<p:outputLabel value="#{entity.protocolo}"
+							rendered="#{ordemProducaoBean.isAtrasado(entity) == false}" />
+					</p:column>
+
+					<p:column headerText="Situação" styleClass="Center"
+						style="width: 100px">
+						<p:outputLabel value="#{entity.situacao}"
+							styleClass="negrito Green"
+							rendered="#{entity.situacao eq 'FINALIZADA'}" />
+						<p:outputLabel value="#{entity.situacao}" styleClass="negrito Red"
+							rendered="#{entity.situacao eq 'CANCELADA'}" />
+						<p:outputLabel value="#{entity.situacao}"
+							styleClass="negrito Blue"
+							rendered="#{entity.situacao eq 'ANDAMENTO'}" />
+					</p:column>
+
+					<p:column headerText="Tipo de Serviço" styleClass="Center">
+						<p:outputLabel value="#{entity.tipoCostura}" />
+					</p:column>
+
+					<p:column headerText="Data de cadastro" styleClass="Center">
+						<p:outputLabel value="#{entity.dataCadastro}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Facção" styleClass="Center" width="300">
+						<p:outputLabel value="#{entity.faccao.nome}" />
+					</p:column>
+
+					<p:column headerText="Coleção" styleClass="Center">
+						<p:outputLabel value="#{entity.colecao.nome}" />
+					</p:column>
+
+					<p:column headerText="Prévisão de término">
+						<p:outputLabel value="#{entity.previsaoTermino}" />
+					</p:column>
+
+					<p:column headerText="Valor Total da Ordem" styleClass="Center">
+						<p:outputLabel
+							value="#{ordemProducaoBean.getValorTotalOrdem(entity)}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+				</p:dataTable>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,216 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:t="http://myfaces.apache.org/tomahawk"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="materia.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>#{materiaPrimaBean.materiaPrima.id == null ? 'Cadastrar
+					Materia Prima' : 'Atualizar Materia Prima'}</h1>
+				<h3>#{materiaPrimaBean.materiaPrima.id == null ? 'Preencha o
+					formulário abaixo para cadastrar uma nova materia prima.' :
+					'Preencha o formulário abaixo para atualizar a materia prima.'}</h3>
+
+				<div class="links-funcionais">
+					<p:link id="lista" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/lista/listarMateriaPrima.xhtml">
+						<i class="material-icons md-32">list</i>
+						<br />
+					</p:link>
+					<p:tooltip for="lista" position="top"
+						value="Listar Materias Primas" />
+
+					<p:link styleClass="link-funcional" outcome="/private/index.xhtml"
+						id="inicio">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+			<p:panel style="margin-top: 15px" styleClass="my-panel">
+				<p:outputLabel value="(" />
+				<p:outputLabel value="*" styleClass="campoObrigatorio" />
+				<p:outputLabel value=") Campos obrigatórios." />
+			</p:panel>
+
+			<t:saveState value="#{materiaPrimaBean.materiaPrima}" />
+			<t:saveState value="#{materiaPrimaBean.materiaPrimas}" />
+
+			<h:form id="frm">
+				<div class="ui-fluid">
+					<p:messages showDetail="true" autoUpdate="true" closable="true" />
+
+					<p:panelGrid columns="2" layout="grid"
+						styleClass="ui-panelgrid-blank">
+
+						<p:panelGrid columns="2" style="margin-top: 20px" layout="grid"
+							styleClass="ui-panelgrid-blank">
+
+							<h:panelGroup>
+								<p:outputLabel value="Nome: " styleClass="my-label"
+									style="vertical-align: text-top;" for="nome" />
+								<br />
+								<p:inputText id="nome"
+									value="#{materiaPrimaBean.materiaPrima.nome}" required="true"
+									label="Nome" requiredMessage="Nome é obrigatório." />
+							</h:panelGroup>
+
+							<h:panelGroup>
+								<p:outputLabel value="Valor: " styleClass="my-label"
+									style="vertical-align: text-top;" for="valor" />
+								<br />
+								<p:inputText required="true" size="20" id="valor"
+									requiredMessage="Campo 'Valor Unitário' é obrigatório!"
+									styleClass="moeda" maxlength="10"
+									value="#{materiaPrimaBean.materiaPrima.valor}">
+									<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+										minFractionDigits="2" type="number" />
+								</p:inputText>
+							</h:panelGroup>
+
+							<h:panelGroup>
+								<p:outputLabel value="Saldo: " styleClass="my-label"
+									style="vertical-align: text-top;" for="saldo" />
+								<br />
+								<p:inputText id="saldo"
+									value="#{materiaPrimaBean.materiaPrima.saldo}" required="true"
+									label="Saldo" requiredMessage="Saldo é obrigatório." />
+							</h:panelGroup>
+
+							<h:panelGroup>
+								<p:outputLabel value="Grupo Item: " styleClass="my-label"
+									style="vertical-align: text-top;" for="grupo-item" />
+								<br />
+								<p:selectOneMenu id="grupo-item"
+									value="#{materiaPrimaBean.materiaPrima.grupoItem}"
+									required="true" 
+									requiredMessage="Grupo Item é obrigatório.">
+									<f:selectItem itemLabel="Selecione" />
+									<f:selectItems var="u" value="#{materiaPrimaBean.grupoItens}"
+										itemLabel="#{u.descricao}" itemValue="#{u}" />
+										<p:ajax update="tipo"/>
+								</p:selectOneMenu>
+							</h:panelGroup>
+							<h:panelGroup>
+								<p:outputLabel value="Unidade de medida: " styleClass="my-label"
+									style="vertical-align: text-top;" for="unidade" />
+								<br />
+								<p:selectOneMenu id="unidade"
+									value="#{materiaPrimaBean.materiaPrima.unidadeMedida}"
+									required="true" label="Saldo"
+									requiredMessage="Unidade é obrigatório.">
+									<f:selectItem itemLabel="Selecione" />
+									<f:selectItems var="u" value="#{materiaPrimaBean.unidades}"
+										itemLabel="#{u} - #{u.descricao}" itemValue="#{u}" />
+								</p:selectOneMenu>
+							</h:panelGroup>
+							<h:panelGroup>
+								<p:outputLabel value="Subgrupo: " styleClass="my-label"
+									style="vertical-align: text-top;" for="grupo-item" />
+								<br />
+								<p:selectOneMenu id="sub-grupo-item"
+									value="#{materiaPrimaBean.materiaPrima.subGrupo}"
+									required="true" 
+									requiredMessage="Subgrupo é obrigatório." converter="genericConverter">
+									<f:selectItem itemLabel="Selecione" />
+									<f:selectItems var="u" value="#{subGrupoBean.subGrupos}"
+										itemLabel="#{u.nome}" itemValue="#{u}" />
+								</p:selectOneMenu>
+							</h:panelGroup>
+							
+							<h:panelGroup id="tipo">
+								<p:outputLabel value="Tipo: " styleClass="my-label" rendered="#{materiaPrimaBean.materiaPrima.grupoItem eq 'MALHA'}"
+									style="vertical-align: text-top;" for="grupo-item" />
+								<br />
+								<p:selectOneMenu id="tipo-item" rendered="#{materiaPrimaBean.materiaPrima.grupoItem eq 'MALHA'}"
+									value="#{materiaPrimaBean.materiaPrima.tipoMateriaPrima}"
+									required="true" label="Tipo"
+									requiredMessage="Grupo Item é obrigatório.">
+									<f:selectItem itemLabel="Selecione" />
+									<f:selectItems var="u" value="#{materiaPrimaBean.tipos}"
+										itemLabel="#{u.descricao}" itemValue="#{u}" />
+								</p:selectOneMenu>
+							</h:panelGroup>
+
+							<h:panelGroup>
+								<p:outputLabel value="Observação: " styleClass="my-label"
+									style="vertical-align: text-top;" for="observacao" />
+								<br />
+								<p:inputTextarea id="observacao" rows="6" cols="60"
+									value="#{materiaPrimaBean.materiaPrima.observacao}"
+									label="Saldo" />
+							</h:panelGroup>
+
+						</p:panelGrid>
+						<p:panelGrid columns="2" style="margin-top: 20px" layout="grid"
+							styleClass="ui-panelgrid-blank">
+
+							<h:panelGroup>
+								<p:outputLabel value="Fornecedores: " styleClass="my-label"
+									style="vertical-align: text-top;" />
+								<br />
+								<p:selectManyMenu showCheckbox="true"
+									value="#{materiaPrimaBean.materiaPrima.fornecedores}"
+									validatorMessage="erro ao validar" converter="clienteConverter"
+									converterMessage="Erro ao converter!">
+									<f:attribute name="collectionType" value="java.util.ArrayList" />
+									<f:selectItems value="#{clienteBean.fornecedores}" var="f"
+										itemLabel="#{f.nome}" itemValue="#{f}" />
+								</p:selectManyMenu>
+							</h:panelGroup>
+						</p:panelGrid>
+						<p:panelGrid columns="2" style="margin-top: 20px" layout="grid"
+							styleClass="ui-panelgrid-blank">
+							<h:panelGroup>
+								<p:outputLabel value="Anexar Arquivo: " styleClass="my-label" />
+							</h:panelGroup>
+							<br />
+							<p:fileUpload immediate="true" mode="advanced"
+								value="#{materiaPrimaBean.materiaPrima.arquivo}"
+								label="Escolher arquivo"
+								invalidFileMessage="Extensões permitidas: .png, .gif, .jpg ou .jpeg"
+								fileUploadListener="#{materiaPrimaBean.uploadFile}"
+								fileLimit="1" fileLimitMessage="Apenas um arquivo por vez!"
+								dragDropSupport="true" multiple="false" cancelLabel="Cancelar"
+								uploadLabel="Enviar" allowTypes="/(\.|\/)(gif|jpe?g|png)$/" />
+						</p:panelGrid>
+					</p:panelGrid>
+					<br /> <br />
+					<p:separator />
+					<h:panelGrid columns="3">
+						<p:commandButton value="Salvar" icon="fa fa-floppy-o"
+							action="#{materiaPrimaBean.save}" update="frm"
+							rendered="#{materiaPrimaBean.materiaPrima.id == null}" />
+
+						<p:commandButton value="Atualizar" icon="fa fa-floppy-o"
+							action="#{materiaPrimaBean.update}"
+							rendered="#{materiaPrimaBean.materiaPrima.id != null}" />
+
+						<p:spacer width="20" height="0" />
+
+						<p:commandButton value="Cancelar" action="/private/index.xhtml"
+							immediate="true"
+							rendered="#{materiaPrimaBean.materiaPrima.id == null}"
+							icon="fa fa-ban" ajax="false" />
+
+						<p:commandButton value="Cancelar"
+							action="#{materiaPrimaBean.goToList()}" immediate="true"
+							rendered="#{materiaPrimaBean.materiaPrima.id != null}"
+							icon="fa fa-ban" ajax="false" />
+					</h:panelGrid>
+				</div>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

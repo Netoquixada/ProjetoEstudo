@@ -1,0 +1,107 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk"
+	template="/template/layout.xhtml">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="key.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>Alterar senhas</h1>
+				<h3>Preencha os campos para alterar sua senha.</h3>
+
+				<div class="links-funcionais">
+					<p:link styleClass="link-funcional" outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+						<p:outputLabel value="Home" styleClass="Roboto" />
+					</p:link>
+				</div>
+			</p:panel>
+
+			<h:form id="frm">
+
+				<p:panel style="background-color: #EEE7D8;">
+					<h:outputLabel value="(" styleClass="myLabel" />
+					<h:outputLabel value="*" styleClass="campoObrigatorio" />
+					<h:outputLabel value=") " styleClass="myLabel" />
+					<h:outputLabel value="Campo obrigatório." />
+
+				</p:panel>
+				<br />
+				<p:panel id="pnl">
+					<f:facet name="header">
+						<h:outputLabel
+							value="Alterar Senha - #{escopoSessaoBean.usuarioLogado.nome}"
+							styleClass="labelHeader" />
+					</f:facet>
+
+					<br />
+
+					<h:panelGroup
+						rendered="#{escopoSessaoBean.usuarioLogado.id !=  null}">
+
+						<h:outputText for="pwdAtual" value="Senha atual "
+							styleClass="myLabel" />
+						<h:outputText value=" * " styleClass="campoObrigatorio" />
+						<br />
+						<p:password id="pwdAtual" value="#{usuarioBean.senhaAtual}"
+							label="Senha atual" required="true" size="40"
+							requiredMessage="Campo 'Senha atual' é obrigatório!" />
+						<br />
+						<br />
+						<h:outputText for="pwd1" value="Senha " styleClass="myLabel" />
+						<h:outputText value=" * " styleClass="campoObrigatorio" />
+						<br />
+						<p:password id="pwd1"
+							value="#{escopoSessaoBean.usuarioLogado.senha}" match="pwd2"
+							label="Senha" required="true" size="40"
+							validatorMessage="As senhas informadas são diferentes ou não atendem ao padrão de senhas que deve conter no mínimo 6 e no máximo 20 dígitos!"
+							feedback="true" promptLabel="Digite sua senha!"
+							weakLabel="Senha fraca" goodLabel="Senha média"
+							strongLabel="Senha forte"
+							requiredMessage="Campo 'Senha' é obrigatório!">
+							<!-- 						<f:validateRegex -->
+							<!-- 							pattern="((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W]).{6,20})" /> -->
+						</p:password>
+						<br />
+						<br />
+						<h:outputText for="pwd2" value="Confirmar senha "
+							styleClass="myLabel" />
+						<h:outputText value=" * " styleClass="campoObrigatorio" />
+						<br />
+						<p:password id="pwd2"
+							value="#{escopoSessaoBean.usuarioLogado.senha}"
+							label="Confirmar senha" required="true" size="40"
+							requiredMessage="Campo 'Confirmar senha' é obrigatório!" />
+					</h:panelGroup>
+					<br />
+					<br />
+				</p:panel>
+				<br />
+				<p:commandButton value="Atualizar" icon="ui-icon-disk"
+					styleClass="btn-blue" action="#{usuarioBean.updateSenha}"
+					update="pnl"
+					rendered="#{escopoSessaoBean.usuarioLogado.id != null}">
+					<f:setPropertyActionListener
+						value="#{escopoSessaoBean.usuarioLogado}"
+						target="#{usuarioBean.usuario}" />
+				</p:commandButton>
+				<p:spacer width="20" height="0" />
+				<p:button icon="ui-icon-close" value="Cancelar"
+					rendered="#{escopoSessaoBean.usuarioLogado.primeiroAcesso == false}"
+					outcome="/pages/private/inicio.xhtml" styleClass="btn-orange" />
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,85 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:t="http://myfaces.apache.org/tomahawk"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+	<br />
+	<p:outputLabel value="Histórico de Corte de produto"
+		styleClass="my-label-titulo" />
+	<br />
+	<br />
+	<center>
+		<p:dataTable id="tableHistorico" var="historico"
+			value="#{ordemCorteBean.historicoList}"
+			emptyMessage="Nenhuma produto recebido até o momento">
+
+			<p:column headerText="Recebido por" style="color: #000000 !important">
+				<p:outputLabel value="#{historico.usuario.nome}" />
+			</p:column>
+
+			<p:column headerText="Data lançamento"
+				style="color: #000000 !important">
+				<p:outputLabel value="#{historico.dataRecebimento}">
+					<f:convertDateTime pattern="dd/MM/yyyy - HH:mm" />
+				</p:outputLabel>
+			</p:column>
+
+			<p:column headerText="Data corte" style="color: #000000 !important">
+				<p:outputLabel value="#{historico.dataCorte}">
+					<f:convertDateTime pattern="dd/MM/yyyy" />
+				</p:outputLabel>
+			</p:column>
+
+			<p:column headerText="Cortador" style="color: #000000 !important">
+				<p:outputLabel value="#{historico.cortador.nome}" />
+			</p:column>
+
+			<p:column headerText="Produto" style="color: #000000 !important">
+				<p:outputLabel value="#{historico.produto.nome}" />
+			</p:column>
+
+			<p:column headerText="Grade" width="50"
+				style="color: #000000 !important">
+				<p:outputLabel value="#{historico.grade.nome}" />
+			</p:column>
+
+			<p:column headerText="Quantidade Cortada" width="90"
+				styleClass="Center" style="color: #000000 !important">
+				<p:outputLabel value="#{historico.qtdRecebido}" />
+			</p:column>
+
+			<!-- 			<p:column headerText="Justificativa" width="80" -->
+			<!-- 				style="color: #000000 !important" styleClass="Center"> -->
+			<!-- 				<p:commandButton id="infop" type="button" icon="fa fa-info" -->
+			<!-- 					update="grid-panel" /> -->
+			<!-- 				<p:overlayPanel showCloseIcon="true" showEffect="fade"  -->
+			<!-- 					id="imagePanelp" for="infop" hideEffect="explode" modal="true" -->
+			<!-- 					style="width: 40%;"> -->
+
+			<!-- 					<h:panelGrid cellpadding="15"> -->
+			<!-- 						<p:outputLabel value="#{historico.justificativa}" id="grid-panel" -->
+			<!-- 							styleClass="Red my-label" /> -->
+			<!-- 					</h:panelGrid> -->
+			<!-- 				</p:overlayPanel> -->
+			<!-- 			</p:column> -->
+			<p:rowExpansion>
+				<br />
+				<p:outputLabel value="Justificativa: " styleClass="negrito" />
+				<br />
+				<p:outputLabel value="#{historico.justificativa}"
+					styleClass="Red" />
+			</p:rowExpansion>
+
+			<p:column style="width:2rem">
+				<p:rowToggler />
+			</p:column>
+			<!-- 			<p:column headerText="Justificativa" width="80" -->
+			<!-- 				style="color: #000000 !important" styleClass="Center"> -->
+
+			<!-- 			</p:column> -->
+
+		</p:dataTable>
+	</center>
+</ui:composition>

@@ -1,0 +1,161 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="usuarios.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>Lista de Usuários</h1>
+				<h3>Listagem de usuários cadastrados no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:link id="cadastrar" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/cadastro/cadastrarUsuario.xhtml">
+						<i class="material-icons md-32">add_to_photos</i>
+						<br />
+					</p:link>
+					<p:tooltip for="cadastrar" position="top" value="Cadastrar usuário" />
+
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{usuarioBean.usuario}" />
+			<t:saveState value="#{usuarioBean.lazy}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel styleClass="panel-pesquisa" style="margin-top: 15px">
+					<div class="lupa">
+						<p:graphicImage library="imagens" name="SearchLupa.png" />
+					</div>
+
+					<h:panelGrid columns="10">
+						<p:outputLabel value="Nome: " styleClass="my-label" />
+						<p:inputText value="#{usuarioBean.usuarioFilter.nome}" size="30"
+							id="nome" />
+						<p:outputLabel value="Perfil: " styleClass="my-label" />
+						<p:selectOneMenu value="#{usuarioBean.usuarioFilter.perfilUser}">
+							<f:selectItem itemLabel="-- Selecione --" />
+							<f:selectItems value="#{usuarioBean.perfis}" var="perfil"
+								itemLabel="#{perfil.descricao}" itemValue="#{perfil}" />
+						</p:selectOneMenu>
+
+						<p:commandButton value="Pesquisar"
+							style="margin-left: 5px; width: 100px !important"
+							update="table-usuarios" action="#{usuarioBean.list()}" />
+					</h:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-usuarios" value="#{usuarioBean.lazy}"
+					var="entity" paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!" paginatorPosition="bottom"
+					paginatorAlwaysVisible="false" rows="10" lazy="true">
+
+					<p:column headerText="Status" style="width: 50px"
+						styleClass="Center">
+						<p:commandLink id="lnkAlterarStatus"
+							action="#{usuarioBean.updateStatus()}" update="table-usuarios"
+							title="#{entity.status ? 'Desativar' : 'Ativar'}">
+
+							<h:panelGroup rendered="#{!entity.status}">
+								<i class="material-icons Red">remove_circle</i>
+							</h:panelGroup>
+
+							<h:panelGroup rendered="#{entity.status}">
+								<i class="material-icons Green">check_circle</i>
+							</h:panelGroup>
+
+							<f:setPropertyActionListener target="#{usuarioBean.usuario}"
+								value="#{entity}" />
+						</p:commandLink>
+					</p:column>
+
+					<p:column headerText="Loja" styleClass="Center"
+						style="width: 100px">
+						<p:outputLabel value="#{entity.loja.descricao}" />
+					</p:column>
+
+					<p:column headerText="Perfil" styleClass="Center"
+						style="width: 100px">
+						<p:outputLabel value="#{entity.perfilUser.descricao}" />
+					</p:column>
+
+					<p:column headerText="Nome">
+						<p:outputLabel value="#{entity.nome}" />
+					</p:column>
+
+					<p:column headerText="CPF" style="width: 110px" styleClass="Center">
+						<p:outputLabel value="#{entity.cpf}" />
+					</p:column>
+
+					<p:column headerText="E-mail">
+						<p:outputLabel value="#{entity.email}" />
+					</p:column>
+
+
+					<p:column headerText="Ações" style="width: 60px"
+						styleClass="Center">
+
+						<p:commandLink id="lnkDetail" rendered="#{entity.status}"
+							oncomplete="PF('dados').show()" style="text-decoration: none"
+							update=":frm:dados">
+							<i class="material-icons GrayDark">assignment</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{usuarioBean.usuario}" />
+						</p:commandLink>
+						<p:tooltip for="lnkDetail" value="Editar" position="top" />
+						<p:spacer />
+						<p:commandLink ajax="false" id="lnkEditar"
+							rendered="#{entity.status}"
+							action="#{usuarioBean.prepareUpdate()}"
+							style="text-decoration: none">
+							<i class="material-icons GrayDark">mode_edit</i>
+
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{usuarioBean.usuario}" />
+						</p:commandLink>
+
+						<p:tooltip for="lnkEditar" value="Editar" position="top" />
+					</p:column>
+				</p:dataTable>
+
+				<p:dialog header="Detalhes do usuário" modal="true" width="50%"
+					id="dados" widgetVar="dados">
+					<h:panelGrid columns="2">
+						<p:outputLabel value="Nome: " styleClass="my-label" />
+						<p:outputLabel value="#{usuarioBean.usuario.nome}" />
+						<p:outputLabel value="CPF: " styleClass="my-label" />
+						<p:outputLabel value="#{usuarioBean.usuario.cpf}" />
+						<p:outputLabel value="E-mail: " styleClass="my-label" />
+						<p:outputLabel value="#{usuarioBean.usuario.email}" />
+						<p:outputLabel value="Celular: " styleClass="my-label" />
+						<p:outputLabel value="#{usuarioBean.usuario.celular}" />
+						<p:outputLabel value="Telefone: " styleClass="my-label" />
+						<p:outputLabel value="#{usuarioBean.usuario.telefone}" />
+						<p:outputLabel value="Login: " styleClass="my-label" />
+						<p:outputLabel value="#{usuarioBean.usuario.login}" />
+						<p:outputLabel value="Perfil: " styleClass="my-label" />
+						<p:outputLabel value="#{usuarioBean.usuario.perfilUser.descricao}" />
+					</h:panelGrid>
+				</p:dialog>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,178 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="folha-pagamento.png"
+						width="60px" style="float: left" />
+				</div>
+
+				<h1>Lista de Folhas de Pagamento</h1>
+				<h3>Listagem de folhas de pagamentos cadastradas no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:link id="cadastrar" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/cadastro/cadastrarFolhaPagamento.xhtml">
+						<i class="material-icons md-32">add_to_photos</i>
+						<br />
+					</p:link>
+					<p:tooltip for="cadastrar" position="top"
+						value="Cadastrar Folha de Pagamento" />
+
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{folhaPagamentoBean.folhaPagamento}" />
+			<t:saveState value="#{folhaPagamentoBean.itemFolhaPagamentoList}" />
+			<t:saveState value="#{folhaPagamentoBean.folhaPagamentos}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel styleClass="panel-pesquisa" style="margin-top: 15px">
+					<div class="lupa">
+						<p:graphicImage library="imagens" name="SearchLupa.png" />
+					</div>
+					<h:panelGrid columns="15">
+						<p:outputLabel value="Protocolo: " styleClass="my-label" />
+						<p:inputText
+							value="#{folhaPagamentoBean.folhaPagamentoFilter.protocolo}"
+							size="10" />
+						<p:outputLabel value="Referência " styleClass="my-label" />
+						<p:inputText
+							value="#{folhaPagamentoBean.folhaPagamentoFilter.referencia}"
+							size="10" />
+
+						<p:outputLabel value="De: " styleClass="my-label" />
+						<p:calendar size="10" navigator="true"
+							value="#{folhaPagamentoBean.folhaPagamentoFilter.dataCadastroInicio}"
+							pattern="dd/MM/yyyy" />
+						<p:outputLabel value="Até: " styleClass="my-label" />
+						<p:calendar size="10" navigator="true"
+							value="#{folhaPagamentoBean.folhaPagamentoFilter.dataCadastroFim}"
+							pattern="dd/MM/yyyy" />
+						<p:commandButton value="Pesquisar" icon="fa fa-search"
+							style="margin-left: 5px; width: 100px !important"
+							update="table-ordem" action="#{folhaPagamentoBean.list()}" />
+
+						<p:commandButton id="report"
+							rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' or escopoSessaoBean.usuarioLogado.perfilUser eq 'CORTADOR'}"
+							actionListener="#{folhaPagamentoBean.gerarPDF}"
+							icon="fa fa-download" value="Gerar PDF"
+							onclick="this.form.target='_blank'" ajax="false">
+						</p:commandButton>
+					</h:panelGrid>
+
+				</p:panel>
+
+				<p:dataTable id="table-ordem"
+					value="#{folhaPagamentoBean.folhaPagamentos}" var="entity"
+					paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10"
+					lazy="true">
+
+					<p:column headerText="Data Cadastro" styleClass="Center">
+						<p:outputLabel value="#{entity.dataCadastro}">
+							<f:convertDateTime pattern="dd/mm/yyyy HH:mm:ss" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Protocolo" styleClass="Center">
+						<p:outputLabel value="#{entity.protocolo}" />
+					</p:column>
+
+					<p:column headerText="Referência" styleClass="Center">
+						<p:outputLabel value="#{entity.referencia}" />
+					</p:column>
+
+					<p:column headerText="Tipo" styleClass="Center">
+						<p:outputLabel value="#{entity.tipoFolhaPagamento.descricao}" />
+					</p:column>
+
+					<p:column headerText="Loja" styleClass="Center">
+						<p:outputLabel value="#{entity.loja.descricao}" />
+					</p:column>
+
+					<p:column headerText="Observação">
+						<p:outputLabel value="#{entity.observacao}" />
+					</p:column>
+
+					<p:column headerText="Ações" style="width: 160px"
+						styleClass="Center">
+
+						<p:commandLink id="lnkDetail" rendered="#{entity.status}"
+							oncomplete="PF('dados').show()" style="text-decoration: none"
+							update=":frm:dados" title="Detalhes"
+							action="#{folhaPagamentoBean.carregarListaItemFolhaPagamento()}">
+							<i class="material-icons GrayDark">assignment</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{folhaPagamentoBean.folhaPagamento}" />
+						</p:commandLink>
+						<p:spacer />
+						<p:link ajax="false" id="lnkEditar" title="Editar"
+							outcome="#{folhaPagamentoBean.prepareUpdate()}"
+							style="text-decoration: none">
+							<i class="material-icons GrayDark">mode_edit</i>
+							<f:param name="id" value="#{entity.id}" />
+						</p:link>
+						<p:spacer />
+						<p:commandLink id="pdf" ajax="false"
+							action="#{folhaPagamentoBean.gerarPDFFolhaPagamento()}"
+							title="Download" style="text-decoration: none">
+							<i class="material-icons GrayDark">get_app</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{folhaPagamentoBean.folhaPagamento}" />
+						</p:commandLink>
+					</p:column>
+				</p:dataTable>
+
+				<p:dialog header="Detalhes da Folha de Pagamento" modal="true"
+					closable="true" width="1000" closeOnEscape="true" draggable="false"
+					id="dados" widgetVar="dados" resizable="false">
+
+					<div class="scroll-dialog">
+						<h:panelGrid columns="2">
+							<p:outputLabel value="Loja: " styleClass="my-label" />
+							<p:outputLabel
+								value="#{folhaPagamentoBean.folhaPagamento.loja.descricao}" />
+							<p:outputLabel value="Data: " styleClass="my-label" />
+							<p:outputLabel
+								value="#{folhaPagamentoBean.folhaPagamento.dataCadastro}">
+								<f:convertDateTime pattern="dd/MM/yyyy" />
+								<p:outputLabel value="Protocolo: " styleClass="my-label" />
+								<p:outputLabel
+									value="#{folhaPagamentoBean.folhaPagamento.protocolo}" />
+								<p:outputLabel value="Referência " styleClass="my-label" />
+								<p:outputLabel
+									value="#{folhaPagamentoBean.folhaPagamento.referencia}" />
+							</p:outputLabel>
+							<p:outputLabel value="Tipo: " styleClass="my-label" />
+							<p:outputLabel
+								value="#{folhaPagamentoBean.folhaPagamento.tipoFolhaPagamento.descricao}" />
+
+						</h:panelGrid>
+
+						<ui:include src="/private/fragmentos/lista-itens-folha.xhtml" />
+						<br />
+					</div>
+				</p:dialog>
+
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

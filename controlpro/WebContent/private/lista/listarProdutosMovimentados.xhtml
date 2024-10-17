@@ -1,0 +1,87 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="produto.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>Lista de Produtos Movimentados</h1>
+				<h3>Listagem de produtos movimentados no sistema.</h3>
+
+				<div class="links-funcionais">
+
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel styleClass="panel-pesquisa" style="margin-top: 15px">
+					<div class="lupa">
+						<p:graphicImage library="imagens" name="SearchLupa.png" />
+					</div>
+
+					<h:panelGrid columns="10">
+						<p:outputLabel value="De: " styleClass="my-label" />
+						<p:calendar size="10" navigator="true"
+							value="#{produtosMovimentadosMB.produtosMovimentados.dataInicioFilter}"
+							pattern="dd/MM/yyyy" />
+						<p:outputLabel value="Até: " styleClass="my-label" />
+						<p:calendar size="10" navigator="true"
+							value="#{produtosMovimentadosMB.produtosMovimentados.dataFimFilter}"
+							pattern="dd/MM/yyyy" />
+
+						<p:commandButton value="Pesquisar"
+							style="margin-left: 5px; width: 100px !important"
+							update="table-produtos" action="#{produtosMovimentadosMB.list()}" />
+					</h:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-produtos"
+					value="#{produtosMovimentadosMB.produtosMovimentadosList}"
+					var="entity" paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10"
+					lazy="true">
+
+					<p:column headerText="Produto" style="width: 110px">
+						<p:outputLabel value="#{entity.produto}" />
+					</p:column>
+
+					<p:column headerText="Nome" 
+						styleClass="Center">
+						<p:outputLabel value="#{entity.nome}" />
+					</p:column>
+
+					<p:column headerText="Vendido" style="width: 110px">
+						<p:outputLabel value="#{entity.vendido}" />
+					</p:column>
+
+					<p:column headerText="Valor" styleClass="Center"
+						style="width: 100px">
+						<p:outputLabel value="#{entity.saida}" >
+						<f:convertNumber minFractionDigits="2" type="currency"
+														maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+
+				</p:dataTable>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

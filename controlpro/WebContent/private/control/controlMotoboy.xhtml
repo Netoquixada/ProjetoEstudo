@@ -1,0 +1,180 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<h:form>
+				<p:panelGrid columns="2"
+					columnClasses="ui-g-12 ui-md-4,ui-g-12 ui-md-8" layout="grid"
+					styleClass="ui-panelgrid-blank">
+
+					<h:panelGroup>
+						<div class="image-title">
+							<h:graphicImage library="imagens" name="motoboy.jpg" width="60px"
+								style="float: left" />
+						</div>
+
+						<h1>Lista de Motoboys</h1>
+						<h3>Listagem de Motboys cadastrados no sistema.</h3>
+					</h:panelGroup>
+
+					<p:menuButton value="Opções" style="float: right">
+						<p:menuitem value="Cadastrar" oncomplete="PF('dados').show()"
+							update=":form-cadastro:dados" icon="fa fa-plus" />
+						<p:menuitem value="Página inicial" outcome="/private/index.xhtml"
+							icon="fa fa-home" />
+					</p:menuButton>
+
+				</p:panelGrid>
+			</h:form>
+
+			<t:saveState value="#{motoboyBean.motoboy}" />
+			<t:saveState value="#{motoboyBean.motoboys}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel header="Painel de Pesquisa" style="margin-top: 15px"
+					toggleable="true" toggleOrientation="vertical">
+
+					<p:panelGrid columns="2"
+						columnClasses="ui-g-12 ui-md-4,ui-g-12 ui-md-8" layout="grid"
+						styleClass="ui-panelgrid-blank">
+
+						<h:panelGroup>
+							<p:outputLabel value="Nome: " styleClass="my-label" />
+							<br />
+							<p:inputText value="#{motoboyBean.motoboyFilter.nome}" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<br />
+							<p:commandButton value="Pesquisar" icon="fa fa-search"
+								style="margin-left: 5px; width: 100px !important"
+								update="table-motoboy" action="#{motoboyBean.list()}" />
+						</h:panelGroup>
+					</p:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-motoboy" value="#{motoboyBean.motoboys}"
+					var="entity" paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10"
+					lazy="true">
+
+					<p:column headerText="Status" style="width: 50px"
+						styleClass="Center">
+						<p:commandLink id="lnkAlterarStatus"
+							action="#{motoboyBean.updateStatus()}" update="table-motoboy"
+							title="#{entity.status ? 'Desativar' : 'Ativar'}">
+
+							<h:panelGroup rendered="#{!entity.status}">
+								<i class="material-icons Red">remove_circle</i>
+							</h:panelGroup>
+
+							<h:panelGroup rendered="#{entity.status}">
+								<i class="material-icons Green">check_circle</i>
+							</h:panelGroup>
+
+							<f:setPropertyActionListener target="#{motoboyBean.motoboy}"
+								value="#{entity}" />
+						</p:commandLink>
+					</p:column>
+
+					<p:column headerText="Nome">
+						<p:outputLabel value="#{entity.nome}" />
+					</p:column>
+					<p:column headerText="Telefone" styleClass="Center">
+						<p:outputLabel value="#{entity.telefone}" />
+					</p:column>
+					<p:column headerText="Observação">
+						<p:outputLabel value="#{entity.observacao}" />
+					</p:column>
+
+					<p:column headerText="Ações" style="width: 90px"
+						styleClass="Center">
+						<p:commandLink id="lnkEditar" rendered="#{entity.status}"
+							oncomplete="PF('dados').show()" style="text-decoration: none"
+							update=":form-cadastro:dados">
+							<i class="material-icons GrayDark">mode_edit</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{motoboyBean.motoboy}" />
+						</p:commandLink>
+
+						<p:tooltip for="lnkEditar" value="Editar" position="top" />
+					</p:column>
+				</p:dataTable>
+			</h:form>
+
+			<h:form id="form-cadastro">
+				<p:dialog modal="true" id="dados" widgetVar="dados"
+					resizable="false">
+
+					<f:facet name="header">
+					#{motoboyBean.motoboy.id == null ? 'Cadastrar Motoboy' :
+					'Atualizar Motoboy'}
+					</f:facet>
+
+					<div class="ui-fluid">
+						<p:messages showDetail="true" autoUpdate="true" closable="true" />
+
+						<h:panelGrid columns="2" style="margin-top: 20px"
+							id="grid-cadastro">
+
+							<p:commandButton id="infop" type="button" icon="fa fa-info"
+								value="Informações" />
+							<p:overlayPanel showCloseIcon="true" showEffect="fade"
+								id="imagePanelp" for="infop" hideEffect="explode" modal="true"
+								style="width: 40%;">
+
+								<h:panelGrid cellpadding="15">
+									<p:outputLabel value="Preencha todos os campos direito! "
+										styleClass="Red my-label" />
+								</h:panelGrid>
+							</p:overlayPanel>
+
+
+							<h:panelGroup>
+								<p:outputLabel value="Nome: " styleClass="my-label"
+									style="vertical-align: text-top;" for="nome" />
+							</h:panelGroup>
+							<p:inputText required="true" id="nome" placeholder="Digite o nome do motoboy"
+								requiredMessage="Informe o nome do motoboy"
+								value="#{motoboyBean.motoboy.nome}" />
+							<h:panelGroup>
+								<p:outputLabel value="Telefone: " styleClass="my-label"
+									style="vertical-align: text-top;" for="telefone" />
+							</h:panelGroup>
+							<p:inputText required="true" id="telefone"
+								requiredMessage="Informe o telefone do motoboy"
+								value="#{motoboyBean.motoboy.telefone}" />
+							<h:panelGroup>
+								<p:outputLabel value="Observação: " styleClass="my-label"
+									style="vertical-align: text-top;" for="observacao" />
+							</h:panelGroup>
+							<p:inputTextarea rows="6" cols="60" id="observacao"
+								value="#{motoboyBean.motoboy.observacao}" label="Observação" />
+						</h:panelGrid>
+						<p:separator />
+						<h:panelGrid columns="3">
+							<p:commandButton value="Salvar" icon="fa fa-floppy-o"
+								action="#{motoboyBean.save}"
+								update="grid-cadastro :frm:table-motoboy"
+								rendered="#{motoboyBean.motoboy.id == null}" />
+
+							<p:commandButton value="Atualizar" icon="fa fa-floppy-o"
+								action="#{motoboyBean.update}"
+								rendered="#{motoboyBean.motoboy.id != null}" />
+
+							<p:spacer width="20" height="0" />
+						</h:panelGrid>
+					</div>
+				</p:dialog>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

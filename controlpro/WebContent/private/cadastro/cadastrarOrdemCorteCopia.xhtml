@@ -1,0 +1,494 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:t="http://myfaces.apache.org/tomahawk"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="avaliacao.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>#{ordemCorteBean.ordemCorte.id == null ? 'Cadastrar Ordem
+					de Corte' : 'Atualizar Ordem de Corte'}</h1>
+				<h3>#{ordemCorteBean.ordemCorte.id == null ? 'Preencha o
+					formulário abaixo para cadastrar uma nova Ordem de Corte.' :
+					'Preencha o formulário abaixo para atualizar a Ordem de Corte.'}</h3>
+
+				<div class="links-funcionais">
+					<p:link id="lista" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/lista/listarOrdemCorte.xhtml">
+						<i class="material-icons md-32">list</i>
+						<br />
+					</p:link>
+					<p:tooltip for="lista" position="top"
+						value="Listar Ordens de Corte" />
+
+					<p:link styleClass="link-funcional" outcome="/private/index.xhtml"
+						id="inicio">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+			<p:panel style="margin-top: 15px" styleClass="my-panel">
+				<p:outputLabel value="(" />
+				<p:outputLabel value="*" styleClass="campoObrigatorio" />
+				<p:outputLabel value=") Campos obrigatórios." />
+			</p:panel>
+
+			<h:form id="frm">
+				<div class="ui-fluid">
+					<p:messages showDetail="true" autoUpdate="false" closable="true" />
+
+					<p:panelGrid columns="2" style="margin-top: 20px" layout="grid"
+						columnClasses="ui-grid-col-2" styleClass="ui-panelgrid-blank">
+
+
+						<p:commandButton id="infop" type="button" icon="fa fa-info"
+							value="Informações" />
+						<p:overlayPanel showCloseIcon="true" showEffect="fade"
+							id="imagePanelp" for="infop" hideEffect="explode" modal="true"
+							style="width: 40%;">
+
+							<h:panelGrid cellpadding="15">
+								<p:outputLabel
+									value="Preencha todos os campos com atenção! VERIFIQUE SE A QUANTIDADE LANÇADA ESTÁ CORRETA. Insira as informações do ENFESTO! "
+									styleClass="Red my-label" />
+							</h:panelGrid>
+						</p:overlayPanel>
+
+
+						<h:panelGroup>
+							<p:outputLabel value="Loja: " styleClass="my-label"
+								style="vertical-align: text-top;" for="loja" />
+						</h:panelGroup>
+						<p:selectOneMenu required="true"
+							requiredMessage="Selecione a loja" id="loja"
+							value="#{ordemCorteBean.ordemCorte.loja}">
+							<f:selectItem itemLabel="Selecione" />
+							<f:selectItems value="#{ordemCorteBean.lojas}" var="loja"
+								itemLabel="#{loja.descricao}" itemValue="#{loja}" />
+						</p:selectOneMenu>
+						<h:panelGroup>
+							<p:outputLabel value="Prévisão de término: "
+								styleClass="my-label" for="previsao" />
+						</h:panelGroup>
+						<p:inputMask mask="99/99/9999" id="previsao" required="true"
+							label="Prévisão"
+							requiredMessage="Prévisão de término obrigatório"
+							value="#{ordemCorteBean.ordemCorte.previsaoTermino}">
+
+							<p:ajax update="dias" event="blur"
+								listener="#{ordemCorteBean.atualizarQtdDias()}" />
+						</p:inputMask>
+
+						<h:panelGroup>
+							<p:outputLabel value="Duração(Dias): " styleClass="my-label" />
+						</h:panelGroup>
+						<p:outputLabel id="dias"
+							value="#{ordemCorteBean.ordemCorte.qtdDias}"
+							styleClass="negrito tam-18" />
+
+						<h:panelGroup>
+							<p:outputLabel value="N° do pedido: " styleClass="my-label" />
+						</h:panelGroup>
+						<p:inputText value="#{ordemCorteBean.ordemCorte.numeroPedido}" />
+
+						<h:panelGroup>
+							<p:outputLabel value="Observação: " styleClass="my-label"
+								for="observacao" />
+						</h:panelGroup>
+						<p:inputTextarea id="observacao" rows="6" cols="60"
+							label="Observação"
+							value="#{ordemCorteBean.ordemCorte.observacao}" />
+					</p:panelGrid>
+					<h:panelGrid>
+						<br />
+						<p:commandButton value="Adicionar grade na ordem de corte"
+							oncomplete="PF('dados').show()" styleClass="button-add"
+							action="#{ordemCorteBean.clearGradeOrdem()}" process="@this"
+							update=":form-cadastro:dados" icon="fa fa-plus">
+						</p:commandButton>
+						<br />
+
+						<p:dataTable id="tableGradeOrdem" var="gradeOrdem"
+							value="#{ordemCorteBean.gradeOrdemList}"
+							emptyMessage="Nenhuma atividade foi adicionada">
+
+							<p:column headerText="Cortador">
+								<p:outputLabel value="#{gradeOrdem.cortador.nome}" />
+							</p:column>
+
+							<p:column headerText="Produto">
+								<p:outputLabel value="#{gradeOrdem.produto.nome}" />
+							</p:column>
+
+							<p:column headerText="Unidade" width="60">
+								<p:outputLabel value="#{gradeOrdem.produto.unidadeVenda}" />
+							</p:column>
+
+							<p:column headerText="Referência" width="90">
+								<p:outputLabel value="#{gradeOrdem.produto.id}" />
+							</p:column>
+
+							<p:column headerText="Grade" width="50">
+								<p:outputLabel value="#{gradeOrdem.grade.nome}" />
+							</p:column>
+
+							<p:column headerText="Quantidade" width="90">
+								<p:outputLabel value="#{gradeOrdem.quantidade}" />
+							</p:column>
+
+							<p:column headerText="Ações" width="80">
+								<div align="center">
+									<h:panelGroup>
+										<p:commandLink oncomplete="PF('dados').show()"
+											id="editgradeOrdem" update=":form-cadastro:dados"
+											process="@this">
+											<i class="material-icons GrayDark">mode_edit</i>
+											<f:setPropertyActionListener
+												target="#{ordemCorteBean.gradeOrdem}" value="#{gradeOrdem}" />
+										</p:commandLink>
+										<p:tooltip for="editgradeOrdem"
+											value="Clique para editar a grade na ordem de corte" />
+									</h:panelGroup>
+									<h:panelGroup>
+										<p:commandLink id="removeGrade"
+											action="#{ordemCorteBean.removerGradeOrdem()}"
+											update="tableGradeOrdem" process="@this">
+											<i class="material-icons GrayDark">delete_forever</i>
+											<f:setPropertyActionListener
+												target="#{ordemCorteBean.gradeOrdem}" value="#{gradeOrdem}"></f:setPropertyActionListener>
+										</p:commandLink>
+										<p:tooltip for="removeGrade"
+											value="Clique para excluir a grade da ordem de corte" />
+									</h:panelGroup>
+								</div>
+							</p:column>
+
+						</p:dataTable>
+					</h:panelGrid>
+
+					<h:panelGrid>
+						<br />
+						<!-- 						Botão de adicionar Enfesto só é exibido para o Administrador -->
+						<p:commandButton
+							rendered="#{ordemCorteBean.ordemCorte.id != null and
+							 (escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR' or escopoSessaoBean.usuarioLogado.perfilUser eq 'CORTADOR')}"
+							value="Adicionar item de enfesto na ordem de corte"
+							oncomplete="PF('dados-enfesto').show()" styleClass="button-add"
+							action="#{ordemCorteBean.clearItemEnfesto()}" process="@this"
+							update=":form-cadastro-enfesto:dados-enfesto" icon="fa fa-plus">
+						</p:commandButton>
+						<br />
+
+						<p:dataTable id="tableItemEnfesto" var="enfesto"
+							value="#{ordemCorteBean.itemEnfestoCorteList}"
+							emptyMessage="Nenhuma atividade foi adicionada">
+
+							<p:column headerText="Matéria Prima">
+								<p:outputLabel value="#{enfesto.materiaPrima.nome}" />
+							</p:column>
+
+							<p:column headerText="Unidade de Medida">
+								<p:outputLabel value="#{enfesto.materiaPrima.unidadeMedida}" />
+							</p:column>
+
+							<p:column headerText="Valor Materia Prima" styleClass="Center">
+								<p:outputLabel value="#{enfesto.materiaPrima.valor}"
+									styleClass="negrito">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+
+							<p:column headerText="Comprimento">
+								<p:outputLabel value="#{enfesto.comprimento}" />
+							</p:column>
+
+							<!-- 							<p:column headerText="Largura"> -->
+							<!-- 								<p:outputLabel value="#{enfesto.largura}" /> -->
+							<!-- 							</p:column> -->
+
+							<p:column headerText="Metro Folha">
+								<p:outputLabel value="#{enfesto.metroFolha}" />
+							</p:column>
+
+							<p:column headerText="Folha">
+								<p:outputLabel value="#{enfesto.folha}" />
+							</p:column>
+
+							<p:column headerText="Qtd. por Folha">
+								<p:outputLabel value="#{enfesto.qtdPorFolha}" />
+							</p:column>
+
+
+							<p:column headerText="Usado Total" width="90" styleClass="Center">
+								<p:outputLabel value="#{enfesto.total}"
+									styleClass="label-laranja"
+									title="Resultado da multiplicação do comprimento pela folha." />
+							</p:column>
+
+							<p:column headerText="Usado por Item" width="90"
+								styleClass="Center">
+								<p:outputLabel value="#{enfesto.usadoPorItem}"
+									styleClass="label-laranja"
+									title="Resultado da divisão do comprimento pela quantidade por folha." />
+							</p:column>
+
+							<p:column headerText="Total R$" width="90" styleClass="Center">
+								<p:outputLabel
+									value="#{enfesto.materiaPrima.valor * enfesto.usadoPorItem}"
+									styleClass="negrito">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+
+							<p:column headerText="Ações" width="80">
+								<div align="center">
+									<h:panelGroup
+										rendered="#{escopoSessaoBean.usuarioLogado.perfilUser eq 'ADMINISTRADOR'}">
+										<p:commandLink oncomplete="PF('dados-enfesto').show()"
+											id="editItemEnfesto"
+											update=":form-cadastro-enfesto:dados-enfesto" process="@this">
+											<i class="material-icons GrayDark">mode_edit</i>
+											<f:setPropertyActionListener
+												target="#{ordemCorteBean.itemEnfestoCorte}"
+												value="#{enfesto}" />
+										</p:commandLink>
+										<p:tooltip for="editItemEnfesto"
+											value="Clique para editar item de enfesto" />
+									</h:panelGroup>
+									<h:panelGroup>
+										<p:commandLink id="removeEnfesto"
+											action="#{ordemCorteBean.removerItemEnfesto()}"
+											update="tableItemEnfesto" process="@this">
+											<i class="material-icons GrayDark">delete_forever</i>
+											<f:setPropertyActionListener
+												target="#{ordemCorteBean.itemEnfestoCorte}"
+												value="#{enfesto}"></f:setPropertyActionListener>
+										</p:commandLink>
+										<p:tooltip for="removeEnfesto"
+											value="Clique para excluir o item de enfesto" />
+									</h:panelGroup>
+								</div>
+							</p:column>
+
+						</p:dataTable>
+					</h:panelGrid>
+
+					<br /> <br />
+					<p:separator />
+					<h:panelGrid columns="3">
+						<p:commandButton value="Salvar" icon="fa fa-floppy-o"
+							action="#{ordemCorteBean.save}" update="frm"
+							rendered="#{ordemCorteBean.ordemCorte.id == null}" />
+
+						<p:commandButton value="Atualizar" icon="fa fa-floppy-o"
+							action="#{ordemCorteBean.update}"
+							rendered="#{ordemCorteBean.ordemCorte.id != null}" />
+
+						<p:spacer width="20" height="0" />
+
+						<p:commandButton value="Cancelar" action="/private/index.xhtml"
+							immediate="true"
+							rendered="#{ordemCorteBean.ordemCorte.id == null}"
+							icon="fa fa-ban" ajax="false" />
+
+						<p:commandButton value="Cancelar"
+							action="#{ordemCorteBean.goToList()}" immediate="true"
+							rendered="#{ordemCorteBean.ordemCorte.id != null}"
+							icon="fa fa-ban" ajax="false" />
+					</h:panelGrid>
+				</div>
+			</h:form>
+
+			<h:form id="form-cadastro">
+				<p:dialog modal="true" id="dados" widgetVar="dados"
+					resizable="false">
+
+					<f:facet name="header">
+					#{ordemCorteBean.gradeOrdem.grade.nome == null ? 'Adicionar Grade' :
+					'Atualizar Grade'}
+					</f:facet>
+
+					<div class="ui-fluid">
+						<p:messages showDetail="true" autoUpdate="true" closable="true" />
+
+						<h:panelGrid columns="2" style="margin-top: 20px"
+							id="grid-cadastro" cellpadding="05px">
+
+							<h:panelGroup>
+								<p:outputLabel value="Cortador: " styleClass="my-label"
+									style="vertical-align: text-top;" for="cortador" />
+							</h:panelGroup>
+							<p:autoComplete value="#{ordemCorteBean.gradeOrdem.cortador}"
+								autocomplete="true" size="36" id="cortador"
+								completeMethod="#{funcionarioBean.getFuncionarioAutoComplete}"
+								forceSelection="true" minQueryLength="1" maxResults="30"
+								dropdown="true" required="true"
+								requiredMessage="Campo 'Cortador' é obrigatório!"
+								converterMessage="Não foi possível selecionar o funcionário (Erro ao converter o objeto)"
+								converter="funcionarioConverter" var="func"
+								itemLabel="#{func.nome}" itemValue="#{func}"
+								placeholder="Pesquise pelo nome">
+							</p:autoComplete>
+
+							<h:panelGroup>
+								<p:outputLabel value="Produto: " styleClass="my-label"
+									style="vertical-align: text-top;" for="produto" />
+							</h:panelGroup>
+							<p:autoComplete value="#{ordemCorteBean.gradeOrdem.produto}"
+								autocomplete="true" size="36" id="produto"
+								completeMethod="#{produtoBean.getProdutoAutoCompletePorProduto}"
+								forceSelection="true" minQueryLength="2" maxResults="30"
+								dropdown="true" required="true"
+								requiredMessage="Campo 'Produto' é obrigatório!"
+								converterMessage="Não foi possível selecionar o produto (Erro ao converter o objeto)"
+								converter="produtoConverter" var="prod" itemLabel="#{prod.nome}"
+								itemValue="#{prod}" placeholder="Pesquise pelo código">
+							</p:autoComplete>
+							<h:panelGroup>
+								<p:outputLabel value="Grade: " styleClass="my-label"
+									style="vertical-align: text-top;" for="grade" />
+							</h:panelGroup>
+							<p:selectOneMenu id="grade"
+								value="#{ordemCorteBean.gradeOrdem.grade}" required="true"
+								requiredMessage="Grade é obrigatório."
+								converter="genericConverter">
+								<f:selectItem itemLabel="-- Selecione --" />
+								<f:selectItems value="#{gradeBean.grades}" var="grad"
+									itemLabel="#{grad.nome}" itemValue="#{grad}" />
+							</p:selectOneMenu>
+
+
+							<h:panelGroup>
+								<p:outputLabel value="Quantidade: " styleClass="my-label"
+									style="vertical-align: text-top;" />
+							</h:panelGroup>
+							<p:inputText id="qtd" validatorMessage="Apenas números"
+								value="#{ordemCorteBean.gradeOrdem.quantidade}" required="true"
+								requiredMessage="Campo 'quantidade' obrigatório!" />
+						</h:panelGrid>
+						<p:separator />
+						<h:panelGrid columns="3">
+							<p:commandButton value="Adicionar"
+								update=":frm:tableGradeOrdem grid-cadastro"
+								action="#{ordemCorteBean.addGradeOrdem()}" icon="fa fa-plus"
+								rendered="#{ordemCorteBean.gradeOrdem.grade.nome == null}" />
+
+							<p:commandButton value="Atualizar"
+								oncomplete="PF('dados').hide()" icon="fa fa-refresh"
+								update=":frm:tableGradeOrdem"
+								action="#{ordemCorteBean.updateGradeOrdem()}"
+								rendered="#{ordemCorteBean.gradeOrdem.grade.nome != null}" />
+
+							<p:commandButton value="Cancelar" styleClass="btn-orange"
+								icon="fa fa-close" process="@this"
+								oncomplete="PF('dados').hide()" immediate="true" />
+
+							<p:spacer width="20" height="0" />
+						</h:panelGrid>
+					</div>
+				</p:dialog>
+			</h:form>
+
+			<h:form id="form-cadastro-enfesto">
+				<p:dialog modal="true" id="dados-enfesto" widgetVar="dados-enfesto"
+					resizable="false">
+
+					<f:facet name="header">
+					#{ordemCorteBean.itemEnfestoCorte.materiaPrima.nome == null ? 'Adicionar Enfesto' :
+					'Atualizar Enfesto'}
+					</f:facet>
+
+					<div class="ui-fluid">
+						<p:messages showDetail="true" autoUpdate="true" closable="true" />
+
+						<h:panelGrid columns="2" style="margin-top: 20px"
+							id="grid-cadastro-enfesto" cellpadding="05px">
+
+							<h:panelGroup>
+								<p:outputLabel value="Matéria Prima:" styleClass="my-label" />
+							</h:panelGroup>
+							<p:selectOneMenu id="materia" filter="true"
+								filterMatchMode="startsWith"
+								value="#{ordemCorteBean.itemEnfestoCorte.materiaPrima}"
+								required="true" requiredMessage="Materia Prima é obrigatório."
+								converter="genericConverter">
+								<f:selectItem itemLabel="-- Selecione --" />
+								<f:selectItems value="#{materiaPrimaBean.materiasMalha}"
+									var="mat" itemLabel="#{mat.nome}" itemValue="#{mat}" />
+							</p:selectOneMenu>
+
+							<h:panelGroup>
+								<p:outputLabel value="Comprimento: " styleClass="my-label" />
+							</h:panelGroup>
+							<p:inputText id="comprimento" required="true"
+								requiredMessage="true"
+								value="#{ordemCorteBean.itemEnfestoCorte.comprimento}" />
+							<h:panelGroup>
+								<p:outputLabel value="Largura: " styleClass="my-label" />
+							</h:panelGroup>
+							<p:inputText id="largura" required="true" requiredMessage="true"
+								value="#{ordemCorteBean.itemEnfestoCorte.largura}" />
+							<h:panelGroup>
+								<p:outputLabel value="Folha(s): " styleClass="my-label" />
+							</h:panelGroup>
+							<p:inputText id="folha" required="true" requiredMessage="true"
+								value="#{ordemCorteBean.itemEnfestoCorte.folha}">
+							</p:inputText>
+							<h:panelGroup>
+								<p:outputLabel value="Qtd. por Folha: " styleClass="my-label" />
+							</h:panelGroup>
+							<p:inputText id="qtd-por-folha" required="true"
+								requiredMessage="true"
+								value="#{ordemCorteBean.itemEnfestoCorte.qtdPorFolha}">
+							</p:inputText>
+							<hr />
+							<h:panelGroup>
+								<p:outputLabel value="Débitar saldo matéria prima? "
+									styleClass="my-label" />
+							</h:panelGroup>
+							<p:selectOneRadio
+								value="#{ordemCorteBean.itemEnfestoCorte.debitarSaldo}">
+								<f:selectItem itemLabel="Sim" itemValue="true" />
+								<f:selectItem itemLabel="Não" itemValue="false" />
+							</p:selectOneRadio>
+
+						</h:panelGrid>
+						<p:separator />
+						<h:panelGrid columns="3">
+							<p:commandButton value="Adicionar"
+								update=":frm:tableItemEnfesto grid-cadastro-enfesto"
+								action="#{ordemCorteBean.addItemEnfesto()}" icon="fa fa-plus"
+								rendered="#{ordemCorteBean.itemEnfestoCorte.materiaPrima.nome == null}" />
+
+							<p:commandButton value="Atualizar"
+								oncomplete="PF('dados-enfesto').hide()" icon="fa fa-refresh"
+								update=":frm:tableItemEnfesto"
+								action="#{ordemCorteBean.updateItemEnfesto()}"
+								rendered="#{ordemCorteBean.itemEnfestoCorte.materiaPrima.nome != null}" />
+
+							<p:commandButton value="Cancelar" styleClass="btn-orange"
+								icon="fa fa-close" process="@this"
+								oncomplete="PF('dados-enfesto').hide()" immediate="true" />
+
+							<p:spacer width="20" height="0" />
+						</h:panelGrid>
+					</div>
+				</p:dialog>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

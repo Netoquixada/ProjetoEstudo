@@ -1,0 +1,196 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="item-producao.png"
+						width="60px" style="float: left" />
+				</div>
+
+				<h1>Auditoria Item da Ordem de Produção</h1>
+				<h3>Listagem de auditoria das alterações no item de ordem de
+					produção</h3>
+
+				<div class="links-funcionais">
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel header="Filtros" style="margin-top: 15px">
+
+					<h:panelGrid columns="4">
+
+						<h:panelGroup>
+							<p:outputLabel value="De: " />
+							<br />
+							<p:calendar navigator="true"
+								value="#{itensAudProducaoBean.itemAudProducaoFilter.ordemProducao.dataCadastroInicio}"
+								pattern="MM/dd/yyyy HH:mm" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Até: " styleClass="my-label" />
+							<br />
+							<p:calendar navigator="true"
+								value="#{itensAudProducaoBean.itemAudProducaoFilter.ordemProducao.dataCadastroFim}"
+								pattern="MM/dd/yyyy HH:mm" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Protocolo: " styleClass="my-label" />
+							<br />
+							<p:inputText
+								value="#{itensAudProducaoBean.itemAudProducaoFilter.ordemProducao.protocolo}" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<br />
+							<p:commandButton value="Pesquisar" icon="fa fa-search"
+								style="margin-left: 5px; width: 100px !important"
+								update="table-historico" action="#{itensAudProducaoBean.list}" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Facção: " styleClass="my-label" />
+							<br />
+							<p:selectOneMenu
+								value="#{itensAudProducaoBean.itemAudProducaoFilter.ordemProducao.faccao}"
+								converter="genericConverter">
+								<f:selectItem itemLabel="Todos" />
+								<f:selectItems value="#{historicoProducaoBean.faccaos}"
+									var="faccao" itemLabel="#{faccao.nome}" itemValue="#{faccao}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Produto: " styleClass="my-label" />
+							<br />
+							<p:autoComplete
+								value="#{itensAudProducaoBean.itemAudProducaoFilter.produto}"
+								autocomplete="true" id="produto"
+								completeMethod="#{produtoBean.getProdutoAutoCompletePorProduto}"
+								forceSelection="true" minQueryLength="2" maxResults="30"
+								dropdown="true"
+								converterMessage="Não foi possível selecionar o produto (Erro ao converter o objeto)"
+								converter="produtoConverter" var="prod" itemLabel="#{prod.nome}"
+								itemValue="#{prod}" placeholder="Pesquise pelo código">
+							</p:autoComplete>
+						</h:panelGroup>
+					</h:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-historico"
+					value="#{itensAudProducaoBean.itemAudProducaoListl}"
+					var="historico" paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10">
+
+					<p:column headerText="Tipo" width="90"
+						style="color: #000000 !important">
+						<p:outputLabel value="#{historico.tipoAuditoria.descricao}" />
+					</p:column>
+
+					<p:column headerText="Usuário" width="90"
+						style="color: #000000 !important">
+						<p:outputLabel value="#{historico.usuario.nome}" />
+					</p:column>
+
+					<p:column headerText="Data Registro" width="150"
+						style="color: #000000 !important">
+						<p:outputLabel value="#{historico.dataRegistro}">
+							<f:convertDateTime pattern="dd/MM/yyyy hh:mm:ss" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Protocolo" width="90"
+						style="color: #000000 !important">
+						<p:outputLabel value="#{historico.ordemProducao.protocolo}" />
+					</p:column>
+
+					<!-- 					<p:column headerText="Data envio" style="color: #000000 !important"> -->
+					<!-- 						<p:outputLabel value="#{historico.ordemProducao.dataCadastro}"> -->
+					<!-- 							<f:convertDateTime pattern="dd/MM/yyyy - HH:mm" /> -->
+					<!-- 						</p:outputLabel> -->
+					<!-- 					</p:column> -->
+
+					<p:column headerText="Facção" style="color: #000000 !important">
+						<p:outputLabel value="#{historico.ordemProducao.faccao.nome}" />
+					</p:column>
+
+					<p:column headerText="Produto" style="color: #000000 !important">
+						<p:outputLabel value="#{historico.produto.nome}" />
+					</p:column>
+
+					<p:column headerText="Referência" width="90" styleClass="Center"
+						style="color: #000000 !important">
+						<p:outputLabel value="#{historico.produto.id}" />
+					</p:column>
+
+
+					<!-- 					<p:column headerText="Unidade" styleClass="Center" width="60" -->
+					<!-- 						style="color: #000000 !important"> -->
+					<!-- 						<p:outputLabel value="#{historico.produto.unidadeVenda}" /> -->
+					<!-- 					</p:column> -->
+
+					<p:column headerText="Quantidade enviada" width="90"
+						styleClass="Center" style="color: #000000 !important">
+						<p:outputLabel value="#{historico.quantidade}" />
+					</p:column>
+
+					<p:column headerText="Valor Unitário" styleClass="Center"
+						style="width: 100px">
+						<p:outputLabel value="#{historico.valor}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+					<!-- 					<p:column headerText="Quantidade pronto" width="90" -->
+					<!-- 						styleClass="Center" style="color: #000000 !important"> -->
+					<!-- 						<p:outputLabel value="#{historico.prontas}" /> -->
+					<!-- 					</p:column> -->
+					<!-- 					<p:column headerText="Quantidade defeito" width="90" -->
+					<!-- 						styleClass="Center" style="color: #000000 !important"> -->
+					<!-- 						<p:outputLabel value="#{historico.defeito}" /> -->
+					<!-- 					</p:column> -->
+					<!-- 					<p:column headerText="Pendente" width="90" styleClass="Center" -->
+					<!-- 						style="color: #000000 !important"> -->
+					<!-- 						<p:outputLabel -->
+					<!-- 							value="#{historico.quantidade - historico.prontas - historico.defeito}" /> -->
+					<!-- 					</p:column> -->
+
+
+					<!-- 					<f:facet name="footer"> -->
+					<!-- 						<div align="right"> -->
+					<!-- 							<h:panelGrid columns="2" style="width:30%"> -->
+					<!-- 								<p:outputLabel value="Enviadas" /> -->
+					<!-- 								<p:outputLabel -->
+					<!-- 									value="#{itensAudProducaoBean.itemAudProducaoTotal.quantidade}" /> -->
+					<!-- 								<p:outputLabel value="Prontas" /> -->
+					<!-- 								<p:outputLabel -->
+					<!-- 									value="#{itensAudProducaoBean.itemAudProducaoTotal.prontas}" /> -->
+					<!-- 								<p:outputLabel value="Defeito" /> -->
+					<!-- 								<p:outputLabel -->
+					<!-- 									value="#{itensAudProducaoBean.itemAudProducaoTotal.defeito}" /> -->
+					<!-- 								<p:outputLabel value="Pendente" /> -->
+					<!-- 								<p:outputLabel -->
+					<!-- 									value="#{itensAudProducaoBean.itemAudProducaoTotal.quantidade - itensAudProducaoBean.itemAudProducaoTotal.prontas - itensAudProducaoBean.itemAudProducaoTotal.defeito}" /> -->
+					<!-- 							</h:panelGrid> -->
+					<!-- 						</div> -->
+					<!-- 					</f:facet> -->
+
+				</p:dataTable>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

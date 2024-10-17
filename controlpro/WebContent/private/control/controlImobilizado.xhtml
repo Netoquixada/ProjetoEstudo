@@ -1,0 +1,281 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<h:form>
+				<p:panelGrid columns="2"
+					columnClasses="ui-g-12 ui-md-4,ui-g-12 ui-md-8" layout="grid"
+					styleClass="ui-panelgrid-blank">
+
+					<h:panelGroup>
+						<div class="image-title">
+							<h:graphicImage library="imagens" name="imobilizado.png"
+								width="60px" style="float: left" />
+						</div>
+
+						<h1>Lista de Imobilizados</h1>
+						<h3>Listagem de imobilizados cadastrados no sistema.</h3>
+					</h:panelGroup>
+
+					<p:menuButton value="Opções" style="float: right">
+						<p:menuitem value="Cadastrar" oncomplete="PF('dados').show()"
+							update=":form-cadastro:dados" icon="fa fa-plus" />
+						<p:menuitem value="Página inicial" outcome="/private/index.xhtml"
+							icon="fa fa-home" />
+					</p:menuButton>
+
+				</p:panelGrid>
+			</h:form>
+
+			<t:saveState value="#{imobilizadoBean.imobilizado}" />
+			<t:saveState value="#{imobilizadoBean.imobilizados}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel header="Painel de Pesquisa" style="margin-top: 15px"
+					toggleable="true" toggleOrientation="vertical">
+
+					<p:panelGrid columns="5"
+						layout="grid"
+						styleClass="ui-panelgrid-blank">
+
+						<h:panelGroup>
+							<p:outputLabel value="Loja" styleClass="my-label" />
+							<br />
+							<p:selectOneMenu
+								value="#{imobilizadoBean.imobilizadoFilter.tipo}">
+								<f:selectItem itemLabel="Todos" />
+								<f:selectItems value="#{imobilizadoBean.tipoImobilizado}"
+									var="l" itemLabel="#{l.descricao}" itemValue="#{l}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+
+						<h:panelGroup>
+							<p:outputLabel value="Nome" styleClass="my-label" />
+							<br />
+							<p:inputText value="#{imobilizadoBean.imobilizadoFilter.nome}" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Tombamento" styleClass="my-label" />
+							<br />
+							<p:inputText
+								value="#{imobilizadoBean.imobilizadoFilter.tombamento}" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="De: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{imobilizadoBean.imobilizadoFilter.dataPesquisaInicio}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Até: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{imobilizadoBean.imobilizadoFilter.dataPesquisaFim}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<br />
+							<p:commandButton value="Pesquisar" icon="fa fa-search"
+								style="margin-left: 5px; width: 100px !important"
+								update="table-imobilizado" action="#{imobilizadoBean.list()}" />
+							<p:commandButton id="report"
+								actionListener="#{imobilizadoBean.gerarPDF}"
+								icon="fa fa-download" value="Gerar PDF"
+								onclick="this.form.target='_blank'" ajax="f	alse">
+							</p:commandButton>
+						</h:panelGroup>
+					</p:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-imobilizado"
+					value="#{imobilizadoBean.imobilizados}" var="entity"
+					paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10"
+					lazy="true">
+
+					<p:column headerText="Pago?" style="width: 50px"
+						styleClass="Center">
+						<p:commandLink id="lnkAlterarStatus"
+							action="#{imobilizadoBean.updateStatus()}"
+							update="table-imobilizado"
+							title="#{entity.status ? 'Inativo' : 'Ativo'}">
+
+							<h:panelGroup rendered="#{!entity.status}">
+								<i class="material-icons Red">remove_circle</i>
+							</h:panelGroup>
+
+							<h:panelGroup rendered="#{entity.status}">
+								<i class="material-icons Green">check_circle</i>
+							</h:panelGroup>
+
+							<f:setPropertyActionListener
+								target="#{imobilizadoBean.imobilizado}" value="#{entity}" />
+						</p:commandLink>
+					</p:column>
+
+					<p:column headerText="Nome" styleClass="Center">
+						<p:outputLabel value="#{entity.nome}" />
+					</p:column>
+
+					<p:column headerText="Data do Cadastro">
+						<p:outputLabel value="#{entity.dataCadastro}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Tombamento" styleClass="Center">
+						<p:outputLabel value="#{entity.tombamento}" />
+					</p:column>
+
+					<p:column headerText="Ano" styleClass="Center">
+						<p:outputLabel value="#{entity.ano}" />
+					</p:column>
+
+					<p:column headerText="Valor" styleClass="Center">
+						<p:outputLabel value="#{entity.valor}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+					<p:column headerText="Observação">
+						<p:outputLabel value="#{entity.observacao}" />
+					</p:column>
+
+					<p:column headerText="Ações" style="width: 90px"
+						styleClass="Center">
+
+						<p:commandLink id="lnkEditar" rendered="#{entity.status}"
+							oncomplete="PF('dados').show()" style="text-decoration: none"
+							update=":form-cadastro:dados">
+							<i class="material-icons GrayDark">mode_edit</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{imobilizadoBean.imobilizado}" />
+						</p:commandLink>
+						<p:tooltip for="lnkEditar" value="Editar" position="top" />
+
+					</p:column>
+
+					<f:facet name="footer">
+						<div align="right">
+							<h1>
+								<p:outputLabel value="Total:" style="color:#fff" />
+								<p:outputLabel value="#{imobilizadoBean.total}"
+									style="color:#fff">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</h1>
+						</div>
+					</f:facet>
+				</p:dataTable>
+			</h:form>
+
+			<h:form id="form-cadastro">
+				<p:dialog modal="true" id="dados" widgetVar="dados"
+					resizable="false">
+
+					<f:facet name="header">
+					#{imobilizadoBean.imobilizado.id == null ? 'Cadastrar Imobilizado' :
+					'Atualizar Imobilizado'}
+					</f:facet>
+
+					<div class="ui-fluid">
+						<p:messages showDetail="true" autoUpdate="true" closable="true" />
+
+						<h:panelGrid columns="2" style="margin-top: 20px"
+							id="grid-cadastro">
+
+							<h:panelGroup>
+								<p:outputLabel value="Nome: " styleClass="my-label"
+									style="vertical-align: text-top;" for="nome" />
+							</h:panelGroup>
+							<p:inputText id="nome"
+								value="#{imobilizadoBean.imobilizado.nome}" label="Nome" />
+
+							<h:panelGroup>
+								<p:outputLabel value="Loja: " styleClass="my-label"
+									style="vertical-align: text-top;" for="loja" />
+							</h:panelGroup>
+
+							<p:selectOneMenu value="#{imobilizadoBean.imobilizado.loja}"
+								id="loja" required="true" requiredMessage="Selecione a loja">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{imobilizadoBean.loja}" var="loja"
+									itemLabel="#{loja.descricao}" itemValue="#{loja}" />
+							</p:selectOneMenu>
+
+							<h:panelGroup>
+								<p:outputLabel value="Tipo: " styleClass="my-label"
+									style="vertical-align: text-top;" for="loja" />
+							</h:panelGroup>
+							<p:selectOneMenu value="#{imobilizadoBean.imobilizado.tipo}"
+								id="tipo" required="true" requiredMessage="Selecione a tipo">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{imobilizadoBean.tipoImobilizado}"
+									var="tipo" itemLabel="#{tipo.descricao}" itemValue="#{tipo}" />
+							</p:selectOneMenu>
+
+							<h:panelGroup>
+								<p:outputLabel value="Tombamento: " styleClass="my-label"
+									style="vertical-align: text-top;" for="tombamento" />
+							</h:panelGroup>
+							<p:inputText id="tombamento"
+								value="#{imobilizadoBean.imobilizado.tombamento}"
+								label="Tombamento" />
+
+							<h:panelGroup>
+								<p:outputLabel value="Ano: " styleClass="my-label"
+									style="vertical-align: text-top;" for="ano" />
+							</h:panelGroup>
+							<p:inputMask mask="9999" id="ano"
+								value="#{imobilizadoBean.imobilizado.ano}" label="Ano" />
+
+							<h:panelGroup>
+								<p:outputLabel value="Valor(R$):" styleClass="my-label"
+									style="vertical-align: text-top;" for="valor" />
+							</h:panelGroup>
+
+							<p:inputText required="true" id="valor"
+								requiredMessage="Campo 'Valor' é obrigatório!"
+								styleClass="moeda" maxlength="10"
+								value="#{imobilizadoBean.imobilizado.valor}">
+								<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+									minFractionDigits="2" type="number" />
+							</p:inputText>
+							<h:panelGroup>
+								<p:outputLabel value="Observação: " styleClass="my-label"
+									style="vertical-align: text-top;" for="observacao" />
+							</h:panelGroup>
+							<p:inputTextarea rows="6" cols="60" id="observacao"
+								value="#{imobilizadoBean.imobilizado.observacao}"
+								label="Observação" />
+						</h:panelGrid>
+						<p:separator />
+						<h:panelGrid columns="3">
+							<p:commandButton value="Salvar" icon="fa fa-floppy-o"
+								action="#{imobilizadoBean.save}"
+								update="grid-cadastro :frm:table-imobilizado"
+								rendered="#{imobilizadoBean.imobilizado.id == null}" />
+
+							<p:commandButton value="Atualizar" icon="fa fa-floppy-o"
+								action="#{imobilizadoBean.update}"
+								rendered="#{imobilizadoBean.imobilizado.id != null}" />
+
+							<p:spacer width="20" height="0" />
+						</h:panelGrid>
+					</div>
+				</p:dialog>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

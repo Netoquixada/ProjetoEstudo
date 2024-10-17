@@ -1,0 +1,112 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="resumo-cartao.png"
+						width="60px" style="float: left" />
+				</div>
+
+				<h1>Relatório de Resumo de Operadoras de Cartão</h1>
+				<h3>Prencha os filtros para gerar o relatório.</h3>
+
+				<div class="links-funcionais">
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<br />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" showSummary="true"
+					showDetail="true" />
+
+				<p:panel styleClass="panel-pesquisa">
+					<div class="lupa">
+						<p:graphicImage library="images" name="SearchLupa.png" />
+					</div>
+
+					<h:panelGrid columns="10">
+						<p:outputLabel value="De: " styleClass="my-label" />
+						<p:calendar navigator="true" pattern="dd/MM/yyyy"
+							value="#{resumoCartaoMB.resumoCartao.dataInicioFilter}" />
+						<p:outputLabel value="Até: " styleClass="my-label" />
+						<p:calendar navigator="true" pattern="dd/MM/yyyy"
+							value="#{resumoCartaoMB.resumoCartao.dataFimFilter}" />
+
+						<p:commandButton value="Pesquisar" styleClass="button-blue"
+							ajax="false" icon="fa fa-search"
+							style="margin-left: 5px; display: right; width: 100px !important"
+							update="table-resumo table-resumo-total"
+							action="#{resumoCartaoMB.list()}" />
+
+						<p:commandButton id="report"
+							actionListener="#{resumoCartaoMB.gerarPDF}" icon="fa fa-download"
+							value="Dowlonad do Relatório" styleClass="button-green"
+							onclick="this.form.target='_blank'" ajax="f	alse">
+						</p:commandButton>
+					</h:panelGrid>
+				</p:panel>
+
+				<br />
+				<h:panelGrid cellpadding="10" columns="2"
+					style="margin-top: 10px;width: 100%;"
+					styleClass="ui-panelgrid-blank"
+					columnClasses="ui-grid-col-8,ui-grid-col-4" id="grid">
+					<p:dataTable id="table-resumo" paginatorPosition="bottom"
+						value="#{resumoCartaoMB.resumoCartaoList}" var="entity"
+						paginator="true" paginatorAlwaysVisible="false" rows="25"
+						lazy="true" emptyMessage="Nenhuma ocorrência encontrada.">
+
+						<f:facet name="header">
+		Detalhado
+		</f:facet>
+						<p:column headerText="Administradora" styleClass="Center">
+							<p:outputLabel value="#{entity.administradora}" />
+						</p:column>
+						<p:column headerText="Data" styleClass="Center">
+							<p:outputLabel value="#{entity.data}">
+								<f:convertDateTime pattern="dd/MM/yyyy" />
+							</p:outputLabel>
+						</p:column>
+						<p:column headerText="Valor" styleClass="Center">
+							<p:outputLabel value="#{entity.valor}">
+								<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+									minFractionDigits="2" type="currency" />
+							</p:outputLabel>
+						</p:column>
+					</p:dataTable>
+					<p:dataTable id="table-resumo-total" paginatorPosition="bottom"
+						value="#{resumoCartaoMB.resumoCartaoTotalList}" var="entity"
+						paginator="true" paginatorAlwaysVisible="false" rows="25"
+						lazy="true" emptyMessage="Nenhuma ocorrência encontrada.">
+						<f:facet name="header">
+		Totais
+		</f:facet>
+						<p:column headerText="Administradora" styleClass="Center">
+							<p:outputLabel value="#{entity.administradora}" />
+						</p:column>
+						<p:column headerText="Valor" styleClass="Center">
+							<p:outputLabel value="#{entity.valor}">
+								<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+									minFractionDigits="2" type="currency" />
+							</p:outputLabel>
+						</p:column>
+					</p:dataTable>
+				</h:panelGrid>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,301 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="meta.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>Lista de Meta</h1>
+				<h3>Listagem de metas cadastradas no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:link id="cadastrar" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/cadastro/cadastrarMeta.xhtml">
+						<i class="material-icons md-32">add_to_photos</i>
+						<br />
+					</p:link>
+					<p:tooltip for="cadastrar" position="top" value="Cadastrar Meta" />
+
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{metaBean.meta}" />
+			<t:saveState value="#{metaBean.metas}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel style="margin-top: 15px">
+					<h:panelGrid columns="15">
+
+						<h:panelGroup>
+							<p:outputLabel value="Loja: " styleClass="my-label" />
+							<br />
+							<p:selectOneMenu value="#{metaBean.metaFilter.loja}">
+								<f:selectItem itemLabel="Todas" />
+								<f:selectItems value="#{metaBean.lojas}" var="l"
+									itemLabel="#{l.descricao}" itemValue="#{l}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+
+						<h:panelGroup>
+							<p:outputLabel value="Competência: " styleClass="my-label" />
+							<br />
+							<p:inputMask mask="99/9999"
+								value="#{metaBean.metaFilter.competencia}" />
+						</h:panelGroup>
+
+						<h:panelGroup>
+							<p:outputLabel value="De: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{metaBean.metaFilter.dataCadastroInicio}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Até: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{metaBean.metaFilter.dataCadastroFim}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<br />
+							<p:commandButton icon="fa fa-search" id="pesquisar"
+								style="margin-left: 5px;" update="table-meta"
+								action="#{metaBean.list()}" />
+							<p:tooltip for="pesquisar" value="Pesquisar" position="top" />
+						</h:panelGroup>
+					</h:panelGrid>
+
+
+				</p:panel>
+
+				<p:dataTable id="table-meta" value="#{metaBean.metas}" var="entity"
+					paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!" scrollable="true"
+					scrollHeight="150" paginatorPosition="bottom"
+					paginatorAlwaysVisible="false" rows="10" lazy="true">
+
+					<p:column headerText="Data de cadastro" styleClass="Center"
+						style="color: #000">
+						<p:outputLabel value="#{entity.dataCadastro}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Loja" styleClass="Center" style="color: #000">
+						<p:outputLabel value="#{entity.loja.descricao}" />
+					</p:column>
+
+					<p:column headerText="Valor" styleClass="Center"
+						style="color: #000">
+						<p:outputLabel value="#{entity.valor}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Competência" style="color: #000">
+						<p:outputLabel value="#{entity.competencia}" />
+					</p:column>
+
+					<p:column headerText="Observação" style="color: #000">
+						<p:outputLabel value="#{entity.observacao}" />
+					</p:column>
+
+					<p:column headerText="Ações" style="width: 160px;color: #000;"
+						styleClass="Center">
+						<p:commandLink id="lnkAquisicao" rendered="#{entity.status}"
+							oncomplete="PF('item-meta').show()" style="text-decoration: none"
+							update=":form:item-meta" title="Item Meta"
+							action="#{metaBean.carregarListaItemMeta()}">
+							<i class="material-icons GrayDark">chrome_reader_mode</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{metaBean.meta}" />
+						</p:commandLink>
+
+						<p:spacer />
+						<p:link ajax="false" id="lnkEditar" title="Editar"
+							rendered="#{entity.status}" outcome="#{metaBean.prepareUpdate()}"
+							style="text-decoration: none">
+							<i class="material-icons GrayDark">mode_edit</i>
+							<f:param name="id" value="#{entity.id}" />
+						</p:link>
+					</p:column>
+				</p:dataTable>
+			</h:form>
+
+			<h:form id="form">
+				<p:dialog modal="true" id="item-meta" width="70%"
+					widgetVar="item-meta" resizable="false">
+
+					<f:facet name="header">
+					Adicionar Item na Meta - #{metaBean.meta.competencia}
+					</f:facet>
+
+					<div class="scroll-dialog">
+
+						<p:messages id="msg" closable="true" showDetail="true"
+							showSummary="true" />
+
+						<p:tabView>
+							<p:tab title="Cadastro / Dashboards">
+								<p:panelGrid columns="2" style="margin-top: 20px" layout="grid"
+									styleClass="ui-panelgrid-blank">
+
+									<p:panel header="Cadastro de Item">
+										<h:panelGrid columns="2" style="margin-top: 20px"
+											id="grid-item" cellpadding="05px">
+
+											<h:panelGroup>
+												<p:outputLabel value="Data:" styleClass="my-label" />
+											</h:panelGroup>
+											<p:calendar size="10" navigator="true"
+												value="#{metaBean.itemMeta.dataRecebimento}"
+												pattern="dd/MM/yyyy" />
+
+											<h:panelGroup>
+												<p:outputLabel value="Valor(R$):" styleClass="my-label"
+													style="vertical-align: text-top;" for="valor" />
+											</h:panelGroup>
+											<p:inputText required="true" id="valor"
+												requiredMessage="Campo 'Valor' é obrigatório!"
+												styleClass="moeda" maxlength="10"
+												value="#{metaBean.itemMeta.valor}">
+												<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+													minFractionDigits="2" type="number" />
+											</p:inputText>
+
+											<h:panelGroup>
+												<p:outputLabel value="Quantidade de Itens:"
+													styleClass="my-label" style="vertical-align: text-top;"
+													for="qtd" />
+											</h:panelGroup>
+											<p:inputText required="true" id="qtd"
+												requiredMessage="Campo 'Quantidade de Itens' é obrigatório!"
+												maxlength="10" value="#{metaBean.itemMeta.qtdItens}">
+											</p:inputText>
+
+											<h:panelGroup>
+												<p:outputLabel value="Observação: " styleClass="my-label"
+													for="observacao" />
+											</h:panelGroup>
+											<p:inputTextarea id="observacao" rows="6" cols="30"
+												label="Observação" value="#{metaBean.itemMeta.observacao}" />
+
+										</h:panelGrid>
+										<p:separator />
+										<h:panelGrid columns="3">
+											<p:commandButton value="Adicionar" ajax="false"
+												update="tableItem msg grid-item"
+												action="#{metaBean.saveItem()}" icon="fa fa-plus" />
+
+											<p:commandButton value="Cancelar" styleClass="btn-orange"
+												icon="fa fa-close" process="@this"
+												oncomplete="PF('dados-aquisicao').hide()" immediate="true" />
+
+											<p:spacer width="20" height="0" />
+										</h:panelGrid>
+									</p:panel>
+
+									<p:panel header="Dashboard">
+
+										<h:panelGrid id="panel-dash"
+											style="width: 100% !important; text-align: center !important;">
+											<h:panelGroup>
+												<p:outputLabel value="Meta: " styleClass="my-label" />
+												<p:outputLabel value="#{metaBean.meta.valor}"
+													styleClass="my-label Red">
+													<f:convertNumber minFractionDigits="2" type="currency"
+														maxFractionDigits="2" />
+												</p:outputLabel>
+											</h:panelGroup>
+											<h:panelGroup>
+												<p:outputLabel value="Alcançado: " styleClass="my-label" />
+												<p:outputLabel value="#{metaBean.total}"
+													styleClass="my-label Green">
+													<f:convertNumber minFractionDigits="2" type="currency"
+														maxFractionDigits="2" />
+												</p:outputLabel>
+											</h:panelGroup>
+											<br />
+											<p:knob labelTemplate="{value}%"
+												value="#{metaBean.percetualMeta}" disabled="true"
+												width="150" max="#{metaBean.setarMaximoDashboard()}"
+												foregroundColor="#{metaBean.percetualMeta gt 50 ? 'green' : 'red'}" />
+										</h:panelGrid>
+									</p:panel>
+								</p:panelGrid>
+
+							</p:tab>
+							<p:tab title="Lista de Itens">
+								<p:dataTable id="tableItem" var="item"
+									value="#{metaBean.itemMetaList}"
+									emptyMessage="Nenhuma atividade foi adicionada">
+
+									<f:facet name="header">
+										<p:outputLabel value="Lista de Itens Cadastrados na Meta" />
+									</f:facet>
+
+									<p:column headerText="Data" style="color: #000">
+										<p:outputLabel value="#{item.dataRecebimento}">
+											<f:convertDateTime pattern="dd/MM/yyyy" />
+										</p:outputLabel>
+									</p:column>
+
+									<p:column headerText="Valor" styleClass="Center"
+										style="color: #000">
+										<p:outputLabel value="#{item.valor}">
+											<f:convertNumber minFractionDigits="2" type="currency"
+												maxFractionDigits="2" />
+										</p:outputLabel>
+									</p:column>
+
+									<p:column headerText="QUantidade de Itens" style="color: #000">
+										<p:outputLabel value="#{item.qtdItens}" />
+									</p:column>
+
+									<p:column headerText="Observação" style="color: #000">
+										<p:outputLabel value="#{item.observacao}" />
+									</p:column>
+
+									<f:facet name="footer">
+										<div align="right">
+										<h:panelGrid columns="2" style="width: 350px">
+												<p:outputLabel value="Total R$:" style="color:#fff" />
+												<p:outputLabel value="#{metaBean.total}" style="color:#fff">
+													<f:convertNumber minFractionDigits="2" type="currency"
+														maxFractionDigits="2" />
+												</p:outputLabel>
+												<p:outputLabel value="Total Itens:" style="color:#fff" />
+												<p:outputLabel value="#{metaBean.totalItens}" style="color:#fff"/>
+										</h:panelGrid>
+										</div>
+									</f:facet>
+								</p:dataTable>
+
+							</p:tab>
+						</p:tabView>
+					</div>
+				</p:dialog>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

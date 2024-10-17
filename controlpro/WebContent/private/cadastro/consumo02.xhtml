@@ -1,0 +1,587 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:t="http://myfaces.apache.org/tomahawk"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="avaliacao.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>#{produtoConsumoBean.produtoConsumo.id == null ? 'Cadastrar
+					Produto/Consumo' : 'Atualizar Produto/Consumo'}</h1>
+				<h3>#{produtoConsumoBean.produtoConsumo.id == null ? 'Preencha
+					o formulário abaixo para cadastrar um novo Produto/Consumo.' :
+					'Preencha o formulário abaixo para atualizar o Produto/Consumo.'}</h3>
+
+				<div class="links-funcionais">
+					<p:link id="lista" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/lista/listarProdutoConsumo.xhtml">
+						<i class="material-icons md-32">list</i>
+						<br />
+					</p:link>
+					<p:tooltip for="lista" position="top"
+						value="Listar Produto/Consumo" />
+
+					<p:link styleClass="link-funcional" outcome="/private/index.xhtml"
+						id="inicio">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+			<p:panel style="margin-top: 15px" styleClass="my-panel">
+				<p:outputLabel value="(" />
+				<p:outputLabel value="*" styleClass="campoObrigatorio" />
+				<p:outputLabel value=") Campos obrigatórios." />
+			</p:panel>
+
+			<h:form id="frm">
+				<div class="ui-fluid">
+					<p:messages showDetail="true" autoUpdate="false" closable="true" />
+					<p:growl autoUpdate="false" id="grol" />
+
+					<p:panelGrid id="total" columns="3" style="margin-top: 20px;"
+						layout="grid" styleClass="ui-panelgrid-blank">
+						<h:panelGroup>
+							<div class="panel-total-projeto shadow-effect">
+								<div class="panel-icon" style="background-color: #283593;">
+									<div class="marginTop10"></div>
+									<i class="material-icons md-48 md-light">credit_card</i>
+								</div>
+
+								<div class="panel-infor" style="background-color: #3f51b5;">
+									<div class="marginTop10"></div>
+									<div style="font-size: 12px" class="Fs16">CUSTO TOTAL</div>
+									<div style="font-size: 16px" class="animated pulse infinite">
+										<p:outputLabel value="#{produtoConsumoBean.totalGeral}">
+											<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+												minFractionDigits="2" type="currency" />
+										</p:outputLabel>
+									</div>
+								</div>
+							</div>
+						</h:panelGroup>
+
+						<h:panelGroup>
+							<div class="panel-total-projeto shadow-effect">
+								<div class="panel-icon" style="#{produtoConsumoBean.percentualLucroVarejo ge 30 ? 'background-color: #126610;' : 'background-color: #9c1313'}">
+									<div class="marginTop10"></div>
+									<i class="material-icons md-48 md-light">credit_card</i>
+								</div>
+
+								<div class="panel-infor" style="#{produtoConsumoBean.percentualLucroVarejo ge 30 ? 'background-color: #1a7221;' : 'background-color: #8f2332'}">
+									<div class="marginTop10"></div>
+									<div style="font-size: 12px" class="Fs16">LUCRO VAREJO</div>
+									<div style="font-size: 16px" class="animated pulse infinite">
+										<p:outputLabel value="#{produtoConsumoBean.lucroVarejo}">
+											<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+												minFractionDigits="2" type="currency" />
+										</p:outputLabel>
+										->
+										<p:outputLabel
+											value="#{produtoConsumoBean.percentualLucroVarejo}">
+											<f:convertNumber locale="pt_BR" maxFractionDigits="1"
+												minFractionDigits="1" type="number" />
+										</p:outputLabel>
+										%
+									</div>
+								</div>
+							</div>
+						</h:panelGroup>
+
+						<h:panelGroup>
+							<div class="panel-total-projeto shadow-effect">
+								<div class="panel-icon" style="#{produtoConsumoBean.percentualLucroAtacado ge 30 ? 'background-color: #126610;' : 'background-color: #9c1313'}">
+									<div class="marginTop10"></div>
+									<i class="material-icons md-48 md-light">credit_card</i>
+								</div>
+
+								<div class="panel-infor" style="#{produtoConsumoBean.percentualLucroAtacado ge 30 ? 'background-color: #1a7221;' : 'background-color: #8f2332'}">
+									<div class="marginTop10"></div>
+									<div style="font-size: 12px" class="Fs16">LUCRO ATACADO</div>
+									<div style="font-size: 16px" class="animated pulse infinite">
+										<p:outputLabel value="#{produtoConsumoBean.lucroAtacado}">
+											<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+												minFractionDigits="2" type="currency" />
+										</p:outputLabel>
+										->
+										<p:outputLabel
+											value="#{produtoConsumoBean.percentualLucroAtacado}">
+											<f:convertNumber locale="pt_BR" maxFractionDigits="1"
+												minFractionDigits="1" type="number" />
+										</p:outputLabel>
+										%
+									</div>
+								</div>
+							</div>
+						</h:panelGroup>
+					</p:panelGrid>
+
+					<p:panelGrid columns="2" style="margin-top: 20px" layout="grid"
+						styleClass="ui-panelgrid-blank"
+						columnClasses="ui-grid-col-4,ui-grid-col-8">
+
+						<p:panel header="Precificação">
+							<h:panelGrid columns="1" style="margin-top: 20px">
+								<h:panelGroup>
+									<p:outputLabel value="Produto: " styleClass="my-label"
+										for="produto" />
+									<br />
+									<br />
+									<p:autoComplete
+										value="#{produtoConsumoBean.produtoConsumo.produto}"
+										autocomplete="true" id="produto" size="40"
+										completeMethod="#{produtoBean.getProdutoAutoCompletePorProduto}"
+										forceSelection="true" minQueryLength="2" maxResults="30"
+										dropdown="true" required="true"
+										requiredMessage="Campo 'Produto' é obrigatório!"
+										converterMessage="Não foi possível selecionar o produto (Erro ao converter o objeto)"
+										converter="produtoConverter" var="prod"
+										itemLabel="#{prod.nome}" itemValue="#{prod}"
+										placeholder="Pesquise pelo código">
+									</p:autoComplete>
+								</h:panelGroup>
+
+								<h:panelGroup>
+									<p:outputLabel value="Venda Varejo(R$): " styleClass="my-label"
+										style="vertical-align: text-top;" for="venda-varejo" />
+									<br />
+									<br />
+									<p:inputText required="true" size="20" id="venda-varejo"
+										requiredMessage="Campo 'Venda Varejo' é obrigatório!"
+										styleClass="moeda" maxlength="10"
+										value="#{produtoConsumoBean.produtoConsumo.vendaVarejo}">
+										<p:ajax update="total" event="blur" />
+										<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+											minFractionDigits="2" type="number" />
+									</p:inputText>
+								</h:panelGroup>
+								<h:panelGroup>
+									<p:outputLabel value="Venda Atacado(R$): "
+										styleClass="my-label" style="vertical-align: text-top;"
+										for="venda-atacado" />
+									<br />
+									<br />
+									<p:inputText required="true" size="20" id="venda-atacado"
+										requiredMessage="Campo 'Venda Atacado' é obrigatório!"
+										styleClass="moeda" maxlength="10"
+										value="#{produtoConsumoBean.produtoConsumo.vendaAtacado}">
+										<p:ajax update="total" event="blur" />
+										<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+											minFractionDigits="2" type="number" />
+									</p:inputText>
+								</h:panelGroup>
+							</h:panelGrid>
+						</p:panel>
+						<h:panelGrid columns="1" style="width: 100% !important">
+							<p:panel header="Custo Produção" style="width: 100% !important">
+								<p:panelGrid columns="2" layout="grid"
+									styleClass="ui-panelgrid-blank"
+									columnClasses="ui-grid-col-9,ui-grid-col-3">
+									<p:panelGrid columns="2" layout="grid"
+										styleClass="ui-panelgrid-blank"
+										columnClasses="ui-grid-col-4,ui-grid-col-8">
+										<h:panelGroup>
+											<p:outputLabel value="Custo Facção (R$): "
+												styleClass="my-label label-vermelho"
+												style="vertical-align: text-top;" for="custo" />
+										</h:panelGroup>
+										<p:inputText required="true" size="20" id="custo"
+											requiredMessage="Campo 'Custo' é obrigatório!"
+											styleClass="moeda" maxlength="10"
+											value="#{produtoConsumoBean.produtoConsumo.costura}">
+											<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+												minFractionDigits="2" type="number" />
+
+											<p:ajax update="total total-producao" event="blur" />
+										</p:inputText>
+
+										<h:panelGroup>
+											<p:outputLabel value="Outros(R$): "
+												styleClass="my-label label-vermelho"
+												style="vertical-align: text-top;" for="outros-producao" />
+										</h:panelGroup>
+										<p:inputText required="true" size="20" id="outros-producao"
+											requiredMessage="Campo 'Outros produção' é obrigatório!"
+											styleClass="moeda" maxlength="10"
+											value="#{produtoConsumoBean.produtoConsumo.outrosProducao}">
+											<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+												minFractionDigits="2" type="number" />
+
+											<p:ajax update="total total-producao" event="blur" />
+										</p:inputText>
+
+
+										<h:panelGroup>
+											<p:outputLabel value="Materia Prima(R$): "
+												styleClass="my-label label-vermelho"
+												style="vertical-align: text-top;" />
+										</h:panelGroup>
+										<p:outputLabel id="total-producao-materia-prima"
+											value="#{produtoConsumoBean.total}" styleClass="my-label">
+											<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+												minFractionDigits="2" type="currency" />
+										</p:outputLabel>
+
+
+
+									</p:panelGrid>
+									<h:panelGroup>
+										<div class="panel-total-projeto shadow-effect">
+											<div class="panel-infor" style="background-color: #ec9454;">
+												<div class="marginTop10"></div>
+												<div style="font-size: 12px" class="Fs16">Custo
+													Produção</div>
+												<div style="font-size: 22px" class="animated pulse infinite">
+													<p:outputLabel value="#{produtoConsumoBean.totalProducao}"
+														id="total-producao">
+														<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+															minFractionDigits="2" type="number" />
+													</p:outputLabel>
+												</div>
+											</div>
+										</div>
+									</h:panelGroup>
+								</p:panelGrid>
+							</p:panel>
+							<p:panel header="Custo Operacional"
+								style="width: 100% !important">
+								<p:panelGrid columns="2" layout="grid"
+									styleClass="ui-panelgrid-blank"
+									columnClasses="ui-grid-col-9,ui-grid-col-3">
+									<p:panelGrid columns="2" layout="grid"
+										styleClass="ui-panelgrid-blank"
+										columnClasses="ui-grid-col-4,ui-grid-col-8">
+										<h:panelGroup>
+											<p:outputLabel value="Cartão (%): "
+												styleClass="my-label label-vermelho"
+												style="vertical-align: text-top;" for="cartao" />
+										</h:panelGroup>
+										<h:panelGrid columns="2" columnClasses="coluna-50,coluna-50">
+											<p:inputText required="true" size="20" id="cartao"
+												requiredMessage="Campo 'Cartão' é obrigatório!"
+												styleClass="moeda" maxlength="10"
+												value="#{produtoConsumoBean.produtoConsumo.percentualCartao}">
+												<p:ajax update="total total-operacional val-cartao"
+													event="blur" />
+												<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+													minFractionDigits="2" type="number" />
+											</p:inputText>
+											<p:outputLabel id="val-cartao" styleClass="my-label"
+												value="#{produtoConsumoBean.valorCartao}">
+												<f:convertNumber minFractionDigits="2" type="currency"
+													maxFractionDigits="2" />
+											</p:outputLabel>
+										</h:panelGrid>
+										<h:panelGroup>
+											<p:outputLabel value="Comissões (%): "
+												styleClass="my-label label-vermelho"
+												style="vertical-align: text-top;" for="comissoes" />
+										</h:panelGroup>
+										<h:panelGrid columns="2" columnClasses="coluna-50,coluna-50">
+											<p:inputText required="true" size="20" id="comissoes"
+												requiredMessage="Campo 'Comissões' é obrigatório!"
+												styleClass="moeda" maxlength="10"
+												value="#{produtoConsumoBean.produtoConsumo.percentualComissao}">
+												<p:ajax update="total total-operacional val-comissoes"
+													event="blur" />
+												<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+													minFractionDigits="2" type="number" />
+											</p:inputText>
+											<p:outputLabel id="val-comissoes" styleClass="my-label"
+												value="#{produtoConsumoBean.valorComissoes}">
+												<f:convertNumber minFractionDigits="2" type="currency"
+													maxFractionDigits="2" />
+											</p:outputLabel>
+										</h:panelGrid>
+
+										<h:panelGroup>
+											<p:outputLabel value="Impostos (%): "
+												styleClass="my-label label-vermelho"
+												style="vertical-align: text-top;" for="impostos" />
+										</h:panelGroup>
+										<h:panelGrid columns="2" columnClasses="coluna-50,coluna-50">
+											<p:inputText required="true" size="20" id="impostos"
+												requiredMessage="Campo 'Impostos' é obrigatório!"
+												styleClass="moeda" maxlength="10"
+												value="#{produtoConsumoBean.produtoConsumo.percentualImpostos}">
+												<p:ajax update="total total-operacional val-impostos"
+													event="blur" />
+												<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+													minFractionDigits="2" type="number" />
+											</p:inputText>
+											<p:outputLabel id="val-impostos" styleClass="my-label"
+												value="#{produtoConsumoBean.valorImpostos}">
+												<f:convertNumber minFractionDigits="2" type="currency"
+													maxFractionDigits="2" />
+											</p:outputLabel>
+										</h:panelGrid>
+										<h:panelGroup>
+											<p:outputLabel value="Loja (R$): "
+												styleClass="my-label label-vermelho"
+												style="vertical-align: text-top;" for="loja" />
+										</h:panelGroup>
+										<p:inputText required="true" size="20" id="loja"
+											requiredMessage="Campo 'Loja' é obrigatório!"
+											styleClass="moeda" maxlength="10"
+											value="#{produtoConsumoBean.produtoConsumo.loja}">
+											<p:ajax update="total total-operacional" event="blur" />
+											<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+												minFractionDigits="2" type="number" />
+										</p:inputText>
+										<h:panelGroup>
+											<p:outputLabel value="Outros (R$): "
+												styleClass="my-label label-vermelho"
+												style="vertical-align: text-top;" for="outros" />
+										</h:panelGroup>
+										<p:inputText required="true" size="20" id="outros"
+											requiredMessage="Campo 'Custo' é obrigatório!"
+											styleClass="moeda" maxlength="10"
+											value="#{produtoConsumoBean.produtoConsumo.outros}">
+											<p:ajax update="total total-operacional" event="blur" />
+											<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+												minFractionDigits="2" type="number" />
+										</p:inputText>
+									</p:panelGrid>
+									<h:panelGroup>
+										<div class="panel-total-projeto shadow-effect">
+											<div class="panel-infor" style="background-color: #ec9454;">
+												<div class="marginTop10"></div>
+												<div style="font-size: 12px" class="Fs16">Custo
+													Operacional</div>
+												<div style="font-size: 22px" class="animated pulse infinite">
+													<h:outputLabel
+														value="#{produtoConsumoBean.totalOperacional}"
+														id="total-operacional">
+														<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+															minFractionDigits="2" type="number" />
+													</h:outputLabel>
+												</div>
+											</div>
+										</div>
+									</h:panelGroup>
+								</p:panelGrid>
+							</p:panel>
+						</h:panelGrid>
+					</p:panelGrid>
+					<br />
+					<p:separator />
+					<h:panelGroup>
+						<p:outputLabel value="Observação: " styleClass="my-label"
+							for="observacao" />
+					</h:panelGroup>
+					<p:inputTextarea id="observacao" rows="6" cols="60"
+						label="Observação"
+						value="#{produtoConsumoBean.produtoConsumo.observacao}" />
+					<h:panelGroup>
+						<p:outputLabel value="Anexar Arquivo: " styleClass="my-label" />
+					</h:panelGroup>
+					<br />
+					<p:fileUpload immediate="true" mode="advanced"
+						value="#{produtoConsumoBean.produtoConsumo.arquivo}"
+						label="Escolher arquivo" update="grol"
+						invalidFileMessage="Extensões permitidas: .png, .gif, .jpg ou .jpeg"
+						fileUploadListener="#{produtoConsumoBean.uploadFile}"
+						fileLimit="1" fileLimitMessage="Apenas um arquivo por vez!"
+						dragDropSupport="true" multiple="false" cancelLabel="Cancelar"
+						uploadLabel="Enviar" allowTypes="/(\.|\/)(gif|jpe?g|png)$/" />
+
+					<p:panelGrid>
+						<h:panelGroup
+							rendered="#{produtoConsumoBean.produtoConsumo.id != null}">
+
+							<p:graphicImage value="#{recuperaImagemMB.image}" width="100%"
+								styleClass="my-img">
+								<f:param name="id"
+									value="#{produtoConsumoBean.produtoConsumo.id}" />
+							</p:graphicImage>
+
+						</h:panelGroup>
+
+					</p:panelGrid>
+
+					<h:panelGrid>
+						<br />
+						<p:commandButton value="Adicionar item"
+							oncomplete="PF('dados').show()" styleClass="button-add"
+							action="#{produtoConsumoBean.clearItemProdutoConsumo()}"
+							process="@this" update=":form-cadastro:dados" icon="fa fa-plus">
+						</p:commandButton>
+						<br />
+
+						<p:dataTable id="tableItemProdutoConsumo" var="entity"
+							value="#{produtoConsumoBean.itemProdutoConsumoList}"
+							emptyMessage="Nenhuma atividade foi adicionada">
+
+							<p:column headerText="Matéria Prima">
+								<p:outputLabel value="#{entity.materiaPrima.nome}" />
+							</p:column>
+
+							<p:column headerText="Unidade Medida">
+								<p:outputLabel
+									value="#{entity.materiaPrima.unidadeMedida} - #{entity.materiaPrima.unidadeMedida.descricao}" />
+							</p:column>
+
+							<p:column styleClass="Center" headerText="Valor (R$)">
+								<p:outputLabel value="#{entity.materiaPrima.valor}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+
+							<p:column headerText="Quantidade" width="110">
+								<p:outputLabel value="#{entity.quantidade}" />
+							</p:column>
+
+							<p:column headerText="Total" width="110">
+								<p:outputLabel value="#{entity.total}" styleClass="label-azul">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+
+							<p:column headerText="Ações" width="80">
+								<div align="center">
+									<h:panelGroup>
+										<p:commandLink oncomplete="PF('dados').show()"
+											id="editItemProdutoConsumo" update=":form-cadastro:dados"
+											process="@this">
+											<i class="material-icons GrayDark">mode_edit</i>
+											<f:setPropertyActionListener
+												target="#{produtoConsumoBean.itemProdutoConsumo}"
+												value="#{entity}" />
+										</p:commandLink>
+										<p:tooltip for="editItemProdutoConsumo"
+											value="Clique para editar o item no produto/consumo" />
+									</h:panelGroup>
+									<h:panelGroup>
+										<p:commandLink id="removeItemProdutoConsumo"
+											action="#{produtoConsumoBean.removerItemProdutoConsumo()}"
+											update=":frm:tableItemProdutoConsumo :frm:total :frm:total-producao :frm:total-producao-materia-prima"
+											process="@this">
+											<i class="material-icons GrayDark">delete_forever</i>
+											<f:setPropertyActionListener
+												target="#{produtoConsumoBean.itemProdutoConsumo}"
+												value="#{entity}"></f:setPropertyActionListener>
+										</p:commandLink>
+										<p:tooltip for="removeItemProdutoConsumo"
+											value="Clique para excluir o item no Produto/Consumo" />
+									</h:panelGroup>
+								</div>
+							</p:column>
+
+							<f:facet name="footer">
+								<div align="right">
+									<h1>
+										<p:outputLabel value="Total:" style="color:#fff" />
+										<p:outputLabel value="#{produtoConsumoBean.total}"
+											style="color:#fff">
+											<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+												minFractionDigits="2" type="currency" />
+										</p:outputLabel>
+									</h1>
+								</div>
+							</f:facet>
+
+						</p:dataTable>
+					</h:panelGrid>
+
+					<br /> <br />
+					<p:separator />
+					<h:panelGrid columns="3">
+						<p:commandButton value="Salvar" icon="fa fa-floppy-o"
+							action="#{produtoConsumoBean.save}" update="frm"
+							rendered="#{produtoConsumoBean.produtoConsumo.id == null}" />
+
+						<p:commandButton value="Atualizar" icon="fa fa-floppy-o"
+							action="#{produtoConsumoBean.update}"
+							rendered="#{produtoConsumoBean.produtoConsumo.id != null}" />
+
+						<p:spacer width="20" height="0" />
+
+						<p:commandButton value="Cancelar" action="/private/index.xhtml"
+							immediate="true"
+							rendered="#{produtoConsumoBean.produtoConsumo.id == null}"
+							icon="fa fa-ban" ajax="false" />
+
+						<p:commandButton value="Cancelar"
+							action="#{produtoConsumoBean.goToList()}" immediate="true"
+							rendered="#{produtoConsumoBean.produtoConsumo.id != null}"
+							icon="fa fa-ban" ajax="false" />
+					</h:panelGrid>
+				</div>
+			</h:form>
+
+			<h:form id="form-cadastro">
+				<p:dialog modal="true" id="dados" widgetVar="dados"
+					resizable="false">
+
+					<f:facet name="header">
+					#{produtoConsumoBean.itemProdutoConsumo.materiaPrima.nome == null ? 'Adicionar item' :
+					'Atualizar item'}
+					</f:facet>
+
+					<div class="ui-fluid">
+						<p:messages showDetail="true" autoUpdate="true" closable="true" />
+
+						<h:panelGrid columns="2" style="margin-top: 20px"
+							id="grid-cadastro" cellpadding="05px">
+
+							<h:panelGroup>
+								<p:outputLabel value="Materia Prima: " styleClass="my-label"
+									style="vertical-align: text-top;" for="materia" />
+							</h:panelGroup>
+							<p:selectOneMenu id="materia"
+								value="#{produtoConsumoBean.itemProdutoConsumo.materiaPrima}"
+								required="true" requiredMessage="Materia Prima é obrigatório."
+								converter="genericConverter">
+								<f:selectItem itemLabel="-- Selecione --" />
+								<f:selectItems value="#{materiaPrimaBean.materias}" var="mat"
+									itemLabel="#{mat.nome}" itemValue="#{mat}" />
+							</p:selectOneMenu>
+
+							<h:panelGroup>
+								<p:outputLabel value="Quantidade: " styleClass="my-label"
+									style="vertical-align: text-top;" />
+							</h:panelGroup>
+							<p:inputText id="qtd" validatorMessage="Apenas números"
+								value="#{produtoConsumoBean.itemProdutoConsumo.quantidade}"
+								required="true"
+								requiredMessage="Campo 'quantidade' obrigatório!" />
+						</h:panelGrid>
+						<p:separator />
+						<h:panelGrid columns="3">
+							<p:commandButton value="Adicionar"
+								update=":frm:tableItemProdutoConsumo grid-cadastro :frm:total :frm:total-producao :frm:total-producao-materia-prima"
+								action="#{produtoConsumoBean.addItemProdutoConsumo()}"
+								icon="fa fa-plus"
+								rendered="#{produtoConsumoBean.itemProdutoConsumo.materiaPrima.nome == null}" />
+
+							<p:commandButton value="Atualizar"
+								oncomplete="PF('dados').hide()" icon="fa fa-refresh"
+								update=":frm:tableItemProdutoConsumo :frm:total :frm:total-producao :frm:total-producao-materia-prima"
+								action="#{produtoConsumoBean.updateItemProdutoConsumo()}"
+								rendered="#{produtoConsumoBean.itemProdutoConsumo.materiaPrima.nome != null}" />
+
+							<p:commandButton value="Cancelar" styleClass="btn-orange"
+								icon="fa fa-close" process="@this"
+								oncomplete="PF('dados').hide()" immediate="true" />
+
+							<p:spacer width="20" height="0" />
+						</h:panelGrid>
+					</div>
+				</p:dialog>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

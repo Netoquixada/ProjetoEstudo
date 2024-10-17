@@ -1,0 +1,376 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<h:form>
+				<p:panelGrid columns="2"
+					columnClasses="ui-g-12 ui-md-4,ui-g-12 ui-md-8" layout="grid"
+					styleClass="ui-panelgrid-blank">
+
+					<h:panelGroup>
+						<div class="image-title">
+							<h:graphicImage library="imagens" name="vale.png" width="60px"
+								style="float: left" />
+						</div>
+
+						<h1>Lista de Vales</h1>
+						<h3>Listagem de vales cadastrados no sistema.</h3>
+					</h:panelGroup>
+
+					<p:menuButton value="Opções" style="float: right">
+						<p:menuitem value="Cadastrar" oncomplete="PF('dados').show()"
+							update=":form-cadastro:dados" icon="fa fa-plus" />
+						<p:menuitem value="Página inicial" outcome="/private/index.xhtml"
+							icon="fa fa-home" />
+					</p:menuButton>
+
+				</p:panelGrid>
+			</h:form>
+			<!-- 			<p:panel styleClass="panel-title"> -->
+			<!-- 				<div class="image-title"> -->
+			<!-- 					<h:graphicImage library="imagens" name="vale.png" width="60px" -->
+			<!-- 						style="float: left" /> -->
+			<!-- 				</div> -->
+
+			<!-- 				<h1>Lista de Vales</h1> -->
+			<!-- 				<h3>Listagem de vales cadastrados no sistema.</h3> -->
+
+			<!-- 				<div class="links-funcionais"> -->
+			<!-- 					<p:commandLink id="cadastrar" styleClass="link-funcional" -->
+			<!-- 						style="margin-top: 3px" update=":form-cadastro:dados" -->
+			<!-- 						oncomplete="PF('dados').show()"> -->
+			<!-- 						<i class="material-icons md-32">add_to_photos</i> -->
+			<!-- 						<br /> -->
+			<!-- 					</p:commandLink> -->
+			<!-- 					<p:tooltip for="cadastrar" position="top" value="Cadastrar vale" /> -->
+
+			<!-- 					<p:link id="inicio" styleClass="link-funcional" -->
+			<!-- 						outcome="/private/index.xhtml"> -->
+			<!-- 						<i class="material-icons md-36">home</i> -->
+			<!-- 						<br /> -->
+			<!-- 					</p:link> -->
+			<!-- 					<p:tooltip for="inicio" position="top" value="Página Inicial" /> -->
+			<!-- 				</div> -->
+			<!-- 			</p:panel> -->
+
+			<t:saveState value="#{valeBean.vale}" />
+			<t:saveState value="#{valeBean.vales}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+
+				<p:panel header="Painel de Pesquisa" style="margin-top: 15px"
+					toggleable="true" toggleOrientation="vertical">
+
+					<p:panelGrid columns="2"
+						columnClasses="ui-g-12 ui-md-4,ui-g-12 ui-md-8" layout="grid"
+						styleClass="ui-panelgrid-blank">
+
+						<h:panelGroup>
+							<p:outputLabel value="Loja" styleClass="my-label" />
+							<br />
+							<p:selectOneMenu value="#{valeBean.valeFilter.loja}">
+								<f:selectItem itemLabel="Todos" />
+								<f:selectItems value="#{valeBean.lojas}" var="l"
+									itemLabel="#{l.descricao}" itemValue="#{l}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+
+						<h:panelGroup>
+							<p:outputLabel value="Status Vale" styleClass="my-label" />
+							<br />
+							<p:selectOneRadio value="#{valeBean.valeFilter.statusVale}">
+								<f:selectItem itemLabel="Todos" />
+								<f:selectItems value="#{valeBean.statusValeList}" var="s"
+									itemLabel="#{s.descricao}" itemValue="#{s}" />
+							</p:selectOneRadio>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Funcionário" styleClass="my-label" />
+							<br />
+							<p:selectOneMenu value="#{valeBean.valeFilter.funcionario}"
+								id="func" converter="funcionarioConverter">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{funcionarioBean.listaFuncionarios}"
+									var="func" itemLabel="#{func.nome}" itemValue="#{func}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="De: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{valeBean.valeFilter.dataPesquisaInicio}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Até: " styleClass="my-label" />
+							<br />
+							<p:calendar size="10" navigator="true"
+								value="#{valeBean.valeFilter.dataPesquisaFim}"
+								pattern="dd/MM/yyyy" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<br />
+							<p:commandButton value="Pesquisar" icon="fa fa-search"
+								style="margin-left: 5px; width: 100px !important"
+								update="table-vale" action="#{valeBean.list()}" />
+							<p:commandButton id="report"
+								actionListener="#{valeBean.gerarPDF}" icon="fa fa-download"
+								value="Gerar PDF" onclick="this.form.target='_blank'"
+								ajax="f	alse">
+							</p:commandButton>
+						</h:panelGroup>
+					</p:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-vale" value="#{valeBean.vales}" var="entity"
+					paginator="true" style="margin-top: 15px"
+					emptyMessage="Nenhum registro encontrado!"
+					paginatorPosition="bottom" paginatorAlwaysVisible="false" rows="10"
+					lazy="true">
+
+					<p:column headerText="Pago?" style="width: 50px"
+						styleClass="Center">
+						<p:commandLink id="lnkAlterarStatus"
+							action="#{valeBean.updatePagamento()}" update="table-vale"
+							title="#{entity.pago ? 'Não Pago' : 'Pago'}">
+
+							<h:panelGroup rendered="#{!entity.pago}">
+								<i class="material-icons Red">remove_circle</i>
+							</h:panelGroup>
+
+							<h:panelGroup rendered="#{entity.pago}">
+								<i class="material-icons Green">check_circle</i>
+							</h:panelGroup>
+
+							<f:setPropertyActionListener target="#{valeBean.vale}"
+								value="#{entity}" />
+						</p:commandLink>
+					</p:column>
+
+					<p:column headerText="Status Vale" styleClass="Center">
+						<p:outputLabel value="#{entity.statusVale.descricao}"
+							styleClass="label-verde"
+							rendered="#{entity.statusVale.descricao eq 'Pago'}" />
+						<p:outputLabel value="#{entity.statusVale.descricao}"
+							styleClass="label-vermelho"
+							rendered="#{entity.statusVale.descricao eq 'Aberto'}" />
+					</p:column>
+
+					<p:column headerText="Data do Vale">
+						<p:outputLabel value="#{entity.dataVale}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Loja">
+						<p:outputLabel value="#{entity.loja.descricao}" />
+					</p:column>
+
+					<p:column headerText="Funcionário">
+						<p:outputLabel value="#{entity.funcionario.nome}" />
+					</p:column>
+
+					<p:column headerText="Valor" styleClass="Center">
+						<p:outputLabel value="#{entity.valor}">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+					<p:column headerText="Observação">
+						<p:outputLabel value="#{entity.observacao}" />
+					</p:column>
+
+					<p:column headerText="Data do Pagamento">
+						<p:outputLabel value="#{entity.dataPagamento}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+
+					<p:column headerText="Forma de Pagamento">
+						<p:outputLabel value="#{entity.opcoesPagamento}" />
+					</p:column>
+
+					<p:column headerText="Ações" style="width: 90px"
+						styleClass="Center">
+
+						<p:commandLink id="lnkPagamento" rendered="#{!entity.pago}"
+							oncomplete="PF('pagamento').show()" style="text-decoration: none"
+							update=":form-pagamento:pagamento">
+							<i class="material-icons GrayDark">offline_pin</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{valeBean.vale}" />
+						</p:commandLink>
+
+						<p:commandLink id="lnkEditar" rendered="#{entity.status}"
+							oncomplete="PF('dados').show()" style="text-decoration: none"
+							update=":form-cadastro:dados">
+							<i class="material-icons GrayDark">mode_edit</i>
+							<f:setPropertyActionListener value="#{entity}"
+								target="#{valeBean.vale}" />
+						</p:commandLink>
+
+						<p:tooltip for="lnkEditar" value="Editar" position="top" />
+
+						<p:commandLink id="lnkExcluir" rendered="#{entity.status}"
+							style="text-decoration: none" update="table-vale"
+							action="#{valeBean.deletar(entity)}">
+							<i class="material-icons GrayDark">clear</i>
+						</p:commandLink>
+
+						<p:tooltip for="lnkEditar" value="Editar" position="top" />
+					</p:column>
+
+					<f:facet name="footer">
+						<div align="right">
+							<h1>
+								<p:outputLabel value="Total:" style="color:#fff" />
+								<p:outputLabel value="#{valeBean.total}" style="color:#fff">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</h1>
+						</div>
+					</f:facet>
+				</p:dataTable>
+			</h:form>
+
+			<h:form id="form-cadastro">
+				<p:dialog modal="true" id="dados" widgetVar="dados"
+					resizable="false">
+
+					<f:facet name="header">
+					#{valeBean.vale.id == null ? 'Cadastrar Vale' :
+					'Atualizar Vale'}
+					</f:facet>
+
+					<div class="ui-fluid">
+						<p:messages showDetail="true" autoUpdate="true" closable="true" />
+
+						<h:panelGrid columns="2" style="margin-top: 20px"
+							id="grid-cadastro">
+
+							<h:panelGroup>
+								<p:outputLabel value="Loja: " styleClass="my-label"
+									style="vertical-align: text-top;" for="loja" />
+							</h:panelGroup>
+
+							<p:selectOneMenu value="#{valeBean.vale.loja}" id="loja"
+								required="true" requiredMessage="Selecione a loja">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{valeBean.lojas}" var="loja"
+									itemLabel="#{loja.descricao}" itemValue="#{loja}" />
+							</p:selectOneMenu>
+
+							<h:panelGroup>
+								<p:outputLabel value="Data do Vale: " styleClass="my-label"
+									style="vertical-align: text-top;" for="data" />
+							</h:panelGroup>
+
+							<p:calendar size="10" navigator="true" required="true"
+								requiredMessage="Digite a data do vale" id="data"
+								value="#{valeBean.vale.dataVale}" pattern="dd/MM/yyyy" />
+
+							<h:panelGroup>
+								<p:outputLabel value="Funcionário: " styleClass="my-label"
+									style="vertical-align: text-top;" for="func" />
+							</h:panelGroup>
+
+							<p:selectOneMenu value="#{valeBean.vale.funcionario}" id="func"
+								required="true" requiredMessage="Selecione o funcionário"
+								converter="funcionarioConverter">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{funcionarioBean.listaFuncionarios}"
+									var="func" itemLabel="#{func.nome}" itemValue="#{func}" />
+							</p:selectOneMenu>
+
+							<h:panelGroup>
+								<p:outputLabel value="Valor(R$):" styleClass="my-label"
+									style="vertical-align: text-top;" for="valor" />
+							</h:panelGroup>
+
+							<p:inputText required="true" id="valor"
+								requiredMessage="Campo 'Valor' é obrigatório!"
+								styleClass="moeda" maxlength="10" value="#{valeBean.vale.valor}">
+								<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+									minFractionDigits="2" type="number" />
+							</p:inputText>
+							<h:panelGroup>
+								<p:outputLabel value="Observação: " styleClass="my-label"
+									style="vertical-align: text-top;" for="observacao" />
+							</h:panelGroup>
+							<p:inputTextarea rows="6" cols="60" id="observacao"
+								value="#{valeBean.vale.observacao}" label="Observação" />
+						</h:panelGrid>
+						<p:separator />
+						<h:panelGrid columns="3">
+							<p:commandButton value="Salvar" icon="fa fa-floppy-o"
+								action="#{valeBean.save}" update="grid-cadastro :frm:table-vale"
+								rendered="#{valeBean.vale.id == null}" />
+
+							<p:commandButton value="Atualizar" icon="fa fa-floppy-o"
+								action="#{valeBean.update}"
+								rendered="#{valeBean.vale.id != null}" />
+
+							<p:spacer width="20" height="0" />
+						</h:panelGrid>
+					</div>
+				</p:dialog>
+			</h:form>
+			<h:form id="form-pagamento">
+				<p:dialog modal="true" id="pagamento" widgetVar="pagamento"
+					resizable="false">
+
+					<f:facet name="header">
+					Realizar Pagamento
+					</f:facet>
+
+					<div class="ui-fluid">
+						<p:messages showDetail="true" autoUpdate="true" closable="true" />
+
+						<h:panelGrid columns="2" style="margin-top: 20px"
+							id="grid-cadastro">
+
+							<h:panelGroup>
+								<p:outputLabel value="Data do Pagamento: " styleClass="my-label"
+									style="vertical-align: text-top;" for="data-pagamento" />
+							</h:panelGroup>
+
+							<p:calendar size="10" navigator="true" required="true"
+								requiredMessage="Digite a data do pagamento" id="data-pagamento"
+								value="#{valeBean.vale.dataPagamento}" pattern="dd/MM/yyyy" />
+
+							<h:panelGroup>
+								<p:outputLabel value="Forma de Pagamento: "
+									styleClass="my-label" style="vertical-align: text-top;"
+									for="op" />
+							</h:panelGroup>
+
+							<p:selectOneMenu value="#{valeBean.vale.opcoesPagamento}" id="op"
+								required="true" requiredMessage="Selecione a opção de pagamento">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{valeBean.opcoesPagamento}" var="opc"
+									itemLabel="#{opc.descricao}" itemValue="#{opc}" />
+							</p:selectOneMenu>
+						</h:panelGrid>
+						<p:separator />
+						<h:panelGrid columns="3">
+							<p:commandButton value="Realizar Pagamento" icon="fa fa-floppy-o"
+								action="#{valeBean.updatePagamento}" update=":frm:table-vale"
+								oncomplete="PF('pagamento').hide()"
+								rendered="#{valeBean.vale.id != null}" />
+
+							<p:spacer width="20" height="0" />
+						</h:panelGrid>
+					</div>
+				</p:dialog>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

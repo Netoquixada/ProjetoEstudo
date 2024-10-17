@@ -1,0 +1,171 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="money.png" width="60"
+						style="float: left" />
+				</div>
+
+				<h1>Lista de Vendas</h1>
+				<h3>Listagem de vendas cadastradas no sistema.</h3>
+
+				<div class="links-funcionais">
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+			<t:saveState value="#{vendasBean.vendas}" />
+			<t:saveState value="#{vendasBean.lazy}" />
+
+			<h:form id="frm">
+				<p:messages autoUpdate="true" closable="true" />
+				<div align="center">
+					<p:panel header="Painel de Pesquisa"
+						style="margin-top: 15px; width: 75% !important">
+						<h:panelGrid columns="9" cellpadding="3">
+							<h:panelGroup>
+								<p:outputLabel value="De: " styleClass="my-label" />
+								<br />
+								<p:calendar size="10" navigator="true"
+									value="#{vendasBean.vendasFilter.dataVendaInicio}"
+									pattern="dd/MM/yyyy" />
+							</h:panelGroup>
+							<h:panelGroup>
+								<p:outputLabel value="Até: " styleClass="my-label" />
+								<br />
+								<p:calendar size="10" navigator="true"
+									value="#{vendasBean.vendasFilter.dataVendaFim}"
+									pattern="dd/MM/yyyy" />
+							</h:panelGroup>
+							<h:panelGroup>
+								<br />
+								<p:commandButton value="Pesquisar"
+									style="margin-left: 5px; width: 100px !important"
+									update="grid-dash grid-dash-total" action="#{vendasBean.listDashboard()}" />
+							</h:panelGroup>
+						</h:panelGrid>
+					</p:panel>
+
+					<br />
+
+					<h:panelGrid columns="2" style="width: 75%" id="grid-dash">
+						<h:panelGroup>
+							<div class="panel-total-projeto shadow-effect">
+								<div class="panel-icon" style="background-color: #283593;">
+									<div class="marginTop10"></div>
+									<i class="material-icons md-48 md-light">account_balance</i>
+								</div>
+
+								<div class="panel-infor" style="background-color: #3f51b5;">
+									<div class="marginTop10"></div>
+									<div style="font-size: 12px" class="Fs16">Depósito/Transferencia</div>
+									<div style="font-size: 22px" class="animated pulse infinite">
+										<p:outputLabel value="#{vendasBean.vendasTotais.bancoValor}">
+											<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+												minFractionDigits="2" type="currency" />
+										</p:outputLabel>
+									</div>
+								</div>
+							</div>
+						</h:panelGroup>
+						<h:panelGroup>
+							<div class="panel-total-projeto shadow-effect">
+								<div class="panel-icon" style="background-color: #283593;">
+									<div class="marginTop10"></div>
+									<i class="material-icons md-48 md-light">credit_card</i>
+								</div>
+
+								<div class="panel-infor" style="background-color: #3f51b5;">
+									<div class="marginTop10"></div>
+									<div style="font-size: 12px" class="Fs16">Cartão Débito</div>
+									<div style="font-size: 22px" class="animated pulse infinite">
+										<p:outputLabel
+											value="#{vendasBean.vendasTotais.cartoesDebito}">
+											<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+												minFractionDigits="2" type="currency" />
+										</p:outputLabel>
+									</div>
+								</div>
+							</div>
+						</h:panelGroup>
+						<h:panelGroup>
+							<div class="panel-total-projeto shadow-effect">
+								<div class="panel-icon" style="background-color: #d86b26;">
+									<div class="marginTop10"></div>
+									<i class="material-icons md-48 md-light">credit_card</i>
+								</div>
+
+								<div class="panel-infor" style="background-color: #ec9454;">
+									<div class="marginTop10"></div>
+									<div style="font-size: 12px" class="Fs16">Cartão Crédito</div>
+									<div style="font-size: 22px" class="animated pulse infinite">
+										<p:outputLabel
+											value="#{vendasBean.vendasTotais.cartoesCredito}">
+											<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+												minFractionDigits="2" type="currency" />
+										</p:outputLabel>
+									</div>
+								</div>
+							</div>
+						</h:panelGroup>
+						<h:panelGroup>
+							<div class="panel-total-projeto shadow-effect">
+								<div class="panel-icon" style="background-color: #757B7E;">
+									<div class="marginTop10"></div>
+									<i class="material-icons md-48 md-light">attach_money</i>
+								</div>
+
+								<div class="panel-infor" style="background-color: #8094A1;">
+									<div class="marginTop10"></div>
+									<div style="font-size: 12px" class="Fs16">Dinheiro</div>
+									<div style="font-size: 22px" class="animated pulse infinite">
+										<p:outputLabel
+											value="#{vendasBean.vendasTotais.dinheiro  - vendasBean.vendasTotais.troco}">
+											<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+												minFractionDigits="2" type="currency" />
+										</p:outputLabel>
+									</div>
+								</div>
+							</div>
+						</h:panelGroup>
+					</h:panelGrid>
+					<h:panelGrid columns="1" style="width: 60%" id="grid-dash-total">
+						<h:panelGroup style="width: 100%">
+							<div class="panel-total-projeto shadow-effect">
+								<div class="panel-icon" style="background-color: #2E7D32;">
+									<div class="marginTop10"></div>
+									<i class="material-icons md-48 md-light">check_circle</i>
+								</div>
+
+								<div class="panel-infor" style="background-color: #4CAF50;">
+									<div class="marginTop10"></div>
+									<div style="font-size: 12px" class="Fs16">TOTAL</div>
+									<div style="font-size: 22px" class="animated pulse infinite">
+										<p:outputLabel
+											value="#{vendasBean.vendasTotais.total - vendasBean.vendasTotais.troco}">
+											<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+												minFractionDigits="2" type="currency" />
+										</p:outputLabel>
+									</div>
+								</div>
+							</div>
+						</h:panelGroup>
+					</h:panelGrid>
+				</div>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

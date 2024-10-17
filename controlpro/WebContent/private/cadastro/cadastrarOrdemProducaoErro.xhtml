@@ -1,0 +1,485 @@
+
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:t="http://myfaces.apache.org/tomahawk"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="producao.png" width="60px"
+						style="float: left" />
+				</div>
+
+				<h1>#{ordemProducaoBean.ordemProducao.id == null ? 'Cadastrar
+					Ordem de Produção' : 'Atualizar Ordem de Produção'}</h1>
+				<h3>#{ordemProducaoBean.ordemProducao.id == null ? 'Preencha o
+					formulário abaixo para cadastrar uma nova Ordem de Produção.' :
+					'Preencha o formulário abaixo para atualizar a Ordem de Produção.'}</h3>
+
+				<div class="links-funcionais">
+					<p:link id="lista" styleClass="link-funcional"
+						style="margin-top: 3px"
+						outcome="/private/lista/listarOrdemProducao.xhtml">
+						<i class="material-icons md-32">list</i>
+						<br />
+					</p:link>
+					<p:tooltip for="lista" position="top"
+						value="Listar Ordens de Produção" />
+
+					<p:link styleClass="link-funcional" outcome="/private/index.xhtml"
+						id="inicio">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+			<p:panel style="margin-top: 15px" styleClass="my-panel">
+				<p:outputLabel value="(" />
+				<p:outputLabel value="*" styleClass="campoObrigatorio" />
+				<p:outputLabel value=") Campos obrigatórios." />
+			</p:panel>
+
+			<h:form id="frm">
+				<div class="ui-fluid">
+					<p:messages id="messages" showDetail="true" autoUpdate="false" closable="true" />
+					<p:panelGrid columns="2" style="margin-top: 20px" layout="grid"
+						columnClasses="ui-grid-col-2" styleClass="ui-panelgrid-blank">
+
+						<h:panelGroup>
+							<p:outputLabel value="Facção: " styleClass="my-label"
+								style="vertical-align: text-top;" for="faccao" />
+						</h:panelGroup>
+						<p:autoComplete value="#{ordemProducaoBean.ordemProducao.faccao}"
+							autocomplete="true" id="faccao"
+							completeMethod="#{faccaoBean.getFaccaoAutoComplete}"
+							forceSelection="true" minQueryLength="1" maxResults="30"
+							dropdown="true" required="true"
+							requiredMessage="Campo 'Facção' é obrigatório!"
+							converterMessage="Não foi possível selecionar a facção(Erro ao converter o objeto)"
+							converter="genericConverter" var="faccao"
+							itemLabel="#{faccao.nome}" itemValue="#{faccao}"
+							placeholder="Pesquise pelo nome da facção">
+						</p:autoComplete>
+						<h:panelGroup>
+							<p:outputLabel value="Coleção: " styleClass="my-label"
+								style="vertical-align: text-top;" for="colecao" />
+						</h:panelGroup>
+						<p:selectOneMenu converter="genericConverter"
+							value="#{ordemProducaoBean.ordemProducao.colecao}" id="colecao">
+							<f:selectItem itemLabel="Selecione" />
+							<f:selectItems value="#{colecaoBean.colecaos}" var="c"
+								itemLabel="#{c.nome}" itemValue="#{c}" />
+						</p:selectOneMenu>
+						<h:panelGroup>
+							<p:outputLabel value="Loja: " styleClass="my-label"
+								style="vertical-align: text-top;" for="loja" />
+						</h:panelGroup>
+						<p:selectOneMenu required="true"
+							requiredMessage="Selecione a loja" id="loja"
+							value="#{ordemProducaoBean.ordemProducao.loja}">
+							<f:selectItem itemLabel="Selecione" />
+							<f:selectItems value="#{ordemProducaoBean.lojas}"
+								var="loja" itemLabel="#{loja.descricao}" itemValue="#{loja}" />
+						</p:selectOneMenu>
+						<h:panelGroup>
+							<p:outputLabel value="Tipo de Serviço: " styleClass="my-label"
+								style="vertical-align: text-top;" for="tipoCostura" />
+						</h:panelGroup>
+						<p:selectOneMenu required="true"
+							requiredMessage="Selecione o tipo de costura" id="tipoCostura"
+							value="#{ordemProducaoBean.ordemProducao.tipoCostura}">
+							<f:selectItem itemLabel="Selecione" />
+							<f:selectItems value="#{ordemProducaoBean.tiposCostura}"
+								var="tipo" itemLabel="#{tipo.descricao}" itemValue="#{tipo}" />
+						</p:selectOneMenu>
+						<h:panelGroup>
+							<p:outputLabel value="Prévisão de término: "
+								styleClass="my-label" for="previsao" />
+						</h:panelGroup>
+						<p:inputMask mask="99/99/9999" id="previsao" required="true"
+							label="Prévisão"
+							requiredMessage="Prévisão de término obrigatório"
+							value="#{ordemProducaoBean.ordemProducao.previsaoTermino}">
+
+							<p:ajax update="dias" event="blur"
+								listener="#{ordemProducaoBean.atualizarQtdDias()}" />
+						</p:inputMask>
+
+						<h:panelGroup>
+							<p:outputLabel value="Duração(Dias): " styleClass="my-label" />
+						</h:panelGroup>
+						<p:outputLabel id="dias"
+							value="#{ordemProducaoBean.ordemProducao.qtdDias}"
+							styleClass="negrito tam-18" />
+
+						<h:panelGroup>
+							<p:outputLabel value="Observação: " styleClass="my-label"
+								for="observacao" />
+						</h:panelGroup>
+						<p:inputTextarea id="observacao" rows="6" cols="60"
+							label="Observação"
+							value="#{ordemProducaoBean.ordemProducao.observacao}" />
+					</p:panelGrid>
+					<h:panelGrid>
+						<br />
+						<p:commandButton value="Adicionar item na ordem de produção"
+							oncomplete="PF('dados').show()" styleClass="button-add"
+							action="#{ordemProducaoBean.clearItemProducao()}" process="@this"
+							update=":form-cadastro:dados" icon="fa fa-plus">
+						</p:commandButton>
+						<br />
+
+						<p:dataTable id="tableItemProducao" var="item"
+							value="#{ordemProducaoBean.itemProducaoList}"
+							emptyMessage="Nenhuma atividade foi adicionada">
+
+
+							<p:column headerText="Produto">
+								<p:outputLabel value="#{item.produto.nome}" />
+							</p:column>
+							<p:column headerText="Referência" width="90">
+								<p:outputLabel value="#{item.produto.id}" />
+							</p:column>
+							<p:column headerText="Quantidade" width="90">
+								<p:outputLabel value="#{item.quantidade}" />
+							</p:column>
+							<p:column headerText="Prontas" width="90">
+								<p:outputLabel value="#{item.prontas}"
+									styleClass="Green Center negrito" />
+							</p:column>
+							<p:column headerText="Falta" width="90">
+								<p:outputLabel value="#{item.faltaAux}"
+									styleClass="Red Center negrito" />
+							</p:column>
+
+							<p:column headerText="Valor" width="90">
+								<p:outputLabel value="#{item.valor}">
+									<f:convertNumber minFractionDigits="2" type="currency"
+										maxFractionDigits="2" />
+								</p:outputLabel>
+							</p:column>
+
+							<p:column headerText="Ações" width="80">
+								<div align="center">
+									<h:panelGroup>
+										<p:commandLink oncomplete="PF('dados').show()"
+											id="edititemprod" update=":form-cadastro:dados"
+											process="@this">
+											<i class="material-icons GrayDark">mode_edit</i>
+											<f:setPropertyActionListener
+												target="#{ordemProducaoBean.itemProducao}" value="#{item}" />
+										</p:commandLink>
+										<p:tooltip for="edititemprod"
+											value="Clique para editar o item na ordem de corte" />
+									</h:panelGroup>
+									<h:panelGroup>
+										<p:commandLink id="removeitem"
+											action="#{ordemProducaoBean.removerItemProducao()}"
+											update="tableItemProducao" process="@this">
+											<i class="material-icons GrayDark">delete_forever</i>
+											<f:setPropertyActionListener
+												target="#{ordemProducaoBean.itemProducao}" value="#{item}"></f:setPropertyActionListener>
+										</p:commandLink>
+										<p:tooltip for="removeitem"
+											value="Clique para excluir o item da ordem de corte" />
+									</h:panelGroup>
+								</div>
+							</p:column>
+
+						</p:dataTable>
+					</h:panelGrid>
+
+					<h:panelGrid>
+						<br />
+						<p:commandButton
+							rendered="#{ordemProducaoBean.ordemProducao.id == null}"
+							value="Adicionar item de aviamento na ordem de produção"
+							oncomplete="PF('dados-aviamento').show()" styleClass="button-add"
+							action="#{ordemProducaoBean.clearItemAviamento()}"
+							process="@this" update=":form-cadastro-aviamento:dados-aviamento"
+							icon="fa fa-plus">
+						</p:commandButton>
+						<br />
+
+						<p:dataTable id="tableItemAviamento" var="aviamento"
+							value="#{ordemProducaoBean.itemAviamentoList}"
+							emptyMessage="Nenhuma atividade foi adicionada">
+
+							<p:column headerText="Matéria Prima">
+								<p:outputLabel value="#{aviamento.materiaPrima.nome}" />
+							</p:column>
+
+							<p:column headerText="Unidade de Medida">
+								<p:outputLabel value="#{aviamento.materiaPrima.unidadeMedida}" />
+							</p:column>
+
+							<p:column headerText="Quantidade">
+								<p:outputLabel value="#{aviamento.quantidade}" />
+							</p:column>
+
+							<p:column headerText="Total" width="90" styleClass="Center">
+								<p:outputLabel value="#{aviamento.total}"
+									styleClass="label-laranja"
+									title="Multiplicação da quantidade do item de aviamento pela quantidade de itens da ordem de produção." />
+							</p:column>
+
+							<p:column headerText="Ações" width="80">
+								<div align="center">
+									<h:panelGroup
+										rendered="#{ordemProducaoBean.ordemProducao.id == null}">
+										<p:commandLink oncomplete="PF('dados-aviamento').show()"
+											id="editItemAviamento"
+											update=":form-cadastro-aviamento:dados-aviamento"
+											process="@this">
+											<i class="material-icons GrayDark">mode_edit</i>
+											<f:setPropertyActionListener
+												target="#{ordemProducaoBean.itemAviamentoProducao}"
+												value="#{aviamento}" />
+										</p:commandLink>
+										<p:tooltip for="editItemAviamento"
+											value="Clique para editar item de aviamento" />
+									</h:panelGroup>
+									<h:panelGroup>
+										<p:commandLink id="removeAviamento"
+											action="#{ordemProducaoBean.removerItemAviamento()}"
+											update="tableItemAviamento" process="@this">
+											<i class="material-icons GrayDark">delete_forever</i>
+											<f:setPropertyActionListener
+												target="#{ordemProducaoBean.itemAviamentoProducao}"
+												value="#{aviamento}"></f:setPropertyActionListener>
+										</p:commandLink>
+										<p:tooltip for="removeAviamento"
+											value="Clique para excluir o item de aviamento" />
+									</h:panelGroup>
+								</div>
+							</p:column>
+
+						</p:dataTable>
+					</h:panelGrid>
+
+					<br /> <br />
+					<p:separator />
+					<h:panelGrid columns="3">
+						<p:commandButton value="Salvar" icon="fa fa-floppy-o"
+							action="#{ordemProducaoBean.save}" update="frm messages"
+							rendered="#{ordemProducaoBean.ordemProducao.id == null}" />
+
+						<p:commandButton value="Atualizar" icon="fa fa-floppy-o"
+							action="#{ordemProducaoBean.update}" update="messages"
+							rendered="#{ordemProducaoBean.ordemProducao.id != null}" />
+
+						<p:spacer width="20" height="0" />
+
+						<p:commandButton value="Cancelar" action="/private/index.xhtml"
+							immediate="true"
+							rendered="#{ordemProducaoBean.ordemProducao.id == null}"
+							icon="fa fa-ban" ajax="false" />
+
+						<p:commandButton value="Cancelar"
+							action="#{ordemProducaoBean.goToList()}" immediate="true"
+							rendered="#{ordemProducaoBean.ordemProducao.id != null}"
+							icon="fa fa-ban" ajax="false" />
+					</h:panelGrid>
+				</div>
+			</h:form>
+
+			<h:form id="form-cadastro">
+				<p:dialog modal="true" id="dados" widgetVar="dados"
+					resizable="false" width="60%">
+
+					<f:facet name="header">
+						#{ordemProducaoBean.itemProducao.produto.nome == null ? 'Adicionar item' :
+						'Atualizar item'}
+						</f:facet>
+
+					<div class="scroll-dialog">
+						<p:messages showDetail="true" autoUpdate="true" closable="true" />
+
+						<h:panelGrid columns="2" style="margin-top: 20px; width:100%;"
+							id="grid-cadastro" cellpadding="05px">
+							<h:panelGrid cellpadding="02px">
+								<p:outputLabel value="Produto: " styleClass="my-label"
+									style="vertical-align: text-top;" for="produto" />
+								<p:autoComplete
+									value="#{ordemProducaoBean.itemProducao.produto}"
+									autocomplete="true" size="36" id="produto"
+									completeMethod="#{produtoBean.getProdutoAutoCompletePorProduto}"
+									forceSelection="true" minQueryLength="1" maxResults="30"
+									dropdown="true"
+									converterMessage="Não foi possível selecionar o produto (Erro ao converter o objeto)"
+									converter="produtoConverter" var="prod"
+									itemLabel="#{prod.nome}" itemValue="#{prod}"
+									placeholder="Pesquise pelo código">
+									<p:ajax update="painel-qtd"
+										listener="#{ordemProducaoBean.updateQuantidades()}"
+										event="blur" />
+								</p:autoComplete>
+							</h:panelGrid>
+
+							<p:panel header="Quantidades" id="painel-qtd">
+
+								<!-- 								<f:facet name="actions"> -->
+								<!-- 									<p:commandLink update="painel-qtd" action="#{ordemProducaoBean.updateQuantidades()}" -->
+								<!-- 										ajax="false" styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"> -->
+								<!-- 										<h:outputText styleClass="ui-icon ui-icon-refresh" /> -->
+
+								<!-- 									</p:commandLink> -->
+								<!-- 								</f:facet> -->
+								<h:panelGroup>
+									<p:outputLabel value="Cortadas: " styleClass="my-label Blue"
+										style="vertical-align: text-top;" for="produto" />
+								</h:panelGroup>
+								<h:outputLabel id="qtd-cortadas" styleClass="my-label Blue "
+									value="#{ordemProducaoBean.cortadas}" />
+								<br />
+								<h:panelGroup>
+									<p:outputLabel value="Enviadas: " styleClass="my-label Green"
+										style="vertical-align: text-top;" for="produto" />
+								</h:panelGroup>
+								<h:outputLabel id="qtd-envio" styleClass="my-label Green"
+									value="#{ordemProducaoBean.enviadas}" />
+								<br />
+								<h:panelGroup>
+									<p:outputLabel value="Recebidas: " styleClass="my-label"
+										style="vertical-align: text-top;" for="produto" />
+								</h:panelGroup>
+								<h:outputLabel id="qtd-rec"
+									value="#{ordemProducaoBean.recebidas}" />
+								<br />
+								<p:separator />
+								<h:panelGroup>
+									<p:outputLabel value="Aguardando envio: " styleClass="my-label"
+										style="vertical-align: text-top;" for="produto" />
+								</h:panelGroup>
+								<h:outputLabel id="agua-envio"
+									value="#{ordemProducaoBean.aguardandoEnvio}" />
+								<br />
+								<h:panelGroup>
+									<p:outputLabel value="Aguardando recebimento: "
+										styleClass="my-label" style="vertical-align: text-top;"
+										for="produto" />
+								</h:panelGroup>
+								<h:outputLabel id="agua-rec"
+									value="#{ordemProducaoBean.aguardandoRec}" />
+								<!-- 								<p:commandButton value="Atualizar" -->
+								<!-- 									action="#{ordemProducaoBean.updateQuantidades()}" update="painel-qtd" /> -->
+							</p:panel>
+
+							<h:panelGrid cellpadding="02px">
+								<p:outputLabel value="Quantidade: " styleClass="my-label"
+									style="vertical-align: text-top;" for="qtd" />
+								<p:inputText id="qtd"
+									value="#{ordemProducaoBean.itemProducao.quantidade}"
+									required="true"
+									requiredMessage="Campo 'quantidade' é obrigatório!"
+									validatorMessage="O campo 'quantidade' deve receber apenas números">
+								</p:inputText>
+								<p:outputLabel value="Valor unitário: " styleClass="my-label"
+									style="vertical-align: text-top;" for="valor" />
+								<p:inputText id="valor"
+									value="#{ordemProducaoBean.itemProducao.valor}"
+									styleClass="moeda" maxlength="10">
+									<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+										minFractionDigits="2" type="number" />
+									<!-- 									<p:ajax update="valor-total" listener="#{ordemProducaoBean.calcValorTotal()}" event="keyup"/> -->
+								</p:inputText>
+								<!-- 								<p:outputLabel value="Valor total: " styleClass="my-label" -->
+								<!-- 									style="vertical-align: text-top;" /> -->
+								<!-- 								<p:outputLabel id="valor-total" -->
+								<!-- 									value="#{ordemProducaoBean.itemProducao.valorTotal}"> -->
+								<!-- 									<f:convertNumber minFractionDigits="2" type="currency" -->
+								<!-- 										maxFractionDigits="2" /> -->
+								<!-- 								</p:outputLabel> -->
+							</h:panelGrid>
+						</h:panelGrid>
+						<p:separator />
+						<h:panelGrid columns="3">
+							<p:commandButton value="Adicionar"
+								update=":frm:tableItemProducao grid-cadastro"
+								action="#{ordemProducaoBean.addItemProducao()}"
+								icon="fa fa-plus"
+								rendered="#{ordemProducaoBean.itemProducao.produto.nome == null}" />
+
+							<p:commandButton value="Atualizar" styleClass="btn-green"
+								oncomplete="PF('dados').hide()" icon="fa fa-refresh"
+								update=":frm:tableItemProducao"
+								action="#{ordemProducaoBean.updateItemProducao()}"
+								rendered="#{ordemProducaoBean.itemProducao.produto.nome != null}" />
+
+							<p:commandButton value="Cancelar" styleClass="btn-orange"
+								icon="fa fa-close" process="@this"
+								oncomplete="PF('dados').hide()" immediate="true" />
+
+							<p:spacer width="20" height="0" />
+						</h:panelGrid>
+					</div>
+				</p:dialog>
+			</h:form>
+
+			<h:form id="form-cadastro-aviamento">
+				<p:dialog modal="true" id="dados-aviamento"
+					widgetVar="dados-aviamento" resizable="false">
+
+					<f:facet name="header">
+					#{ordemProducaoBean.itemAviamentoProducao.materiaPrima.nome == null ? 'Adicionar Aviamento' :
+					'Atualizar Aviamento'}
+					</f:facet>
+
+					<div class="ui-fluid">
+						<p:messages showDetail="true" autoUpdate="true" closable="true" />
+
+						<h:panelGrid columns="2" style="margin-top: 20px"
+							id="grid-cadastro-aviamento" cellpadding="05px">
+
+							<h:panelGroup>
+								<p:outputLabel value="Matéria Prima:" styleClass="my-label" />
+							</h:panelGroup>
+							<p:selectOneMenu id="materia"
+								value="#{ordemProducaoBean.itemAviamentoProducao.materiaPrima}"
+								required="true" requiredMessage="Materia Prima é obrigatório."
+								converter="genericConverter">
+								<f:selectItem itemLabel="-- Selecione --" />
+								<f:selectItems value="#{materiaPrimaBean.materias}" var="mat"
+									itemLabel="#{mat.nome}" itemValue="#{mat}" />
+							</p:selectOneMenu>
+
+							<h:panelGroup>
+								<p:outputLabel value="Quantidade: " styleClass="my-label" />
+							</h:panelGroup>
+							<p:inputText id="quantidade" required="true"
+								requiredMessage="true"
+								value="#{ordemProducaoBean.itemAviamentoProducao.quantidade}" />
+						</h:panelGrid>
+						<p:separator />
+						<h:panelGrid columns="3">
+							<p:commandButton value="Adicionar"
+								update=":frm:tableItemAviamento grid-cadastro-aviamento"
+								action="#{ordemProducaoBean.addItemAviamento()}"
+								icon="fa fa-plus"
+								rendered="#{ordemProducaoBean.itemAviamentoProducao.materiaPrima.nome == null}" />
+
+							<p:commandButton value="Atualizar"
+								oncomplete="PF('dados-aviamento').hide()" icon="fa fa-refresh"
+								update=":frm:tableItemAviamento"
+								action="#{ordemProducaoBean.updateItemAviamento()}"
+								rendered="#{ordemProducaoBean.itemAviamentoProducao.materiaPrima.nome != null}" />
+
+							<p:commandButton value="Cancelar" styleClass="btn-orange"
+								icon="fa fa-close" process="@this"
+								oncomplete="PF('dados-enfesto').hide()" immediate="true" />
+
+							<p:spacer width="20" height="0" />
+						</h:panelGrid>
+					</div>
+				</p:dialog>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

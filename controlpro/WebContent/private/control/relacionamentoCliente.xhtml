@@ -1,0 +1,133 @@
+<ui:composition template="/template/layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+
+	<ui:define name="conteudo">
+		<div class="Card ContainerIndent ShadowEffect Container">
+			<p:panel styleClass="panel-title">
+				<div class="image-title">
+					<h:graphicImage library="imagens" name="relacionamento-cliente.png"
+						width="60px" style="float: left" />
+				</div>
+
+				<h1>Listagem de cliente pra prospecção</h1>
+
+				<div class="links-funcionais">
+					<p:link id="inicio" styleClass="link-funcional"
+						outcome="/private/index.xhtml">
+						<i class="material-icons md-36">home</i>
+						<br />
+					</p:link>
+					<p:tooltip for="inicio" position="top" value="Página Inicial" />
+				</div>
+			</p:panel>
+
+
+			<h:form id="frm">
+				<p:messages id="msg" autoUpdate="true" closable="true" />
+
+				<p:panel style="margin-top: 15px">
+					<h:panelGrid columns="10">
+						<h:panelGroup>
+							<p:outputLabel value="Saldo maior que: " styleClass="my-label" />
+							<br />
+							<p:inputText styleClass="moeda" maxlength="10" required="true"
+								requiredMessage="Informe o valor do saldo"
+								value="#{relacionamentoClienteMB.relacionamentoCliente.saldo}">
+								<f:convertNumber locale="pt_BR" maxFractionDigits="2"
+									minFractionDigits="2" type="number" />
+							</p:inputText>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Ultima compra antes de: "
+								styleClass="my-label" />
+							<br />
+							<p:calendar required="true" pattern="dd/MM/yyyy" navigator="true"
+								requiredMessage="Informe a data da ultima compra"
+								value="#{relacionamentoClienteMB.relacionamentoCliente.ultimaCompra}" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:outputLabel value="Cidade: " styleClass="my-label" />
+							<br />
+							<p:selectOneMenu id="cidade" filter="true"
+								filterMatchMode="startsWith"
+								value="#{relacionamentoClienteMB.relacionamentoCliente.cidade}">
+								<f:selectItem itemLabel="Selecione" />
+								<f:selectItems value="#{relacionamentoClienteMB.cidades}"
+									var="cidade" itemLabel="#{cidade}"
+									itemValue="#{cidade}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup>
+							<br />
+							<p:commandButton value="Pesquisar"
+								style="margin-left: 5px; width: 100px !important"
+								update="table-clientes msg" icon="fa fa-search"
+								action="#{relacionamentoClienteMB.list()}" />
+						</h:panelGroup>
+						<h:panelGroup>
+							<br />
+							<p:commandButton id="report"
+								actionListener="#{relacionamentoClienteMB.gerarPDF}"
+								icon="fa fa-download" value="Gerar PDF"
+								onclick="this.form.target='_blank'" ajax="false">
+							</p:commandButton>
+						</h:panelGroup>
+					</h:panelGrid>
+				</p:panel>
+
+				<p:dataTable id="table-clientes" paginatorPosition="bottom"
+					value="#{relacionamentoClienteMB.relacionamentoClienteList}"
+					var="entity" paginator="true" style="margin-top: 15px"
+					paginatorAlwaysVisible="false" rows="20" lazy="true">
+
+
+					<p:column headerText="Cód." styleClass="Center" width="40">
+						<p:outputLabel value="#{entity.codigo}" />
+					</p:column>
+
+					<p:column headerText="Nome" width="250">
+						<p:outputLabel value="#{entity.nome}" />
+					</p:column>
+
+					<p:column headerText="Endereço" styleClass="Center">
+						<p:outputLabel
+							value="#{entity.endereco}, #{entity.bairro} - #{entity.cidade}" />
+					</p:column>
+
+					<p:column headerText="Telefone" styleClass="Center">
+						<p:outputLabel value="#{entity.telefone}" />
+					</p:column>
+					<!-- 					<p:column headerText="Valor" styleClass="Center" width="150"> -->
+					<!-- 						<p:outputLabel value="#{entity.valor}"> -->
+					<!-- 							<f:convertNumber minFractionDigits="2" type="currency" -->
+					<!-- 								maxFractionDigits="2" /> -->
+					<!-- 						</p:outputLabel> -->
+					<!-- 					</p:column> -->
+					<!-- 					<p:column headerText="Resgatado" styleClass="Center" width="150"> -->
+					<!-- 						<p:outputLabel value="#{entity.resgatado}"> -->
+					<!-- 							<f:convertNumber minFractionDigits="2" type="currency" -->
+					<!-- 								maxFractionDigits="2" /> -->
+					<!-- 						</p:outputLabel> -->
+					<!-- 					</p:column> -->
+					<p:column headerText="Ultima Compra" styleClass="Center"
+						width="100">
+						<p:outputLabel value="#{entity.ultimaCompra}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+					<p:column headerText="Saldo" styleClass="Center" width="150">
+						<p:outputLabel value="#{entity.saldo}" styleClass="label-azul">
+							<f:convertNumber minFractionDigits="2" type="currency"
+								maxFractionDigits="2" />
+						</p:outputLabel>
+					</p:column>
+				</p:dataTable>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>
